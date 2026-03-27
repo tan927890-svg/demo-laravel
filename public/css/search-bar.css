@@ -1,0 +1,177 @@
+/* ============================================================
+   CAR SEARCH BAR — Thêm vào cuối custom-override.css
+   ============================================================ */
+
+/* Ẩn 2 con xe decoration cũ */
+.welcome-block .objects-left,
+.welcome-block .objects-right { display: none !important; }
+
+/* ── SEARCH BAR WRAPPER ─────────────────────────────────── */
+.car-search-bar {
+   background: var(--co-black);
+   padding: 0 0 64px;
+   margin-top: -2px;
+}
+
+.car-search-bar .container { position: relative; }
+
+.search-wrap {
+   background: var(--co-dark2);
+   border: 1px solid rgba(255,255,255,0.07);
+   border-top: 3px solid var(--co-red);
+   box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+   overflow: hidden;
+}
+
+/* ── HEADER ROW ─────────────────────────────────────────── */
+.search-header {
+   background: var(--co-red);
+   padding: 14px 28px;
+   display: flex;
+   align-items: center;
+   gap: 10px;
+}
+.search-header i {
+   color: rgba(255,255,255,0.8);
+   font-size: 15px;
+}
+.search-header span {
+   font-family: var(--co-font-cond);
+   font-size: 12px;
+   font-weight: 700;
+   letter-spacing: 3px;
+   text-transform: uppercase;
+   color: var(--co-white);
+}
+
+/* ── FORM ───────────────────────────────────────────────── */
+.search-form { padding: 0; }
+
+.search-fields {
+   display: flex;
+   align-items: stretch;
+   min-height: 72px;
+}
+
+/* ── INDIVIDUAL FIELD ───────────────────────────────────── */
+.search-field {
+   flex: 1;
+   display: flex;
+   flex-direction: column;
+   justify-content: center;
+   padding: 14px 24px;
+   position: relative;
+   transition: background 0.2s;
+}
+.search-field:hover { background: rgba(255,255,255,0.03); }
+
+.search-field label {
+   font-family: var(--co-font-cond);
+   font-size: 10px;
+   font-weight: 700;
+   letter-spacing: 2.5px;
+   text-transform: uppercase;
+   color: var(--co-red);
+   margin-bottom: 6px;
+   display: flex;
+   align-items: center;
+   gap: 6px;
+   cursor: default;
+}
+.search-field label i { font-size: 10px; }
+
+.search-select {
+   background: transparent;
+   border: none;
+   outline: none;
+   color: var(--co-white);
+   font-family: var(--co-font-body);
+   font-size: 14px;
+   font-weight: 400;
+   cursor: pointer;
+   -webkit-appearance: none;
+   -moz-appearance: none;
+   appearance: none;
+   width: 100%;
+   padding-right: 20px;
+
+   /* Custom dropdown arrow */
+   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23C8102E'/%3E%3C/svg%3E");
+   background-repeat: no-repeat;
+   background-position: right 2px center;
+}
+.search-select option {
+   background: #1A1C24;
+   color: var(--co-white);
+}
+.search-select:focus { outline: none; }
+
+/* Placeholder option color */
+.search-select option[value=""] { color: rgba(255,255,255,0.4); }
+
+/* ── DIVIDER ────────────────────────────────────────────── */
+.search-divider {
+   width: 1px;
+   background: rgba(255,255,255,0.07);
+   align-self: stretch;
+   flex-shrink: 0;
+}
+
+/* ── SEARCH BUTTON ──────────────────────────────────────── */
+.search-btn {
+   background: var(--co-red);
+   border: none;
+   color: var(--co-white);
+   padding: 0 36px;
+   cursor: pointer;
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: center;
+   gap: 6px;
+   min-width: 120px;
+   flex-shrink: 0;
+   transition: background 0.2s, transform 0.15s;
+   position: relative;
+   overflow: hidden;
+}
+.search-btn::before {
+   content: '';
+   position: absolute;
+   inset: 0;
+   background: rgba(255,255,255,0.08);
+   transform: translateY(100%);
+   transition: transform 0.3s;
+}
+.search-btn:hover::before { transform: translateY(0); }
+.search-btn:hover { background: var(--co-red-dark); }
+.search-btn:active { transform: scale(0.98); }
+
+.search-btn i {
+   font-size: 20px;
+   color: var(--co-white);
+}
+.search-btn span {
+   font-family: var(--co-font-cond);
+   font-size: 11px;
+   font-weight: 700;
+   letter-spacing: 2px;
+   text-transform: uppercase;
+   color: var(--co-white);
+}
+
+/* ── RESPONSIVE ─────────────────────────────────────────── */
+@media (max-width: 1100px) {
+   .search-fields { flex-wrap: wrap; }
+   .search-field  { flex: 1 1 calc(50% - 1px); min-width: 200px; }
+   .search-divider { display: none; }
+   .search-field  { border-bottom: 1px solid rgba(255,255,255,0.07); }
+   .search-btn    { width: 100%; flex-direction: row; gap: 10px; padding: 18px 24px; border-top: 1px solid rgba(255,255,255,0.07); }
+}
+
+@media (max-width: 640px) {
+   .search-field  { flex: 1 1 100%; }
+   .search-header { padding: 12px 20px; }
+   .search-field  { padding: 12px 20px; }
+   .car-search-bar { padding-bottom: 40px; }
+}
