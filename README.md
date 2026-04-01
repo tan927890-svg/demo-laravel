@@ -58,74 +58,76 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
 
-## Model 
+## Model
+
 AutoViet — Web Bán Ô Tô Laravel
 Cấu trúc thư mục
 laravel-car/
 ├── app/
-│   ├── Models/
-│   │   ├── Car.php           ← Model xe
-│   │   └── Order.php         ← Model đơn đặt cọc
-│   └── Http/Controllers/
-│       ├── CarController.php         ← Controller public
-│       └── Admin/CarController.php  ← Controller admin
+│ ├── Models/
+│ │ ├── Car.php ← Model xe
+│ │ └── Order.php ← Model đơn đặt cọc
+│ └── Http/Controllers/
+│ ├── CarController.php ← Controller public
+│ └── Admin/CarController.php ← Controller admin
 ├── database/
-│   ├── migrations/           ← Tạo bảng cars, orders
-│   └── seeders/              ← Dữ liệu mẫu 8 xe
+│ ├── migrations/ ← Tạo bảng cars, orders
+│ └── seeders/ ← Dữ liệu mẫu 8 xe
 ├── resources/views/
-│   ├── layouts/app.blade.php ← Layout chính
-│   ├── cars/
-│   │   ├── index.blade.php   ← Danh sách + lọc xe
-│   │   ├── show.blade.php    ← Chi tiết xe
-│   │   └── order.blade.php   ← Form đặt cọc
-│   └── admin/
-│       └── dashboard.blade.php ← Dashboard admin
-└── routes/web.php            ← Tất cả routes
+│ ├── layouts/app.blade.php ← Layout chính
+│ ├── cars/
+│ │ ├── index.blade.php ← Danh sách + lọc xe
+│ │ ├── show.blade.php ← Chi tiết xe
+│ │ └── order.blade.php ← Form đặt cọc
+│ └── admin/
+│ └── dashboard.blade.php ← Dashboard admin
+└── routes/web.php ← Tất cả routes
 Cài đặt
+
 1. Tạo dự án Laravel mới
-bashcomposer create-project laravel/laravel autoviet
-cd autoviet
+   bashcomposer create-project laravel/laravel autoviet
+   cd autoviet
 2. Copy các file vào dự án
-Sao chép tất cả file trong thư mục này vào đúng vị trí trong dự án Laravel.
+   Sao chép tất cả file trong thư mục này vào đúng vị trí trong dự án Laravel.
 3. Cài Breeze (Auth)
-bashcomposer require laravel/breeze --dev
-php artisan breeze:install blade
-npm install && npm run build
+   bashcomposer require laravel/breeze --dev
+   php artisan breeze:install blade
+   npm install && npm run build
 4. Cấu hình .env
-envDB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=autoviet
-DB_USERNAME=root
-DB_PASSWORD=
+   envDB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=autoviet
+   DB_USERNAME=root
+   DB_PASSWORD=
 5. Thêm cột is_admin vào users
-Tạo migration:
-bashphp artisan make:migration add_is_admin_to_users_table
-Nội dung:
-php$table->boolean('is_admin')->default(false);
+   Tạo migration:
+   bashphp artisan make:migration add_is_admin_to_users_table
+   Nội dung:
+   php$table->boolean('is_admin')->default(false);
 6. Thêm middleware admin
-Tạo file app/Http/Middleware/AdminMiddleware.php:
-php<?php
-namespace App\Http\Middleware;
-use Closure;
-class AdminMiddleware {
-    public function handle($request, Closure $next) {
+   Tạo file app/Http/Middleware/AdminMiddleware.php:
+   php<?php
+   namespace App\Http\Middleware;
+   use Closure;
+   class AdminMiddleware {
+   public function handle($request, Closure $next) {
         if (!auth()->check() || !auth()->user()->is_admin) {
             abort(403);
         }
         return $next($request);
-    }
-}
-Đăng ký trong bootstrap/app.php:
-php->withMiddleware(function (Middleware $middleware) {
-    $middleware->alias(['admin' => \App\Http\Middleware\AdminMiddleware::class]);
-})
+   }
+   }
+   Đăng ký trong bootstrap/app.php:
+   php->withMiddleware(function (Middleware $middleware) {
+   $middleware->alias(['admin' => \App\Http\Middleware\AdminMiddleware::class]);
+   })
 7. Chạy migration + seeder
-bashphp artisan migrate --seed
-php artisan storage:link
+   bashphp artisan migrate --seed
+   php artisan storage:link
 8. Chạy server
-bashphp artisan serve
-Tài khoản mặc định
+   bashphp artisan serve
+   Tài khoản mặc định
 
 Admin: admin@autoviet.vn / password
 
@@ -138,3 +140,4 @@ Tính năng
 ✅ CRUD xe (thêm/sửa/xoá + upload ảnh)
 ✅ Quản lý đơn đặt cọc + cập nhật trạng thái
 ✅ Auto cập nhật trạng thái xe khi đơn thay đổi
+chay mingrad sẽ có csdl lai

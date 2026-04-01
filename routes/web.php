@@ -3,20 +3,45 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CarController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\Admin\CarController as AdminCarController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\NewsController;
+use App\Http\Controllers\NewsletterController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PasswordController;
 
 // Trang chủ
 Route::get('/', [CarController::class, 'home'])->name('home');
+
 // Về chúng tôi
 Route::get('/about', function () {
     return view('about');
 })->name('about');
+
+// Dịch vụ
+Route::get('/services', function () {
+    return view('services');
+})->name('services');
+
+// Liên hệ
+Route::get('/contact', [ContactController::class, 'index'])->name('contact');
+Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+
 // Dashboard
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/news', [NewsController::class, 'index'])->name('news.index');
+Route::get('/news/{slug}', [NewsController::class, 'show'])->name('news.show');
+Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
+
+// Laravel Auth routes (nếu chưa có)
+Route::post('/login',    [AuthController::class, 'login'])->name('login');
+Route::post('/register', [AuthController::class, 'register'])->name('register');
+Route::post('/logout',   [AuthController::class, 'logout'])->name('logout');
+Route::get('/password/reset', [PasswordController::class, 'request'])->name('password.request');
 
 // Cars - public
 Route::get('/cars', [CarController::class, 'index'])->name('cars.index');

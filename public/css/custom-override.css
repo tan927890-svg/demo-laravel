@@ -312,7 +312,7 @@ a:hover, a:focus { color: var(--co-red); }
 
 /* ── HEADER ─────────────────────────────────────────────── */
 #header.defualt {
-  background: rgba(10,10,10,0.92) !important;
+  background: rgba(16, 9, 9, 0.92) !important;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid rgba(255,255,255,0.07);
@@ -1062,3 +1062,27 @@ footer .copyright ul li a:hover { color: var(--co-white); }
   .section-title h2 { font-size: 34px; }
   .play-video .play-video-bg h3 { font-size: 30px; }
 }
+/* Owl navigation buttons */
+.owl-prev,
+.owl-next {
+    position: absolute !important;
+    top: 40% !important;
+    transform: translateY(-50%) !important;
+    background: rgba(212, 43, 43, 0.85) !important;
+    color: #fff !important;
+    width: 44px !important;
+    height: 44px !important;
+    line-height: 44px !important;
+    text-align: center !important;
+    opacity: 1 !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    transition: background .2s !important;
+    z-index: 99 !important;
+}
+.owl-prev:hover,
+.owl-next:hover {
+    background: #b01e1e !important;
+}
+.owl-prev { left: 0 !important; }
+.owl-next { right: 0 !important; }
