@@ -11,6 +11,7 @@ use App\Http\Controllers\NewsController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PasswordController;
+use App\Http\Controllers\BaoGiaNhanhController;
 
 // Trang chủ
 Route::get('/', [CarController::class, 'home'])->name('home');
@@ -29,15 +30,19 @@ Route::get('/services', function () {
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
+// Báo giá nhanh
+Route::post('/bao-gia-nhanh', [BaoGiaNhanhController::class, 'store'])->name('bao-gia-nhanh.store');
+
 // Dashboard
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+
 Route::get('/news', [NewsController::class, 'index'])->name('news.index');
 Route::get('/news/{slug}', [NewsController::class, 'show'])->name('news.show');
 Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
 
-// Laravel Auth routes (nếu chưa có)
+// Laravel Auth routes
 Route::post('/login',    [AuthController::class, 'login'])->name('login');
 Route::post('/register', [AuthController::class, 'register'])->name('register');
 Route::post('/logout',   [AuthController::class, 'logout'])->name('logout');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\Brand;
 use App\Http\Controllers\Controller;
 use App\Models\Car;
 use Illuminate\Http\Request;
@@ -11,25 +12,25 @@ class CarController extends Controller
 {
     public function index()
     {
-        $cars = Car::latest()->paginate(15);
+        $cars = Car::with('brand')->latest()->paginate(15);
         return view('admin.cars.index', compact('cars'));
     }
 
     public function create()
     {
-        return view('admin.cars.create');
+        $brands = Brand::orderBy('name')->get();
+        return view('admin.cars.create', compact('brands'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
             'name'          => 'required|string|max:255',
-            'brand'         => 'required|string|max:100',
+            'brand_id'      => 'required|exists:brands,id',  // ← đổi từ brand sang brand_id
             'year'          => 'required|integer|min:2000|max:' . (date('Y') + 1),
             'price_per_day' => 'required|numeric|min:0',
             'description'   => 'nullable|string',
             'image'         => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-            'is_available'  => 'boolean',
         ]);
 
         if ($request->hasFile('image')) {
@@ -46,14 +47,15 @@ class CarController extends Controller
 
     public function edit(Car $car)
     {
-        return view('admin.cars.edit', compact('car'));
+        $brands = Brand::orderBy('name')->get();
+        return view('admin.cars.edit', compact('car', 'brands'));
     }
 
     public function update(Request $request, Car $car)
     {
         $validated = $request->validate([
             'name'          => 'required|string|max:255',
-            'brand'         => 'required|string|max:100',
+            'brand_id'      => 'required|exists:brands,id',  // ← đổi từ brand sang brand_id
             'year'          => 'required|integer|min:2000|max:' . (date('Y') + 1),
             'price_per_day' => 'required|numeric|min:0',
             'description'   => 'nullable|string',
@@ -81,4 +83,4 @@ class CarController extends Controller
         return redirect()->route('admin.cars.index')
             ->with('success', 'Đã xóa xe.');
     }
-}
+}   

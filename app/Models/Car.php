@@ -10,17 +10,39 @@ class Car extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'name', 'brand', 'model', 'year', 'price', 'color',
-        'mileage', 'fuel_type', 'transmission', 'condition',
-        'engine', 'seats', 'description', 'images', 'status', 'slug',
-    ];
+   protected $fillable = [
+    'name',
+    'brand',        // giữ lại cột cũ (string) — có thể dùng để migration data
+    'brand_id',     // cột mới — foreign key
+    'model',
+    'year',
+    'price',
+    'price_per_day',
+    'color',
+    'mileage',
+    'fuel_type',
+    'transmission',
+    'condition',
+    'engine',
+    'seats',
+    'description',
+    'images',
+    'image',
+    'status',
+    'is_available',
+    'slug',
+    'tagline',
+    'hero_image',
+];
 
+public function brand()
+{
+    return $this->belongsTo(\App\Models\Brand::class);
+}
     protected $casts = [
-        'images' => 'array',
-        'price'  => 'decimal:0',
-    ];
-
+    'price_per_day' => 'decimal:0',
+    'is_available' => 'boolean',
+];
     // Auto-generate slug khi tạo mới
     protected static function boot()
     {
@@ -35,6 +57,60 @@ class Car extends Model
     {
         return $this->hasMany(Order::class);
     }
+    
+    // ── Relationships mới cho trang detail ──────────────────────
+
+public function variants()
+{
+    return $this->hasMany(CarVariant::class)->orderBy('sort_order');
+}
+
+public function colors()
+{
+    return $this->hasMany(CarColor::class)->orderBy('sort_order');
+}
+
+public function defaultColor()
+{
+    return $this->hasOne(CarColor::class)->where('is_default', true);
+}
+
+public function specs()
+{
+    return $this->hasMany(CarSpec::class)
+                ->orderBy('category_order')
+                ->orderBy('sort_order');
+}
+
+public function features()
+{
+    return $this->hasMany(CarFeature::class)->orderBy('sort_order');
+}
+
+public function galleries()
+{
+    return $this->hasMany(CarGallery::class)->orderBy('sort_order');
+}
+
+public function images()
+{
+    return $this->hasMany(CarGallery::class)
+                ->where('type', 'image')
+                ->orderBy('sort_order');
+}
+
+public function videos()
+{
+    return $this->hasMany(CarGallery::class)
+                ->where('type', 'video')
+                ->orderBy('sort_order');
+}
+
+// Helper: specs nhóm theo category
+public function specsByCategory()
+{
+    return $this->specs->groupBy('category');
+}
 
     // Scopes
     public function scopeAvailable($query)

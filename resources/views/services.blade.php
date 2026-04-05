@@ -239,7 +239,12 @@
     <h1>Dịch <em>Vụ</em></h1>
     <p class="hero-sub">Mọi nhu cầu xe hơi — Một điểm đến duy nhất</p>
   </div>
-  <div class="breadcrumb"><a href="{{ url('/') }}">Home</a> &rsaquo; <span>Dịch Vụ</span></div>
+  <div class="breadcrumb">
+  <a href="{{ url('/') }}">Home</a> &rsaquo;
+  <a href="{{ url('/about') }}">About Us</a> &rsaquo;
+  <a href="{{ url('/cars') }}">Cars</a> &rsaquo;
+  <span>Dịch Vụ</span>
+</div>
 </section>
 
 {{-- INTRO --}}
