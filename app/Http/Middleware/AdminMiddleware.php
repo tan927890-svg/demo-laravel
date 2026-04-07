@@ -4,14 +4,18 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Auth;
 
 class AdminMiddleware
 {
-    public function handle(Request $request, Closure $next): Response
+    /**
+     * Handle an incoming request.
+     */
+    public function handle(Request $request, Closure $next)
     {
-        if (!auth()->check() || !auth()->user()->is_admin) {
-            abort(403, 'Bạn không có quyền truy cập trang này.');
+        // If user is not logged in or not an admin, redirect to home
+        if (!Auth::check() || !Auth::user()->is_admin) {
+            return redirect('/');
         }
 
         return $next($request);

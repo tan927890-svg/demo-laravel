@@ -93,4 +93,12 @@ if ($request->filled('status')) {
 
     return view('cars.show', compact('car', 'specsByCategory', 'relatedCars'));
 }
+public function costEstimate(Car $car) {
+    return view('cars.cost-estimate', compact('car'));
+}
+
+public function costEstimateGeneral() {
+    $cars = Car::with('variants')->where('status', 'available')->get();
+    return view('cars.cost-estimate', compact('cars'));
+}
 }

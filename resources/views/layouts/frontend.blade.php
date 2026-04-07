@@ -8,7 +8,7 @@
   <meta name="author" content="potenzaglobalsolutions.com" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <meta name="csrf-token" content="{{ csrf_token() }}">
-  <title>@yield('title', 'Concept Car Dealer')</title>
+  <title>@yield('title', 'AUTO X')</title>
 
   <link rel="shortcut icon" href="{{ asset('images/favicon.ico') }}" />
   <link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap.min.css') }}" />
@@ -43,6 +43,9 @@
     margin: 0;
   }
   main { margin-top: 90px; }
+
+  /* Anchor targets should avoid being hidden behind fixed header */
+  .anchor-target { scroll-margin-top: 120px; }
 
   /* ── Owl navigation ── */
   .owl-prev, .owl-next {
@@ -231,12 +234,7 @@
   .nb-cta:hover { opacity: 0.88; transform: translateY(-1px); }
 
   /* ── Car top scroll button ── */
-  .car-top {
-    position: fixed;
-    bottom: 50px; right: 20px;
-    z-index: 999; cursor: pointer;
-  }
-  .car-top span img { width: 60px; height: auto; display: block; }
+  /* removed sitewide car-top element (decorative scroll-to-top) */
 
   @media (max-width: 991px) {
     .nb-links { gap: 0; }
@@ -253,10 +251,24 @@
   }
 
   #loading { display: none !important; }
+  /* When on homepage we don't want the header fixed or to overlap the banner */
+  #header.home { position: static !important; top: auto !important; }
+  body.home-page main { margin-top: 0; }
+  /* Remove any gap between header and homepage banner */
+  body.home-page #header { margin-bottom: 0; padding-bottom: 0; }
+  body.home-page .navbar-pill { margin-bottom: 0; }
+  body.home-page .slider { margin-top: 0; padding-top: 0; }
+  /* Slightly lower the navbar so it visually sits on the banner */
+  body.home-page .navbar-pill { transform: translateY(14px); box-shadow: 0 10px 34px rgba(0,0,0,0.09); transition: transform .12s ease; }
+
+  @media (max-width: 991px) {
+    body.home-page .navbar-pill { transform: translateY(10px); }
+  }
 </style>
   @stack('styles')
+  @stack('styles')
 </head>
-<body>
+<body class="{{ request()->is('/') ? 'home-page' : '' }}">
 
 {{-- ── LOADING ── --}}
 <div id="loading">
@@ -266,7 +278,7 @@
 </div>
 
 {{-- ── HEADER / NAV ── --}}
-<header id="header" class="defualt">
+<header id="header" class="defualt {{ request()->is('/') ? 'home' : '' }}">
   <div class="menu">
     <nav id="menu" class="mega-menu">
       <section class="menu-list-items">
@@ -282,8 +294,8 @@
                     <img src="{{ asset('images/testimonial/logo.jpg') }}" alt="Logo">
                   </div>
                   <div class="nb-title">
-                    <strong>CONCEPT</strong>
-                    <span>Car Dealer</span>
+                    <strong>AUTO X</strong>
+                    <span>AuTo X</span>
                   </div>
                 </a>
 
@@ -295,7 +307,7 @@
 
                   {{-- Dropdown --}}
                   <li class="has-dropdown">
-                    <a href="#">Dịch vụ <i class="fa fa-angle-down"></i></a>
+                    <a href="{{ url('/services#tuvan') }}">Dịch vụ <i class="fa fa-angle-down"></i></a>
                     <ul class="dropdown">
                       <li><a href="{{ url('/services') }}">Tư vấn & Mua xe</a></li>
                       <li><a href="{{ url('/services#tai-chinh') }}">Tài chính & Vay</a></li>
@@ -306,6 +318,11 @@
                   </li>
 
                   <li><a href="{{ url('/news') }}">News</a></li>
+                  @auth
+                    @if(Auth::user()->is_admin)
+                      <li><a href="{{ route('admin.dashboard') }}">Admin</a></li>
+                    @endif
+                  @endauth
                 </ul>
 
                 {{-- CTA button --}}
@@ -406,7 +423,7 @@
       <div class="row">
         <div class="col-lg-6 col-md-6">
           <div class="text-left">
-            <p>©Copyright {{ date('Y') }} <a href="{{ url('/') }}">Concept Car Dealer</a></p>
+            <p>©Copyright {{ date('Y') }} <a href="{{ url('/') }}">AuToX</a></p>
           </div>
         </div>
         <div class="col-lg-6 col-md-6">
@@ -421,9 +438,7 @@
   </div>
 </footer>
 
-<div class="car-top">
-  <span><img src="{{ asset('images/car.png') }}" alt=""></span>
-</div>
+{{-- car-top removed sitewide --}}
 
 {{-- ── SCRIPTS ── --}}
 <script type="text/javascript" src="{{ asset('js/jquery.min.js') }}"></script>
@@ -447,35 +462,27 @@
 <script>
 $(document).ready(function() {
  function fixHeader() {
+    // If we're on the homepage, keep header static so it doesn't cover the banner
+    if ($('#header').hasClass('home')) {
+      $('#header').css({ 'position': 'static', 'top': 'auto', 'width': '100%' });
+      $('#header .container, #header .row, #header .col-lg-12').css({
+        'max-width': '100%', 'width': '100%', 'padding-left': '0', 'padding-right': '0', 'margin-left': '0', 'margin-right': '0'
+      });
+      $('.navbar-pill').css({ 'max-width': '780px', 'width': '100%', 'margin-left': 'auto', 'margin-right': 'auto', 'border-radius': '50px', 'display': 'flex' });
+      return;
+    }
+
+    // Default fixed header behavior for other pages
     $('#header, #header .menu, #header nav, #header section.menu-list-items, #header .menu-list-items').css({
-      'background': 'transparent',
-      'background-color': 'transparent',
-      'border-bottom': 'none',
-      'box-shadow': 'none',
-      'border': 'none',
-      'height': 'auto',
-      'top': '16px',
-      'width': '100%'
+      'position': 'fixed', 'background': 'transparent', 'background-color': 'transparent', 'border-bottom': 'none', 'box-shadow': 'none', 'border': 'none', 'height': 'auto', 'top': '16px', 'width': '100%'
     });
 
     /* Bỏ giới hạn container trong header */
     $('#header .container, #header .row, #header .col-lg-12').css({
-      'max-width': '100%',
-      'width': '100%',
-      'padding-left': '0',
-      'padding-right': '0',
-      'margin-left': '0',
-      'margin-right': '0'
+      'max-width': '100%', 'width': '100%', 'padding-left': '0', 'padding-right': '0', 'margin-left': '0', 'margin-right': '0'
     });
 
-    $('.navbar-pill').css({
-      'max-width': '780px',
-      'width': '100%',
-      'margin-left': 'auto',
-      'margin-right': 'auto',
-      'border-radius': '50px',
-      'display': 'flex'
-    });
+    $('.navbar-pill').css({ 'max-width': '780px', 'width': '100%', 'margin-left': 'auto', 'margin-right': 'auto', 'border-radius': '50px', 'display': 'flex' });
   }
 
   // Chạy ngay

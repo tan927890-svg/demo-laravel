@@ -1,6 +1,6 @@
 @extends('layouts.frontend')
 
-@section('title', 'Đặt xe — ' . $car->name . ' - Concept Car Dealer')
+@section('title', 'Đặt xe — ' . $car->name . ' - AUTO X')
 
 @push('styles')
 <style>

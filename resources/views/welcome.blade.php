@@ -4,7 +4,10 @@
 
 @push('styles')
 <style>
-   /* ── FEATURE BOX ICON IMAGE ── */
+/* ── GOOGLE FONTS ── */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+/* ── FEATURE BOX ── */
 .feature-box .icon {
     width: 80px;
     height: 80px;
@@ -12,81 +15,420 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid #c9a84c;
 }
-
 .feature-box .icon img {
     width: 100%;
     height: 100%;
-    object-fit: contain; /* giữ tỷ lệ ảnh */
+    object-fit: cover;
 }
-
-/* Đảm bảo các box đều nhau */
 .feature-box {
     padding: 30px 20px;
     min-height: 260px;
     border: 1px solid #eee;
     transition: 0.3s;
 }
-
 .feature-box:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 20px rgba(0,0,0,0.1);
 }
-
-/* Title đẹp hơn */
 .feature-box h6 {
     margin-top: 10px;
     font-weight: 700;
     letter-spacing: 1px;
 }
-
-/* Text gọn hơn */
 .feature-box p {
     font-size: 14px;
     line-height: 1.6;
 }
-   /* ── BOXSTER: căn giữa toàn màn hình ── */
-   .section-boxster {
-      background-size: cover;
-      background-position: center;
-      min-height: 400px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      position: relative;
-   }
-   .section-boxster::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: rgba(0,0,0,0.55);
-   }
-   .section-boxster .custom-block-1 {
-      position: relative;
-      z-index: 2;
-      width: 100%;
-   }
 
-   /* ── SOCIAL: hàng ngang, căn giữa ── */
-   .social ul {
-      display: flex !important;
-      flex-direction: row !important;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: center;
-      gap: 10px;
-      list-style: none !important;
-      padding: 0 !important;
-      margin: 0 !important;
-   }
-   .social ul li {
-      display: inline-block !important;
-      margin: 0 !important;
-   }
-   .social ul li::before {
-      display: none !important;
-   }
+/* ══════════════════════════════════════════
+   NEW SEARCH BAR — Luxury style
+   ══════════════════════════════════════════ */
+.luxury-search-section {
+    background: #f8f5ef;
+    padding: 0;
+}
+
+/* Thumbnail strip */
+.search-thumbnails {
+    display: flex;
+    gap: 0;
+    overflow: hidden;
+    height: 160px;
+}
+.search-thumbnails .thumb-item {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    transition: flex 0.4s ease;
+}
+.search-thumbnails .thumb-item:hover {
+    flex: 2;
+}
+.search-thumbnails .thumb-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+    filter: brightness(0.75);
+}
+.search-thumbnails .thumb-item:hover img {
+    transform: scale(1.05);
+    filter: brightness(0.9);
+}
+.search-thumbnails .thumb-item .thumb-label {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+.search-thumbnails .thumb-item:hover .thumb-label {
+    opacity: 1;
+}
+
+/* Search form container */
+.luxury-search-wrap {
+    background: #fff;
+    border-top: 3px solid #c9a84c;
+    padding: 28px 40px 32px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+}
+.luxury-search-title {
+    text-align: center;
+    margin-bottom: 22px;
+}
+.luxury-search-title p {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #c9a84c;
+    margin: 0 0 6px 0;
+}
+.luxury-search-title h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
+    letter-spacing: 1px;
+}
+.luxury-search-title .title-line {
+    width: 50px;
+    height: 2px;
+    background: #c9a84c;
+    margin: 10px auto 0;
+}
+
+/* Fields row */
+.luxury-search-fields {
+    display: flex;
+    align-items: flex-end;
+    gap: 0;
+    border: 1px solid #e5e0d8;
+}
+.lsf-group {
+    flex: 1;
+    padding: 12px 20px 14px;
+    border-right: 1px solid #e5e0d8;
+    position: relative;
+    background: #fff;
+    transition: background 0.2s;
+}
+.lsf-group:last-of-type {
+    border-right: none;
+}
+.lsf-group:hover {
+    background: #fdf9f2;
+}
+.lsf-group label {
+    display: block;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #c9a84c;
+    margin-bottom: 6px;
+}
+.lsf-group select,
+.lsf-group input[type="text"],
+.lsf-group input[type="number"] {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: #1a1a1a;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    padding: 0;
+}
+.lsf-group .select-arrow {
+    position: absolute;
+    right: 14px;
+    bottom: 18px;
+    pointer-events: none;
+    color: #c9a84c;
+    font-size: 10px;
+}
+
+/* Price inputs row */
+.lsf-price-inputs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+}
+.lsf-price-inputs input[type="number"] {
+    flex: 1;
+    border: 1px solid #e5e0d8 !important;
+    border-radius: 3px !important;
+    padding: 4px 8px !important;
+    font-size: 12px !important;
+    background: #fafafa !important;
+    appearance: auto !important;
+    -webkit-appearance: auto !important;
+}
+.lsf-price-inputs span {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    color: #999;
+}
+
+/* Search button */
+.luxury-search-btn {
+    background: #1a1a1a;
+    color: #c9a84c;
+    border: none;
+    padding: 0 36px;
+    height: 100%;
+    min-height: 68px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.3s, color 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    white-space: nowrap;
+    text-decoration: none;
+}
+.luxury-search-btn:hover {
+    background: #c9a84c;
+    color: #1a1a1a;
+}
+.luxury-search-btn i {
+    font-size: 18px;
+}
+
+/* ══════════════════════════════════════════
+   BMW M8 BANNER — Full background image
+   ══════════════════════════════════════════ */
+.section-boxster {
+    position: relative;
+    min-height: 460px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
+}
+.section-boxster::before {
+    display: none !important;
+}
+.section-boxster .banner-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    transition: transform 6s ease;
+}
+.section-boxster:hover .banner-bg {
+    transform: scale(1.04);
+}
+.section-boxster .banner-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        135deg,
+        rgba(0,0,0,0.72) 0%,
+        rgba(0,0,0,0.35) 50%,
+        rgba(0,0,0,0.55) 100%
+    );
+}
+.section-boxster .custom-block-1 {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    padding: 60px 20px;
+}
+.section-boxster .custom-block-1 h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 72px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    margin-bottom: 0;
+    line-height: 1;
+    text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+.section-boxster .custom-block-1 .banner-subtitle {
+    display: block;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: #c9a84c;
+    margin: 14px 0 20px;
+}
+.section-boxster .custom-block-1 .banner-price {
+    display: block;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 42px;
+    font-weight: 600;
+    color: #c9a84c;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+}
+.section-boxster .custom-block-1 .banner-note {
+    display: block;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    color: rgba(255,255,255,0.75);
+    margin-bottom: 6px;
+}
+.section-boxster .custom-block-1 .banner-offer {
+    display: inline-block;
+    background: rgba(201,168,76,0.15);
+    border: 1px solid rgba(201,168,76,0.4);
+    color: #c9a84c;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 6px 20px;
+    border-radius: 2px;
+    margin-bottom: 28px;
+}
+.section-boxster .custom-block-1 .button.red {
+    display: inline-block;
+    background: #c9a84c;
+    color: #1a1a1a;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 14px 40px;
+    border: none;
+    text-decoration: none;
+    transition: background 0.3s, color 0.3s, transform 0.2s;
+}
+.section-boxster .custom-block-1 .button.red:hover {
+    background: #fff;
+    color: #1a1a1a;
+    transform: translateY(-2px);
+}
+
+/* ── SOCIAL: hàng ngang ── */
+.social ul {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+.social ul li {
+    display: inline-block !important;
+    margin: 0 !important;
+}
+.social ul li::before {
+    display: none !important;
+}
+
+/* ── CAR CAROUSEL FIX ── */
+.owl-carousel-1 .car-item .car-image img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+/* ══════════════════════════════════════════
+   PLAY VIDEO — Compact with YouTube embed
+   ══════════════════════════════════════════ */
+.play-video-section {
+    background: #111;
+    padding: 40px 0;
+}
+.play-video-section .video-header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+.play-video-section .video-header h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 2px;
+    margin: 0 0 8px;
+}
+.play-video-section .video-header p {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #c9a84c;
+    margin: 0;
+}
+.video-embed-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding-bottom: 50.625%; /* 16:9 ratio for max-width 900 */
+    height: 0;
+    overflow: hidden;
+    border: 2px solid rgba(201,168,76,0.3);
+}
+.video-embed-wrap iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
 </style>
 @endpush
 
@@ -102,15 +444,15 @@
                   <div class="tp-caption tp-resizeme" id="slide-3-layer-1" data-x="62" data-y="179" data-width="['auto']" data-height="['auto']" data-type="text" data-responsive_offset="on" data-frames='[{"delay":500,"speed":1500,"frame":"0","from":"x:[-100%];z:0;rX:0deg;rY:0;rZ:0;sX:1;sY:1;skX:0;skY:0;","mask":"x:0px;y:0px;s:inherit;e:inherit;","to":"o:1;","ease":"Power3.easeInOut"},{"delay":"wait","speed":300,"frame":"999","to":"opacity:0;","ease":"nothing"}]' data-textAlign="['left','left','left','left']" data-paddingtop="[0,0,0,0]" data-paddingright="[0,0,0,0]" data-paddingbottom="[0,0,0,0]" data-paddingleft="[0,0,0,0]" style="z-index:5;white-space:nowrap;font-size:70px;line-height:80px;font-weight:900;color:rgba(255,255,255,1.00);font-family:Roboto;text-transform:uppercase">Are You Ready..
                      <br> For The Race
                   </div>
-                  <div class="tp-caption tp-resizeme" id="slide-3-layer-2" data-x="62" data-y="348" data-width="['657']" data-height="['auto']" data-type="text" data-responsive_offset="on" data-frames='[{"delay":1720,"speed":1070,"frame":"0","from":"x:[-100%];z:0;rX:0deg;rY:0;rZ:0;sX:1;sY:1;skX:0;skY:0;","mask":"x:0px;y:0px;s:inherit;e:inherit;","to":"o:1;","ease":"Power3.easeInOut"},{"delay":"wait","speed":300,"frame":"999","to":"opacity:0;","ease":"nothing"}]' data-textAlign="['left','left','left','left']" data-paddingtop="[0,0,0,0]" data-paddingright="[0,0,0,0]" data-paddingbottom="[0,0,0,0]" data-paddingleft="[0,0,0,0]" style="z-index:6;min-width:657px;max-width:657px;white-space:normal;font-size:14px;line-height:24px;font-weight:400;color:rgba(255,255,255,1.00);font-family:Open Sans">We are dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. </div>
-                  <div class="tp-caption button red" data-x="62" data-y="452" data-width="['auto']" data-height="['auto']" data-type="button" data-responsive_offset="on" data-frames='[{"delay":1720,"speed":2000,"frame":"0","from":"y:[100%];z:0;rX:0deg;rY:0;rZ:0;sX:1;sY:1;skX:0;skY:0;opacity:0;","mask":"x:0px;y:[100%];s:inherit;e:inherit;","to":"o:1;","ease":"Power2.easeInOut"},{"delay":"wait","speed":300,"frame":"999","to":"opacity:0;","ease":"nothing"},{"frame":"hover","speed":"300","ease":"Linear.easeNone","force":true,"to":"o:1;rX:0;rY:0;rZ:0;z:0;","style":"c:rgba(0, 0, 0, 1.00);bg:rgba(255, 255, 255, 1.00);bs:solid;bw:0 0 0 0;"}]' data-textAlign="['left','left','left','left']" data-paddingtop="[10,10,10,10]" data-paddingright="[30,30,30,30]" data-paddingbottom="[10,10,10,10]" data-paddingleft="[30,30,30,30]" style="z-index:7;white-space:nowrap;font-size:14px;line-height:16px;font-weight:400;font-family:Open Sans;outline:0;box-shadow:none;box-sizing:border-box;-moz-box-sizing:border-box;-webkit-box-sizing:border-box;cursor:pointer">Discover More </div>
+                  <div class="tp-caption tp-resizeme" id="slide-3-layer-2" data-x="62" data-y="348" data-width="['657']" data-height="['auto']" data-type="text" data-responsive_offset="on" data-frames='[{"delay":1720,"speed":1070,"frame":"0","from":"x:[-100%];z:0;rX:0deg;rY:0;rZ:0;sX:1;sY:1;skX:0;skY:0;","mask":"x:0px;y:0px;s:inherit;e:inherit;","to":"o:1;","ease":"Power3.easeInOut"},{"delay":"wait","speed":300,"frame":"999","to":"opacity:0;","ease":"nothing"}]' data-textAlign="['left','left','left','left']" data-paddingtop="[0,0,0,0]" data-paddingright="[0,0,0,0]" data-paddingbottom="[0,0,0,0]" data-paddingleft="[0,0,0,0]" style="z-index:6;min-width:657px;max-width:657px;white-space:normal;font-size:14px;line-height:24px;font-weight:400;color:rgba(255,255,255,1.00);font-family:Open Sans">We are dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</div>
+                  <div class="tp-caption button red" data-x="62" data-y="452" data-width="['auto']" data-height="['auto']" data-type="button" data-responsive_offset="on" data-frames='[{"delay":1720,"speed":2000,"frame":"0","from":"y:[100%];z:0;rX:0deg;rY:0;rZ:0;sX:1;sY:1;skX:0;skY:0;opacity:0;","mask":"x:0px;y:[100%];s:inherit;e:inherit;","to":"o:1;","ease":"Power2.easeInOut"},{"delay":"wait","speed":300,"frame":"999","to":"opacity:0;","ease":"nothing"},{"frame":"hover","speed":"300","ease":"Linear.easeNone","force":true,"to":"o:1;rX:0;rY:0;rZ:0;z:0;","style":"c:rgba(0, 0, 0, 1.00);bg:rgba(255, 255, 255, 1.00);bs:solid;bw:0 0 0 0;"}]' data-textAlign="['left','left','left','left']" data-paddingtop="[10,10,10,10]" data-paddingright="[30,30,30,30]" data-paddingbottom="[10,10,10,10]" data-paddingleft="[30,30,30,30]" style="z-index:7;white-space:nowrap;font-size:14px;line-height:16px;font-weight:400;font-family:Open Sans;outline:0;box-shadow:none;box-sizing:border-box;cursor:pointer">Discover More</div>
                </li>
                <li data-index="rs-5" data-transition="fade" data-slotamount="default" data-hideafterloop="0" data-hideslideonmobile="off" data-easein="default" data-easeout="default" data-masterspeed="default" data-rotate="0" data-saveperformance="off" data-title="Slide">
                   <img src="{{ asset('images/slider/back-road.jpg') }}" alt="" />
                   <div class="tp-caption tp-resizeme" id="slide-5-layer-6" data-x="center" data-y="270" data-width="['auto']" data-height="['auto']" data-transform_idle="o:1;" data-transform_in="y:[-100%];z:0;rZ:35deg;sX:1;sY:1;skX:0;skY:0;s:800;e:Power4.easeInOut;" data-transform_out="opacity:0;s:300;" data-mask_in="x:0px;y:0px;" data-start="1400" data-splitin="chars" data-splitout="none" data-responsive_offset="on" data-elementdelay="0.05" style="z-index:5;white-space:nowrap;font-size:30px;line-height:30px;font-weight:400;color:rgba(255,255,255,1.00);font-family:Roboto;text-align:center;text-transform:uppercase">Welcome to the most stunning</div>
-                  <div class="tp-caption tp-resizeme" id="slide-5-layer-7" data-x="center" data-y="center" data-voffset="-140" data-width="['auto']" data-height="['auto']" data-transform_idle="o:1;" data-transform_in="y:[-100%];z:0;rZ:35deg;sX:1;sY:1;skX:0;skY:0;s:800;e:Power4.easeInOut;" data-transform_out="opacity:0;s:300;" data-mask_in="x:0px;y:0px;s:inherit;e:inherit;" data-start="1700" data-splitin="chars" data-splitout="none" data-responsive_offset="on" data-elementdelay="0.05" style="z-index:6;white-space:nowrap;font-size:70px;line-height:70px;font-weight:700;color:rgba(255,255,255,1.00);font-family:Roboto;text-align:center;text-transform:uppercase">Concept Car dealer website</div>
-                  <div class="tp-caption button red tp-resizeme" id="slide-5-layer-10" data-x="center" data-y="bottom" data-voffset="130" data-width="['auto']" data-height="['auto']" data-transform_idle="o:1;" data-transform_hover="o:1;rX:0;rY:0;rZ:0;z:0;s:300;e:Power0.easeIn;" data-style_hover="c:rgba(0, 0, 0, 1.00);bg:rgba(255, 255, 255, 1.00);" data-transform_in="y:bottom;s:600;e:Power2.easeInOut;" data-transform_out="opacity:0;s:300;" data-start="3300" data-splitin="none" data-splitout="none" data-responsive_offset="on" style="z-index:7;white-space:nowrap;font-size:14px;line-height:18px;font-weight:400;color:rgba(255,255,255,1.00);font-family:Open Sans;text-align:center;text-transform:uppercase;background-color:rgba(219,45,46,1.00);padding:12px 20px 12px 20px;border-color:rgba(0,0,0,1.00);outline:0;box-shadow:none;box-sizing:border-box;-moz-box-sizing:border-box;-webkit-box-sizing:border-box;cursor:pointer">learn more</div>
-                  <div class="tp-caption tp-resizeme" id="slide-5-layer-12" data-x="right" data-hoffset="70" data-y="center" data-voffset="135" data-width="['none','none','none','none']" data-height="['none','none','none','none']" data-transform_idle="o:1;" data-transform_in="x:-50px;opacity:0;s:800;e:Power2.easeInOut;" data-transform_out="opacity:0;s:300;" data-start="620" data-responsive_offset="on" style="z-index:8"> <img src="{{ asset('images/slider/left-car.png') }}" alt="" /> </div>
+                  <div class="tp-caption tp-resizeme" id="slide-5-layer-7" data-x="center" data-y="center" data-voffset="-140" data-width="['auto']" data-height="['auto']" data-transform_idle="o:1;" data-transform_in="y:[-100%];z:0;rZ:35deg;sX:1;sY:1;skX:0;skY:0;s:800;e:Power4.easeInOut;" data-transform_out="opacity:0;s:300;" data-mask_in="x:0px;y:0px;s:inherit;e:inherit;" data-start="1700" data-splitin="chars" data-splitout="none" data-responsive_offset="on" data-elementdelay="0.05" style="z-index:6;white-space:nowrap;font-size:70px;line-height:70px;font-weight:700;color:rgba(255,255,255,1.00);font-family:Roboto;text-align:center;text-transform:uppercase">AUTO X Kính Chào Quý Khách</div>
+                  <div class="tp-caption button red tp-resizeme" id="slide-5-layer-10" data-x="center" data-y="bottom" data-voffset="130" data-width="['auto']" data-height="['auto']" data-transform_idle="o:1;" data-transform_hover="o:1;rX:0;rY:0;rZ:0;z:0;s:300;e:Power0.easeIn;" data-style_hover="c:rgba(0, 0, 0, 1.00);bg:rgba(255, 255, 255, 1.00);" data-transform_in="y:bottom;s:600;e:Power2.easeInOut;" data-transform_out="opacity:0;s:300;" data-start="3300" data-splitin="none" data-splitout="none" data-responsive_offset="on" style="z-index:7;white-space:nowrap;font-size:14px;line-height:18px;font-weight:400;color:rgba(255,255,255,1.00);font-family:Open Sans;text-align:center;text-transform:uppercase;background-color:rgba(219,45,46,1.00);padding:12px 20px;cursor:pointer">learn more</div>
+                  <div class="tp-caption tp-resizeme" id="slide-5-layer-12" data-x="right" data-hoffset="70" data-y="center" data-voffset="135" data-width="['none','none','none','none']" data-height="['none','none','none','none']" data-transform_idle="o:1;" data-transform_in="x:-50px;opacity:0;s:800;e:Power2.easeInOut;" data-transform_out="opacity:0;s:300;" data-start="620" data-responsive_offset="on" style="z-index:8"><img src="{{ asset('images/slider/left-car.png') }}" alt="" /></div>
                   <div class="tp-caption tp-resizeme" id="slide-5-layer-11" data-x="120" data-y="center" data-voffset="130" data-width="['none','none','none','none']" data-height="['none','none','none','none']" data-transform_idle="o:1;" data-transform_in="x:50px;opacity:0;s:800;e:Power2.easeInOut;" data-transform_out="opacity:0;s:300;" data-start="200" data-responsive_offset="on" style="z-index:9"><img src="{{ asset('images/slider/right-car.png') }}" alt="" /></div>
                </li>
             </ul>
@@ -119,86 +461,119 @@
       </div>
    </section>
 
-   {{-- ── WELCOME + SEARCH ── --}}
-   <section class="welcome-block objects-car page-section-ptb white-bg portfolio-main">
-      <div class="car-search-bar">
-         <div class="container">
-            <div class="search-wrap">
-               <div class="search-header">
-                  <i class="fa fa-search"></i>
-                  <span>Tìm kiếm xe của bạn</span>
-               </div>
-               <form class="search-form" action="#" method="GET">
-                  <div class="search-fields">
-                     <div class="search-field">
-                        <label><i class="fa fa-car"></i> Hãng xe</label>
-                        <select name="brand" class="search-select">
-                           <option value="">Tất cả hãng</option>
-                           <option value="toyota">Toyota</option>
-                           <option value="honda">Honda</option>
-                           <option value="ford">Ford</option>
-                           <option value="bmw">BMW</option>
-                           <option value="mercedes">Mercedes-Benz</option>
-                           <option value="audi">Audi</option>
-                           <option value="lexus">Lexus</option>
-                           <option value="hyundai">Hyundai</option>
-                           <option value="kia">Kia</option>
-                           <option value="mazda">Mazda</option>
-                           <option value="porsche">Porsche</option>
-                           <option value="acura">Acura</option>
-                        </select>
-                     </div>
-                     <div class="search-divider"></div>
-                     <div class="search-field">
-                        <label><i class="fa fa-tag"></i> Dòng xe</label>
-                        <select name="model" class="search-select">
-                           <option value="">Tất cả dòng</option>
-                           <option value="gs450h">Lexus GS 450h</option>
-                           <option value="rsx">Acura Rsx</option>
-                           <option value="santafe">Hyundai Santa Fe</option>
-                           <option value="boxster">Porsche Boxster</option>
-                           <option value="camry">Toyota Camry</option>
-                           <option value="civic">Honda Civic</option>
-                           <option value="mustang">Ford Mustang</option>
-                        </select>
-                     </div>
-                     <div class="search-divider"></div>
-                     <div class="search-field">
-                        <label><i class="fa fa-th-large"></i> Loại xe</label>
-                        <select name="type" class="search-select">
-                           <option value="">Tất cả loại</option>
-                           <option value="sedan">Sedan</option>
-                           <option value="suv">SUV / Crossover</option>
-                           <option value="coupe">Coupe</option>
-                           <option value="hatchback">Hatchback</option>
-                           <option value="pickup">Pickup Truck</option>
-                           <option value="convertible">Convertible</option>
-                           <option value="van">Van / Minivan</option>
-                        </select>
-                     </div>
-                     <div class="search-divider"></div>
-                     <div class="search-field">
-                        <label><i class="fa fa-dollar"></i> Khoảng giá</label>
-                        <select name="price" class="search-select">
-                           <option value="">Tất cả mức giá</option>
-                           <option value="0-10000">Dưới $10,000</option>
-                           <option value="10000-20000">$10,000 – $20,000</option>
-                           <option value="20000-35000">$20,000 – $35,000</option>
-                           <option value="35000-50000">$35,000 – $50,000</option>
-                           <option value="50000-80000">$50,000 – $80,000</option>
-                           <option value="80000+">Trên $80,000</option>
-                        </select>
-                     </div>
-                     <button type="submit" class="search-btn">
-                        <i class="fa fa-search"></i>
-                        <span>Tìm Xe</span>
-                     </button>
-                  </div>
-               </form>
-            </div>
+   {{-- ══════════════════════════════════════════
+        NEW SEARCH BAR — Luxury with thumbnails
+        ══════════════════════════════════════════ --}}
+   <section class="luxury-search-section">
+
+      {{-- Thumbnail strip --}}
+      <div class="search-thumbnails">
+         <div class="thumb-item">
+            <img src="{{ asset('images/Xe/Porsche/Porsche 911 đen.avif') }}" alt="Porsche 911" onerror="this.src='{{ asset('images/car/01.jpg') }}'">
+            <span class="thumb-label">Porsche 911</span>
+         </div>
+         <div class="thumb-item">
+            <img src="{{ asset('images/Xe/Lamborghini/Lamborghini Aventador do.avif') }}" alt="Lamborghini" onerror="this.src='{{ asset('images/car/01.jpg') }}'">
+            <span class="thumb-label">Lamborghini</span>
+         </div>
+         <div class="thumb-item">
+            <img src="{{ asset('images/Xe/Bugatti/Bugatti Chiron cam.avif') }}" alt="Bugatti Chiron" onerror="this.src='{{ asset('images/car/01.jpg') }}'">
+            <span class="thumb-label">Bugatti Chiron</span>
+         </div>
+         <div class="thumb-item">
+            <img src="{{ asset('images/Xe/BMW/BMW M4 đen.avif') }}" alt="BMW M4" onerror="this.src='{{ asset('images/car/01.jpg') }}'">
+            <span class="thumb-label">BMW M4</span>
+         </div>
+         <div class="thumb-item">
+            <img src="{{ asset('images/Xe/Audi/AudiR8.avif') }}" alt="Audi R8" onerror="this.src='{{ asset('images/car/01.jpg') }}'">
+            <span class="thumb-label">Audi R8</span>
          </div>
       </div>
 
+      {{-- Search form — action dẫn đến trang cars --}}
+      <div class="luxury-search-wrap">
+         <div class="luxury-search-title">
+            <p>AutoX Collection</p>
+            <h3>Bạn Đang Tìm Kiếm Xe Gì?</h3>
+            <div class="title-line"></div>
+         </div>
+
+         <form action="{{ route('cars.index') }}" method="GET" id="luxury-search-form">
+            <div class="luxury-search-fields">
+
+               {{-- Keyword --}}
+               <div class="lsf-group">
+                  <label>Tìm kiếm</label>
+                  <input type="text" name="q" placeholder="Nhập tên xe..." />
+               </div>
+
+               {{-- Brand --}}
+               <div class="lsf-group">
+                  <label>Hãng xe</label>
+                  <select name="brand" id="brand-select">
+                     <option value="">Tất cả hãng</option>
+                     <option value="audi">Audi</option>
+                     <option value="bmw">BMW</option>
+                     <option value="bugatti">Bugatti</option>
+                     <option value="lamborghini">Lamborghini</option>
+                     <option value="porsche">Porsche</option>
+                     <option value="vinfast">VinFast</option>
+                  </select>
+                  <span class="select-arrow">▾</span>
+               </div>
+
+               {{-- Model — filtered by brand --}}
+               <div class="lsf-group">
+                  <label>Dòng xe</label>
+                  <select name="model" id="model-select">
+                     <option value="">Tất cả dòng</option>
+                     {{-- Audi --}}
+                     <option value="tt-rs" data-brand="audi">Audi TT RS</option>
+                     <option value="r8"    data-brand="audi">Audi R8</option>
+                     {{-- BMW --}}
+                     <option value="m4"   data-brand="bmw">BMW M4</option>
+                     <option value="m8"   data-brand="bmw">BMW M8</option>
+                     {{-- Bugatti --}}
+                     <option value="chiron"     data-brand="bugatti">Bugatti Chiron</option>
+                     {{-- Lamborghini --}}
+                     <option value="aventador"  data-brand="lamborghini">Lamborghini Aventador</option>
+                     {{-- Porsche --}}
+                     <option value="911"     data-brand="porsche">Porsche 911</option>
+                     <option value="cayenne" data-brand="porsche">Porsche Cayenne</option>
+                     {{-- VinFast --}}
+                     <option value="vf6" data-brand="vinfast">VinFast VF 6</option>
+                     <option value="vf9" data-brand="vinfast">VinFast VF 9</option>
+                  </select>
+                  <span class="select-arrow">▾</span>
+               </div>
+
+               {{-- Price range — number inputs --}}
+               <div class="lsf-group" style="min-width: 220px;">
+                  <label>Khoảng giá thuê / ngày (VNĐ)</label>
+                  <div class="lsf-price-inputs">
+                     <input type="number" name="price_min" id="price-min-input"
+                            placeholder="Tối thiểu" min="0" step="100000"
+                            value="" style="width:100%;" />
+                     <span>—</span>
+                     <input type="number" name="price_max" id="price-max-input"
+                            placeholder="Tối đa" min="0" step="100000"
+                            value="" style="width:100%;" />
+                  </div>
+               </div>
+
+               {{-- Button — submit dẫn qua trang cars --}}
+               <button type="submit" class="luxury-search-btn">
+                  <i class="fa fa-search"></i>
+                  <span>SEARCH</span>
+               </button>
+
+            </div>
+         </form>
+      </div>
+   </section>
+
+   {{-- ── WELCOME ── --}}
+   <section class="welcome-block objects-car page-section-ptb white-bg portfolio-main">
       <div class="container">
          <div class="row">
             <div class="col-lg-12 col-md-12">
@@ -207,9 +582,9 @@
                   <h2>TẠI SAO CHỌN AUTOX</h2>
                   <div class="separator"></div>
                   <p>
-                  AutoX là nền tảng mua bán và trải nghiệm ô tô hiện đại, mang đến cho bạn mọi thứ cần thiết để xây dựng một 
-                  <strong>website showroom xe chuyên nghiệp</strong>. 
-                  Chúng tôi được phát triển dành riêng cho các đại lý, nhà phân phối và doanh nghiệp kinh doanh ô tô, 
+                  AutoX là nền tảng mua bán và trải nghiệm ô tô hiện đại, mang đến cho bạn mọi thứ cần thiết để xây dựng một
+                  <strong>website showroom xe chuyên nghiệp</strong>.
+                  Chúng tôi được phát triển dành riêng cho các đại lý, nhà phân phối và doanh nghiệp kinh doanh ô tô,
                   với khả năng tùy chỉnh linh hoạt và phù hợp trên mọi nền tảng công nghệ.
                   </p>
                </div>
@@ -218,53 +593,45 @@
          <div class="row">
             <div class="col-lg-3 col-md-3 col-sm-6">
                <div class="feature-box text-center">
-                 <div class="icon">
-                  <img src="{{ asset('images/car/01.jpg') }}" alt="Car" style="width:80px;">
-               </div>
+                  <div class="icon">
+                     <img src="{{ asset('images/car/01.jpg') }}" alt="Car">
+                  </div>
                   <div class="content">
                      <h6>ĐA DẠNG MẪU XE</h6>
-                        <p>
-                        AutoX cung cấp hàng trăm mẫu xe từ phổ thông đến cao cấp, đáp ứng mọi nhu cầu và phong cách sống.
-                        </p>
-                     </div>
+                     <p>AutoX cung cấp hàng trăm mẫu xe từ phổ thông đến cao cấp, đáp ứng mọi nhu cầu và phong cách sống.</p>
                   </div>
                </div>
+            </div>
             <div class="col-lg-3 col-md-3 col-sm-6">
                <div class="feature-box text-center">
                   <div class="icon">
-                  <img src="{{ asset('images/team/suport.jpg') }}" alt="Car" style="width:80px;">
-               </div>
+                     <img src="{{ asset('images/team/suport.jpg') }}" alt="Support">
+                  </div>
                   <div class="content">
                      <h6>HỖ TRỢ 24/7</h6>
-                     <p>
-                     Đội ngũ AutoX luôn sẵn sàng tư vấn và hỗ trợ bạn mọi lúc, giúp quá trình mua xe nhanh chóng và dễ dàng.
-                     </p>
+                     <p>Đội ngũ AutoX luôn sẵn sàng tư vấn và hỗ trợ bạn mọi lúc, giúp quá trình mua xe nhanh chóng và dễ dàng.</p>
                   </div>
                </div>
             </div>
             <div class="col-lg-3 col-md-3 col-sm-6">
                <div class="feature-box text-center">
-                 <div class="icon">
-                  <img src="{{ asset('images/testimonial/showroom.jpg') }}" alt="Car" style="width:80px;">
-               </div>
+                  <div class="icon">
+                     <img src="{{ asset('images/testimonial/showroom.jpg') }}" alt="Showroom">
+                  </div>
                   <div class="content">
                      <h6>ĐẠI LÝ UY TÍN</h6>
-                      <p>
-                        Chúng tôi hợp tác với các đại lý chính hãng, đảm bảo chất lượng xe và dịch vụ tốt nhất.
-                     </p>
+                     <p>Chúng tôi hợp tác với các đại lý chính hãng, đảm bảo chất lượng xe và dịch vụ tốt nhất.</p>
                   </div>
                </div>
             </div>
             <div class="col-lg-3 col-md-3 col-sm-6">
                <div class="feature-box text-center">
-                 <div class="icon">
-                  <img src="{{ asset('images/team/customer car.webp') }}" alt="Car" style="width:80px;">
-               </div>
+                  <div class="icon">
+                     <img src="{{ asset('images/team/customer car.webp') }}" alt="Price">
+                  </div>
                   <div class="content">
                      <h6>GIÁ TỐT NHẤT</h6>
-                     <p>
-                     AutoX cam kết giá cạnh tranh cùng nhiều ưu đãi hấp dẫn, phù hợp với mọi ngân sách.
-                     </p>
+                     <p>AutoX cam kết giá cạnh tranh cùng nhiều ưu đãi hấp dẫn, phù hợp với mọi ngân sách.</p>
                   </div>
                </div>
             </div>
@@ -273,7 +640,7 @@
             <div class="col-lg-12 col-md-12">
                <div class="halp-call text-center">
                   <img class="img-responsive" src="{{ asset('images/team/01.jpg') }}" alt="" />
-                  <span>Have any question ?</span>
+                  <span>Liên hệ ngay với chúng tôi?</span>
                   <h2 class="text-red">(007) 123 456 7890</h2>
                </div>
             </div>
@@ -288,22 +655,23 @@
          <div class="car-item text-center">
             <div class="car-image">
                @if($car->image_url)
-                  <img class="img-responsive" src="{{ asset('images/car/' . $car->image_url) }}" alt="{{ $car->name }}">
+                  @if(str_starts_with($car->image_url, 'images/'))
+                     <img class="img-responsive" src="{{ asset($car->image_url) }}" alt="{{ $car->name }}"
+                          style="width:100%;height:200px;object-fit:cover;"
+                          onerror="this.src='{{ asset('images/car/placeholder.jpg') }}'">
+                  @else
+                     <img class="img-responsive" src="{{ asset('images/car/' . $car->image_url) }}" alt="{{ $car->name }}"
+                          style="width:100%;height:200px;object-fit:cover;"
+                          onerror="this.src='{{ asset('images/car/placeholder.jpg') }}'">
+                  @endif
                @else
-                  <img class="img-responsive" src="{{ asset('images/car/placeholder.jpg') }}" alt="No image">
+                  <img class="img-responsive" src="{{ asset('images/car/placeholder.jpg') }}" alt="No image"
+                       style="width:100%;height:200px;object-fit:cover;">
                @endif
                <div class="car-overlay-banner">
                   <ul>
-                     <li>
-                        <a href="{{ route('cars.show', $car) }}">
-                           <i class="fa fa-link"></i>
-                        </a>
-                     </li>
-                     <li>
-                        <a href="{{ route('cars.show', $car) }}">
-                           <i class="fa fa-dashboard"></i>
-                        </a>
-                     </li>
+                     <li><a href="{{ route('cars.show', $car) }}"><i class="fa fa-link"></i></a></li>
+                     <li><a href="{{ route('cars.show', $car) }}"><i class="fa fa-dashboard"></i></a></li>
                   </ul>
                </div>
             </div>
@@ -337,15 +705,25 @@
       @endforelse
    </div>
 
-   {{-- ── BOXSTER BANNER ── --}}
-   <section class="bg-5 section-boxster">
+   {{-- ══════════════════════════════════════════
+        BMW M8 BANNER — Full background image
+        ══════════════════════════════════════════ --}}
+   <section class="section-boxster">
+      <div class="banner-bg"
+           style="background-image: url('{{ asset('images/Xe/BMW/BMWM8 đen.avif') }}'),
+                                    url('{{ asset('images/Xe/BMW/bmw-m8.jpg') }}'),
+                                    url('{{ asset('images/car/24.jpg') }}');">
+      </div>
+      <div class="banner-overlay"></div>
+
       <div class="custom-block-1">
-         <h2>boxster</h2>
-         <span>Get the Porsche You always Wanted </span>
-         <strong class="text-red">$450 </strong>
-         <span>per month </span>
-         <p>Limited time Offer!</p>
-         <a href="#" class="button red"> read more </a>
+         <h2>BMW M8</h2>
+         <span class="banner-subtitle">Competition Coupe · 617 Mã Lực</span>
+         <span class="banner-price">7.200.000.000 VNĐ</span>
+         <span class="banner-note">Trả góp từ 28 triệu/tháng</span>
+         <span class="banner-offer">⚡ Ưu Đãi Có Hạn</span>
+         <br>
+         <a href="#" class="button red">Đặt Ngay</a>
       </div>
    </section>
 
@@ -373,7 +751,7 @@
                      <strong class="text-red">post by john doe</strong>
                      </span>
                      <p>Sed do eiusmod tempor lorem ipsum dolor sit amet, consectetur adipisicing elit, incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.</p>
-                     <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa</p>
+                     <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
                      <a class="button border" href="#">Read more</a>
                   </div>
                </div>
@@ -382,25 +760,17 @@
       </div>
    </section>
 
-   {{-- ── PLAY VIDEO ── --}}
-   <section class="play-video popup-gallery">
-      <div class="play-video-bg bg-3 bg-overlay-black-70">
-         <div class="container">
-            <div class="row">
-               <div class="col-md-offset-2 col-md-8 text-center">
-                  <h3 class="text-white">Want to know more about us? Play our promotional video now!</h3>
-               </div>
-            </div>
-         </div>
-      </div>
+   {{-- ══════════════════════════════════════════
+        PLAY VIDEO — YouTube embed (autoplay on scroll)
+        ══════════════════════════════════════════ --}}
+   <section class="play-video-section" id="video-section">
       <div class="container">
-         <div class="row">
-            <div class="col-md-offset-1 col-md-10">
-               <div class="video-info text-center">
-                  <img class="img-responsive" src="{{ asset('images/car/24.jpg') }}" alt="" />
-                  <a class="popup-youtube" href=""><i class="fa fa-play"></i></a>
-               </div>
-            </div>
+         <div class="video-header">
+            <p>AutoX Showcase</p>
+            <h3>Khám Phá Thế Giới Xe Đẳng Cấp</h3>
+         </div>
+         <div class="video-embed-wrap" id="video-wrap">
+            {{-- iframe sẽ được chèn vào đây bởi IntersectionObserver --}}
          </div>
       </div>
    </section>
@@ -491,26 +861,19 @@
         style="position:fixed;top:0;left:0;width:100%;height:100%;
                background:rgba(0,0,0,0.55);z-index:99999;
                display:flex;align-items:center;justify-content:center;">
-
       <div style="background:#fff;border-radius:10px;width:90%;
                   max-width:480px;overflow:hidden;position:relative;
                   animation:popupIn .4s ease;">
-
-         {{-- Header --}}
          <div style="background:#e8f5e9;padding:26px 32px 18px;
                      text-align:center;border-bottom:1px solid #ddd;">
             <h2 style="margin:0;color:#1a7a3c;letter-spacing:2px;
                        font-size:22px;font-weight:700;">BÁO GIÁ NHANH</h2>
          </div>
-
-         {{-- Nút đóng --}}
          <button onclick="closePopup()"
                  style="position:absolute;top:12px;right:14px;
                         background:#e53935;border:none;border-radius:50%;
                         width:28px;height:28px;color:#fff;font-size:16px;
                         cursor:pointer;line-height:28px;padding:0;">✕</button>
-
-         {{-- Form --}}
          <div style="padding:22px 32px 30px;display:flex;flex-direction:column;gap:14px;">
             <input type="text" id="popup-ten" placeholder="Tên Bạn"
                    style="padding:13px 16px;border:1.5px solid #b0c4b8;
@@ -570,6 +933,88 @@
 </style>
 
 <script>
+/* ══════════════════════════════════════════
+   1. BRAND → MODEL FILTER
+   ══════════════════════════════════════════ */
+(function() {
+   var brandSelect = document.getElementById('brand-select');
+   var modelSelect = document.getElementById('model-select');
+   if (!brandSelect || !modelSelect) return;
+
+   // Cache all original options (except the first "Tất cả dòng")
+   var allOptions = Array.from(modelSelect.querySelectorAll('option[data-brand]'));
+
+   brandSelect.addEventListener('change', function() {
+      var selectedBrand = this.value;
+
+      // Remove all brand options first
+      allOptions.forEach(function(opt) {
+         if (opt.parentNode) opt.parentNode.removeChild(opt);
+      });
+
+      // Reset model selection
+      modelSelect.value = '';
+
+      if (!selectedBrand) {
+         // Show all models
+         allOptions.forEach(function(opt) {
+            modelSelect.appendChild(opt);
+         });
+      } else {
+         // Show only matching brand models
+         allOptions.forEach(function(opt) {
+            if (opt.getAttribute('data-brand') === selectedBrand) {
+               modelSelect.appendChild(opt);
+            }
+         });
+      }
+   });
+})();
+
+/* ══════════════════════════════════════════
+   2. YOUTUBE VIDEO — autoplay on scroll
+   ══════════════════════════════════════════ */
+(function() {
+   var videoWrap = document.getElementById('video-wrap');
+   if (!videoWrap) return;
+
+   var videoLoaded = false;
+   // Video ID từ: https://youtu.be/OGEEQ9VEEmc
+   var videoId = 'OGEEQ9VEEmc';
+
+   function loadVideo(autoplay) {
+      if (videoLoaded) return;
+      videoLoaded = true;
+      var iframe = document.createElement('iframe');
+      iframe.src = 'https://www.youtube.com/embed/' + videoId
+                 + '?autoplay=' + (autoplay ? '1' : '0')
+                 + '&rel=0&modestbranding=1';
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+      iframe.allowFullscreen = true;
+      iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:0;';
+      videoWrap.appendChild(iframe);
+   }
+
+   // IntersectionObserver — tự động load + play khi scroll đến
+   if ('IntersectionObserver' in window) {
+      var observer = new IntersectionObserver(function(entries) {
+         entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+               loadVideo(true);  // autoplay=1
+               observer.unobserve(entry.target);
+            }
+         });
+      }, { threshold: 0.4 });
+      observer.observe(videoWrap);
+   } else {
+      // Fallback cho trình duyệt cũ
+      loadVideo(false);
+   }
+})();
+
+/* ══════════════════════════════════════════
+   3. POPUP
+   ══════════════════════════════════════════ */
 function closePopup() {
    document.getElementById('popup-overlay').style.display = 'none';
 }

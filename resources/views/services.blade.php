@@ -1,15 +1,15 @@
 @extends('layouts.frontend')
 
-@section('title', 'Dịch Vụ - Concept Car Dealer')
+@section('title', 'Dịch Vụ - AUTO X')
 
 @push('styles')
 <style>
   :root {
-    --red: #d42b2b; --red-dark: #b01e1e;
-    --red-light: rgba(212,43,43,0.08); --red-border: rgba(212,43,43,0.22);
-    --bg: #1c1c1e; --bg2: #242426; --bg3: #2c2c2f; --card: #2a2a2d;
-    --border: #3a3a3e; --border-light: #4a4a4e;
-    --white: #f5f0eb; --text: #c8c3bc; --muted: #8a857e; --subtle: #5a5854;
+    --red: #b8973a; --red-dark: #8a6d1e;
+    --red-light: rgba(184,151,58,0.10); --red-border: rgba(184,151,58,0.28);
+    --bg:  #f5f0e8; --bg2: #ede8de; --bg3: #e6e0d4; --card: #ffffff;
+    --border: #d8d0c0; --border-light: #c8bfaa;
+    --white: #ffffff; --text: #4a4438; --muted: #7a7060; --subtle: #a09880;
   }
 
   .section { padding: 96px 0; }
@@ -22,31 +22,42 @@
   .section-label::before { content: ''; width: 3px; height: 14px; background: var(--red); flex-shrink: 0; }
   .section-title {
     font-family: 'Barlow Condensed', sans-serif;
-    font-size: clamp(34px,4vw,52px); font-weight: 800;
-    text-transform: uppercase; color: var(--white); letter-spacing: -.5px;
+    font-size: clamp(28px,4vw,48px); font-weight: 800;
+    text-transform: uppercase; color: var(--text); letter-spacing: -.5px;
   }
   .divider-line { width: 56px; height: 3px; background: var(--red); margin: 24px 0; }
 
   /* HERO */
   .hero {
     position: relative; height: 440px;
-    background: linear-gradient(160deg,#1c1c1e 0%,#2a1616 45%,#1c1c1e 100%);
     display: flex; align-items: center; justify-content: center; overflow: hidden;
   }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background: url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1600&q=80') center/cover no-repeat;
+    z-index: 0;
+  }
+  .hero-overlay {
+    position: absolute; inset: 0; z-index: 1;
+    background: linear-gradient(160deg, rgba(28,26,22,0.64) 0%, rgba(28,26,22,0.48) 50%, rgba(28,26,22,0.64) 100%);
+    pointer-events: none;
+  }
   .hero::before {
-    content: ''; position: absolute; inset: 0;
+    content: ''; position: absolute; inset: 0; z-index: 2;
     background:
-      repeating-linear-gradient(90deg,transparent,transparent 80px,rgba(212,43,43,.025) 80px,rgba(212,43,43,.025) 81px),
-      repeating-linear-gradient(0deg,transparent,transparent 80px,rgba(212,43,43,.025) 80px,rgba(212,43,43,.025) 81px);
+      repeating-linear-gradient(90deg,transparent,transparent 80px,rgba(184,151,58,.025) 80px,rgba(184,151,58,.025) 81px),
+      repeating-linear-gradient(0deg,transparent,transparent 80px,rgba(184,151,58,.025) 80px,rgba(184,151,58,.025) 81px);
+    pointer-events: none;
   }
   .hero-glow {
-    position: absolute; width: 700px; height: 350px;
-    background: radial-gradient(ellipse,rgba(180,30,30,.2) 0%,transparent 68%);
+    position: absolute; width: 700px; height: 350px; z-index: 1;
+    background: radial-gradient(ellipse,rgba(184,151,58,.18) 0%,transparent 68%);
     top: 50%; left: 50%; transform: translate(-50%,-50%);
     animation: pulse 5s ease-in-out infinite;
+    pointer-events: none;
   }
   @keyframes pulse { 0%,100%{opacity:.5;transform:translate(-50%,-50%) scale(1)} 50%{opacity:1;transform:translate(-50%,-50%) scale(1.08)} }
-  .hero-content { position: relative; text-align: center; }
+  .hero-content { position: relative; text-align: center; z-index: 3; }
   .hero-eyebrow {
     font-family: 'Rajdhani', sans-serif; font-size: 11px; font-weight: 600;
     letter-spacing: 5px; text-transform: uppercase; color: var(--red);
@@ -56,40 +67,44 @@
   .hero h1 {
     font-family: 'Barlow Condensed', sans-serif;
     font-size: clamp(60px,9vw,106px); font-weight: 800;
-    color: var(--white); line-height: .92; text-transform: uppercase; letter-spacing: -1px;
+    color: #f5f0e8; line-height: .92; text-transform: uppercase; letter-spacing: -1px;
   }
   .hero h1 em { color: var(--red); font-style: normal; }
   .hero-sub { margin-top: 20px; font-size: 15px; color: var(--muted); }
   .breadcrumb {
     position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
     display: flex; align-items: center; gap: 10px;
-    font-size: 12px; letter-spacing: 1px; color: var(--subtle);
+    font-size: 12px; letter-spacing: 1px; color: rgba(245,240,232,0.9);
+    z-index: 4;
+    background: rgba(10,10,10,0.32); padding: 8px 14px; border-radius: 18px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.35); backdrop-filter: blur(6px);
   }
-  .breadcrumb a { color: var(--subtle); text-decoration: none; }
+  .breadcrumb a { color: rgba(245,240,232,0.85); text-decoration: none; transition: color .18s; }
   .breadcrumb a:hover { color: var(--red); }
-  .breadcrumb span { color: var(--red); }
+  .breadcrumb span { color: var(--red); font-weight:700; }
 
   /* SERVICES INTRO */
   .intro-section { background: var(--bg); padding: 96px 0; }
   .intro-grid { display: grid; grid-template-columns: 1fr 1.4fr; gap: 80px; align-items: center; }
   .intro-text p { color: var(--text); font-size: 15px; line-height: 1.85; margin-bottom: 16px; }
-  .intro-nums { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; margin-top: 36px; background: var(--border); }
-  .intro-num-item { background: var(--card); padding: 28px 24px; text-align: center; }
+  .intro-nums { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin-top: 36px; }
+  .intro-num-item { background: transparent; padding: 28px 24px; text-align: center; border-bottom: 1px solid var(--border); }
+  .intro-num-item:nth-child(odd) { border-right: 1px solid var(--border); }
   .intro-num-item strong { font-family: 'Barlow Condensed', sans-serif; font-size: 48px; font-weight: 800; color: var(--red); line-height: 1; display: block; }
   .intro-num-item span { font-family: 'Rajdhani', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-top: 4px; display: block; }
   .intro-visual { position: relative; }
-  .service-showcase { background: var(--bg3); border: 1px solid var(--border); padding: 0; overflow: hidden; }
-  .showcase-header { background: var(--red); padding: 18px 28px; display: flex; align-items: center; justify-content: space-between; }
-  .showcase-header span { font-family: 'Rajdhani', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #fff; }
+  .service-showcase { background: transparent; border: none; padding: 0; overflow: hidden; }
+  .showcase-header { background: transparent; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; }
+  .showcase-header span { font-family: 'Rajdhani', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); }
   .showcase-dots { display: flex; gap: 6px; }
   .showcase-dots i { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,.4); }
   .showcase-dots i:first-child { background: rgba(255,255,255,.9); }
-  .showcase-body { padding: 28px; display: flex; flex-direction: column; gap: 3px; }
-  .mini-service { display: flex; align-items: center; gap: 16px; padding: 14px 16px; background: var(--card); border-left: 3px solid transparent; transition: border-color .3s, background .3s; cursor: default; }
-  .mini-service:hover { border-left-color: var(--red); background: var(--bg2); }
-  .mini-svc-icon { width: 36px; height: 36px; background: var(--red-light); border: 1px solid var(--red-border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .mini-svc-icon svg { width: 16px; height: 16px; stroke: var(--red); fill: none; stroke-width: 1.5; }
-  .mini-svc-name { font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--white); }
+  .showcase-body { padding: 8px 6px; display: flex; flex-direction: column; gap: 0; }
+  .mini-service { display: flex; align-items: center; gap: 16px; padding: 12px 14px; background: transparent; border-left: 0; border-bottom: 1px solid var(--border); transition: border-color .3s, background .3s; cursor: default; }
+  .mini-service:hover { background: var(--bg2); }
+  .mini-svc-icon { width: 44px; height: 44px; background: var(--card); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--red); border-radius: 10px; overflow: hidden; box-shadow: 0 6px 14px rgba(0,0,0,.06); }
+  .mini-svc-icon svg, .mini-svc-icon svg * { width: 20px; height: 20px; stroke: currentColor !important; fill: none !important; stroke-width: 1.6; }
+  .mini-svc-name { font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: var(--text); }
   .mini-svc-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
   .mini-svc-price { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 700; color: var(--red); margin-left: auto; white-space: nowrap; }
 
@@ -105,9 +120,20 @@
   .service-card:hover { background: var(--bg3); }
   .svc-num { font-family: 'Barlow Condensed', sans-serif; font-size: 72px; font-weight: 800; color: rgba(212,43,43,.08); line-height: 1; position: absolute; top: 16px; right: 20px; transition: color .3s; }
   .service-card:hover .svc-num { color: rgba(212,43,43,.16); }
-  .svc-icon { width: 56px; height: 56px; background: var(--red-light); border: 1px solid var(--red-border); display: flex; align-items: center; justify-content: center; margin-bottom: 24px; }
-  .svc-icon svg { width: 24px; height: 24px; stroke: var(--red); fill: none; stroke-width: 1.5; }
-  .svc-title { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 800; text-transform: uppercase; color: var(--white); letter-spacing: .5px; margin-bottom: 12px; }
+  .svc-icon { width: 56px; height: 56px; background: var(--red-light); border: 1px solid var(--red-border); display: flex; align-items: center; justify-content: center; margin-bottom: 24px; color: var(--red); border-radius: 12px; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,.06); }
+  .svc-icon svg, .svc-icon svg * { width: 24px; height: 24px; stroke: currentColor !important; fill: none !important; stroke-width: 1.5; }
+  .svc-icon svg use { stroke: currentColor !important; }
+  .svc-icon svg { color: inherit; }
+
+  /* Predefined swatch helpers (use inline styles or modifier classes if desired) */
+  /* Refined swatch palette to match gold-themed dealer site */
+  .swatch-gold { background: linear-gradient(180deg,#d4b85e 0%,#b8973a 100%); color: #fff !important; border: none; }
+  .swatch-burgundy { background: linear-gradient(180deg,#c0392b 0%,#8e2420 100%); color: #fff !important; border: none; }
+  .swatch-teal { background: linear-gradient(180deg,#30b4a2 0%,#057d73 100%); color: #fff !important; border: none; }
+  .swatch-indigo { background: linear-gradient(180deg,#2b3a67 0%,#1f2a44 100%); color: #fff !important; border: none; }
+  .swatch-purple { background: linear-gradient(135deg,#7b2ff7 0%,#b06ab3 100%); color: #fff !important; border: none; }
+  .swatch-sand { background: linear-gradient(180deg,#f3ede3 0%,#e6d9c2 100%); color: var(--text) !important; border: 1px solid rgba(0,0,0,.04); }
+  .svc-title { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 800; text-transform: uppercase; color: var(--text); letter-spacing: .5px; margin-bottom: 12px; }
   .svc-desc { font-size: 13px; color: var(--muted); line-height: 1.85; margin-bottom: 22px; }
   .svc-list { list-style: none; padding: 0; margin: 0 0 24px; display: flex; flex-direction: column; gap: 8px; }
   .svc-list li { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--text); }
@@ -160,10 +186,11 @@
   .pkg-features { list-style: none; padding: 0; margin: 0 0 32px; display: flex; flex-direction: column; gap: 12px; }
   .pkg-features li { display: flex; align-items: flex-start; gap: 12px; font-size: 13px; color: var(--text); line-height: 1.5; }
   .pkg-card.featured .pkg-features li { color: rgba(255,255,255,.85); }
-  .pkg-features li .tick { width: 16px; height: 16px; min-width: 16px; background: var(--red-light); border: 1px solid var(--red-border); display: flex; align-items: center; justify-content: center; margin-top: 1px; }
-  .pkg-card.featured .pkg-features li .tick { background: rgba(255,255,255,.15); border-color: rgba(255,255,255,.3); }
-  .pkg-features li .tick svg { width: 9px; height: 9px; stroke: var(--red); fill: none; stroke-width: 2.5; }
-  .pkg-card.featured .pkg-features li .tick svg { stroke: #fff; }
+  .pkg-features li .tick { width: 16px; height: 16px; min-width: 16px; background: var(--red-light); border: 1px solid var(--red-border); display: flex; align-items: center; justify-content: center; margin-top: 1px; color: var(--red); }
+  .pkg-card.featured .pkg-features li .tick { background: rgba(255,255,255,.15); border-color: rgba(255,255,255,.3); color: #fff; }
+  .pkg-features li .tick svg, .pkg-features li .tick svg * { width: 9px; height: 9px; stroke: currentColor !important; fill: none !important; stroke-width: 2.5; }
+  .pkg-card.featured .pkg-features li .tick svg, .pkg-card.featured .pkg-features li .tick svg * { stroke: currentColor !important; }
+  .pkg-features li .tick svg { color: inherit; }
   .btn-red {
     display: inline-flex; align-items: center; gap: 10px;
     background: var(--red); color: #fff;
@@ -231,8 +258,13 @@
 
 @section('content')
 
+@include('partials.icons')
+
+
 {{-- HERO --}}
 <section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-overlay"></div>
   <div class="hero-glow"></div>
   <div class="hero-content">
     <div class="hero-eyebrow">Giải pháp toàn diện</div>
@@ -240,11 +272,11 @@
     <p class="hero-sub">Mọi nhu cầu xe hơi — Một điểm đến duy nhất</p>
   </div>
   <div class="breadcrumb">
-  <a href="{{ url('/') }}">Home</a> &rsaquo;
-  <a href="{{ url('/about') }}">About Us</a> &rsaquo;
-  <a href="{{ url('/cars') }}">Cars</a> &rsaquo;
-  <span>Dịch Vụ</span>
-</div>
+    <a href="{{ url('/') }}">Home</a> &rsaquo;
+    <a href="{{ url('/about') }}">About Us</a> &rsaquo;
+    <a href="{{ url('/cars') }}">Cars</a> &rsaquo;
+    <span>Dịch Vụ</span>
+  </div>
 </section>
 
 {{-- INTRO --}}
@@ -258,10 +290,22 @@
         <p>Chúng tôi không chỉ bán xe — chúng tôi cung cấp trải nghiệm hoàn chỉnh từ lúc bạn bước vào showroom đến khi chiếc xe của bạn lăn bánh trên đường.</p>
         <p>Mỗi dịch vụ được thiết kế để đảm bảo bạn có được giá trị tốt nhất, quy trình minh bạch và sự hỗ trợ liên tục sau mua hàng.</p>
         <div class="intro-nums">
-          <div class="intro-num-item"><strong>15+</strong><span>Năm kinh nghiệm</span></div>
-          <div class="intro-num-item"><strong>8K+</strong><span>Khách hàng phục vụ</span></div>
-          <div class="intro-num-item"><strong>24/7</strong><span>Hỗ trợ liên tục</span></div>
-          <div class="intro-num-item"><strong>98%</strong><span>Hài lòng sau dịch vụ</span></div>
+          <div class="intro-num-item" data-anim style="transition-delay:.08s">
+            <strong data-target="15" data-suffix="+">0+</strong>
+            <span>Năm kinh nghiệm</span>
+          </div>
+          <div class="intro-num-item" data-anim style="transition-delay:.16s">
+            <strong data-target="8" data-format="k" data-suffix="K+">0K+</strong>
+            <span>Khách hàng phục vụ</span>
+          </div>
+          <div class="intro-num-item" data-anim style="transition-delay:.24s">
+            <strong data-target="24" data-suffix="/7">0/7</strong>
+            <span>Hỗ trợ liên tục</span>
+          </div>
+          <div class="intro-num-item" data-anim style="transition-delay:.32s">
+            <strong data-target="98" data-suffix="%">0%</strong>
+            <span>Hài lòng sau dịch vụ</span>
+          </div>
         </div>
       </div>
       <div class="intro-visual" data-anim="right">
@@ -271,28 +315,38 @@
             <div class="showcase-dots"><i></i><i></i><i></i></div>
           </div>
           <div class="showcase-body">
-            <div class="mini-service">
-              <div class="mini-svc-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+            <div class="mini-service" data-anim style="transition-delay:.08s">
+              <div class="mini-svc-icon swatch-gold" aria-hidden="true">
+                <svg aria-hidden="true" width="24" height="24" focusable="false"><use href="#icon-home" xlink:href="#icon-home"></use></svg>
+              </div>
               <div><div class="mini-svc-name">Tư vấn & Mua xe</div><div class="mini-svc-desc">Hỗ trợ chọn xe phù hợp nhất</div></div>
               <div class="mini-svc-price">Miễn phí</div>
             </div>
-            <div class="mini-service">
-              <div class="mini-svc-icon"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
+            <div class="mini-service" data-anim style="transition-delay:.16s">
+              <div class="mini-svc-icon swatch-teal" aria-hidden="true">
+                <svg aria-hidden="true" width="24" height="24" focusable="false"><use href="#icon-briefcase" xlink:href="#icon-briefcase"></use></svg>
+              </div>
               <div><div class="mini-svc-name">Hỗ trợ Tài Chính</div><div class="mini-svc-desc">Vay mua xe lãi suất thấp</div></div>
               <div class="mini-svc-price">Từ 5.9%</div>
             </div>
-            <div class="mini-service">
-              <div class="mini-svc-icon"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
+            <div class="mini-service" data-anim style="transition-delay:.24s">
+              <div class="mini-svc-icon swatch-indigo" aria-hidden="true">
+                <svg aria-hidden="true" width="24" height="24" focusable="false"><use href="#icon-wrench" xlink:href="#icon-wrench"></use></svg>
+              </div>
               <div><div class="mini-svc-name">Bảo Dưỡng & Sửa Chữa</div><div class="mini-svc-desc">Kỹ thuật viên chứng nhận quốc tế</div></div>
               <div class="mini-svc-price">Từ 500K</div>
             </div>
-            <div class="mini-service">
-              <div class="mini-svc-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+            <div class="mini-service" data-anim style="transition-delay:.32s">
+              <div class="mini-svc-icon swatch-burgundy" aria-hidden="true">
+                <svg aria-hidden="true" width="24" height="24" focusable="false"><use href="#icon-shield" xlink:href="#icon-shield"></use></svg>
+              </div>
               <div><div class="mini-svc-name">Bảo Hiểm Xe</div><div class="mini-svc-desc">Gói bảo hiểm toàn diện</div></div>
               <div class="mini-svc-price">Từ 2.5%</div>
             </div>
-            <div class="mini-service">
-              <div class="mini-svc-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+            <div class="mini-service" data-anim style="transition-delay:.40s">
+              <div class="mini-svc-icon swatch-purple" aria-hidden="true">
+                <svg aria-hidden="true" width="24" height="24" focusable="false"><use href="#icon-clock" xlink:href="#icon-clock"></use></svg>
+              </div>
               <div><div class="mini-svc-name">Đổi Xe & Trade-in</div><div class="mini-svc-desc">Định giá xe cũ chính xác</div></div>
               <div class="mini-svc-price">Định giá ngay</div>
             </div>
@@ -312,9 +366,9 @@
     </div>
     <div class="services-grid" data-anim>
 
-      <div class="service-card">
+      <div id="tuvan" class="service-card anchor-target">
         <div class="svc-num">01</div>
-        <div class="svc-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
+        <div class="svc-icon swatch-gold"><svg aria-hidden="true" width="28" height="28" focusable="false"><use href="#icon-car" xlink:href="#icon-car"></use></svg></div>
         <div class="svc-title">Tư Vấn & Mua Xe</div>
         <p class="svc-desc">Đội ngũ tư vấn chuyên nghiệp giúp bạn tìm ra chiếc xe phù hợp nhất với nhu cầu và ngân sách.</p>
         <ul class="svc-list">
@@ -332,7 +386,7 @@
 
       <div class="service-card">
         <div class="svc-num">02</div>
-        <div class="svc-icon"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
+        <div class="svc-icon swatch-teal"><svg aria-hidden="true" width="28" height="28" focusable="false"><use href="#icon-briefcase" xlink:href="#icon-briefcase"></use></svg></div>
         <div class="svc-title">Hỗ Trợ Tài Chính</div>
         <p class="svc-desc">Kết nối trực tiếp với 10+ ngân hàng hàng đầu. Phê duyệt nhanh, thủ tục đơn giản, lãi suất cạnh tranh.</p>
         <ul class="svc-list">
@@ -351,7 +405,7 @@
 
       <div class="service-card">
         <div class="svc-num">03</div>
-        <div class="svc-icon"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
+        <div class="svc-icon swatch-indigo"><svg aria-hidden="true" width="28" height="28" focusable="false"><use href="#icon-wrench" xlink:href="#icon-wrench"></use></svg></div>
         <div class="svc-title">Bảo Dưỡng & Sửa Chữa</div>
         <p class="svc-desc">Xưởng dịch vụ đạt chuẩn quốc tế với thiết bị hiện đại và đội ngũ kỹ thuật viên được chứng nhận.</p>
         <ul class="svc-list">
@@ -370,7 +424,7 @@
 
       <div class="service-card">
         <div class="svc-num">04</div>
-        <div class="svc-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <div class="svc-icon swatch-burgundy"><svg aria-hidden="true" width="28" height="28" focusable="false"><use href="#icon-shield" xlink:href="#icon-shield"></use></svg></div>
         <div class="svc-title">Bảo Hiểm Xe Hơi</div>
         <p class="svc-desc">Các gói bảo hiểm toàn diện từ những công ty bảo hiểm uy tín. Thủ tục nhanh gọn, bồi thường nhanh chóng.</p>
         <ul class="svc-list">
@@ -389,7 +443,7 @@
 
       <div class="service-card">
         <div class="svc-num">05</div>
-        <div class="svc-icon"><svg viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></div>
+        <div class="svc-icon swatch-purple"><svg aria-hidden="true" width="28" height="28" focusable="false"><use href="#icon-exchange" xlink:href="#icon-exchange"></use></svg></div>
         <div class="svc-title">Đổi Xe & Trade-in</div>
         <p class="svc-desc">Định giá xe cũ của bạn theo thị trường thực tế. Quy trình đổi xe minh bạch, nhận giá tốt nhất.</p>
         <ul class="svc-list">
@@ -407,7 +461,7 @@
 
       <div class="service-card">
         <div class="svc-num">06</div>
-        <div class="svc-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
+        <div class="svc-icon swatch-sand"><svg aria-hidden="true" width="28" height="28" focusable="false"><use href="#icon-file" xlink:href="#icon-file"></use></svg></div>
         <div class="svc-title">Đăng Ký & Thủ Tục</div>
         <p class="svc-desc">Dịch vụ hỗ trợ đăng ký biển số, sang tên, đổi chủ và tất cả thủ tục pháp lý liên quan đến xe.</p>
         <ul class="svc-list">
@@ -557,9 +611,82 @@
 
 @push('scripts')
 <script>
+  // IntersectionObserver for reveal & count-up
   const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-  }, { threshold: 0.1 });
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        el.classList.add('visible');
+
+        // start count-up for any child with data-target (only once)
+        el.querySelectorAll('[data-target]').forEach(node => {
+          if (node.dataset.animated) return;
+          const raw = parseFloat(node.dataset.target) || 0;
+          const format = node.dataset.format || null;
+          const suffix = node.dataset.suffix || '';
+          const duration = parseInt(node.dataset.duration) || 1200;
+          animateCount(node, raw, format, suffix, duration);
+          node.dataset.animated = '1';
+        });
+
+        // stop observing this element so the animation only runs once when scrolled in
+        observer.unobserve(el);
+      }
+    });
+  }, { threshold: 0.25, rootMargin: '0px 0px -10% 0px' });
+
   document.querySelectorAll('[data-anim]').forEach(el => observer.observe(el));
+
+  function animateCount(node, target, format, suffix, duration) {
+    const start = 0;
+    const startTime = performance.now();
+    function step(now) {
+      const t = Math.min((now - startTime) / duration, 1);
+      const value = Math.floor(t * (target - start) + start);
+      node.textContent = value + (suffix || '');
+      if (t < 1) requestAnimationFrame(step);
+      else {
+        node.textContent = target + (suffix || '');
+      }
+    }
+    requestAnimationFrame(step);
+  }
+
+  // Scroll helpers: scroll target to top accounting for fixed header
+  function scrollToElementAtTop(el) {
+    if (!el) return;
+    const header = document.querySelector('header') || document.querySelector('.site-header') || document.querySelector('.navbar');
+    const headerHeight = header ? header.offsetHeight : 120;
+    const top = el.getBoundingClientRect().top + window.pageYOffset - headerHeight - 8;
+    window.scrollTo({ top, behavior: 'smooth' });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    if (location.hash) {
+      const target = document.querySelector(location.hash);
+      if (target) setTimeout(() => scrollToElementAtTop(target), 60);
+    }
+
+    document.body.addEventListener('click', (e) => {
+      const a = e.target.closest('a[href*="#"]');
+      if (!a) return;
+      try {
+        const url = new URL(a.href, location.origin);
+        if (url.pathname === location.pathname) {
+          const hash = url.hash;
+          if (hash) {
+            const el = document.querySelector(hash);
+            if (el) {
+              e.preventDefault();
+              history.pushState(null, '', hash);
+              scrollToElementAtTop(el);
+            }
+          }
+        }
+      } catch (err) {
+        // ignore
+      }
+    }, true);
+  });
 </script>
 @endpush

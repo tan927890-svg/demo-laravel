@@ -16,11 +16,19 @@
                         @error('name')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
                     </div>
 
+
                     <div>
                         <label class="block font-medium text-sm text-gray-700">Hãng xe</label>
-                        <input type="text" name="brand" value="{{ old('brand', $car->brand) }}"
-                            class="mt-1 w-full border rounded px-3 py-2 @error('brand') border-red-500 @enderror">
-                        @error('brand')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
+                        <select name="brand_id" id="brand_id"
+                            class="mt-1 w-full border rounded px-3 py-2 @error('brand_id') border-red-500 @enderror">
+                            <option value="">-- Chọn hãng xe --</option>
+                            @foreach($brands as $brand)
+                                <option value="{{ $brand->id }}" {{ old('brand_id', $car->brand_id) == $brand->id ? 'selected' : '' }}>
+                                    {{ $brand->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('brand_id')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
                     </div>
 
                     <div>
@@ -32,7 +40,7 @@
 
                     <div>
                         <label class="block font-medium text-sm text-gray-700">Giá thuê / ngày (VNĐ)</label>
-                        <input type="number" name="price_per_day" value="{{ old('price_per_day', $car->price_per_day) }}"
+                        <input type="number" name="price_per_day" id="price_per_day" value="{{ old('price_per_day', $car->price_per_day) }}"
                             class="mt-1 w-full border rounded px-3 py-2 @error('price_per_day') border-red-500 @enderror">
                         @error('price_per_day')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
                     </div>
@@ -54,7 +62,7 @@
 
                     <div class="flex items-center gap-2">
                         <input type="checkbox" name="is_available" id="is_available" value="1"
-                            {{ $car->is_available ? 'checked' : '' }}>
+                            {{ old('is_available', $car->is_available) ? 'checked' : '' }}>
                         <label for="is_available" class="text-sm text-gray-700">Có sẵn để thuê</label>
                     </div>
 

@@ -445,7 +445,7 @@ section.white-bg,
 /* ══════════════════════════════════════════════════════════
    BOXSTER PROMO SECTION
 ══════════════════════════════════════════════════════════ */
-.bg-5, .section-boxster { background: var(--charcoal2) !important; }
+.bg-5, 
 .section-boxster::before { background: rgba(0,0,0,0.45) !important; }
 .custom-block-1 { padding: 72px 60px !important; }
 .custom-block-1 h2, .section-boxster h2 {

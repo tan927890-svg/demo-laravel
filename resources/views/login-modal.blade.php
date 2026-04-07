@@ -155,7 +155,7 @@
               <a href="{{ url('/terms') }}">Điều khoản sử dụng</a>
               và
               <a href="{{ url('/privacy') }}">Chính sách bảo mật</a>
-              của Concept Car Dealer
+              của AUTO X
             </label>
           </div>
 

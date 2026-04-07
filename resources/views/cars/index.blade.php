@@ -1,6 +1,6 @@
 @extends('layouts.frontend')
 
-@section('title', 'Bộ sưu tập xe - Concept Car Dealer')
+@section('title', 'Bộ sưu tập xe - AUTO X')
 
 @push('styles')
 <style>
@@ -228,13 +228,9 @@ body { background: #fff; color: var(--dark); }
   <div class="cars-grid">
     @forelse($cars as $car)
   @php
-    $rawImg = $car->image_url ?? $car->image ?? null;
-    if ($rawImg) {
-        $filename = basename(str_replace('\\', '/', $rawImg));
-        $imgSrc = asset('images/car/' . $filename);
-    } else {
-        $imgSrc = asset('images/car/01.jpg');
-    }
+    $imgSrc = $car->image_url
+        ? asset(preg_replace_callback('/[^\x20-\x7E]| /', fn($m) => rawurlencode($m[0]), $car->image_url))
+        : asset('images/car/01.jpg');
   @endphp
       <a href="{{ route('cars.show', $car->id) }}" class="car-item">
 

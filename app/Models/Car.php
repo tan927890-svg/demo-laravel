@@ -21,6 +21,7 @@ class Car extends Model
     'color',
     'mileage',
     'fuel_type',
+    'image_url',   // ← thêm dòng này
     'transmission',
     'condition',
     'engine',
