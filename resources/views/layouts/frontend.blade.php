@@ -352,6 +352,7 @@
       <div class="col-lg-3 col-md-3 col-sm-6">
         <div class="about-content">
           <a href="{{ url('/') }}"><img class="img-responsive" src="{{ asset('images/logo-light.png') }}" alt=""></a>
+<<<<<<< HEAD
           <p>Tại Auto X, chúng tôi không chỉ bán xe, chúng tôi trao gửi sự an tâm và phong cách sống. Với hệ thống showroom hiện đại và danh mục sản phẩm đa dạng từ những dòng xe phổ thông tiết kiệm đến những mẫu xe sang đẳng cấp, Auto X tự hào là điểm đến tin cậy cho mọi khách hàng yêu xe. Chúng tôi cung cấp giải pháp toàn diện từ mua bán, ký gửi đến dịch vụ bảo dưỡng chuyên nghiệp, giúp hành trình của bạn luôn trọn vẹn.</p>
         </div>
         <div class="address">
@@ -359,6 +360,15 @@
             <li><i class="fa fa-map-marker"></i><span>Hẻm 2276/23 Trung Mỹ Tây </span></li>
             <li><i class="fa fa-phone"></i><span>(007) 123 456 7890</span></li>
             <li><i class="fa fa-envelope-o"></i><span>AutoX@gmail.com</span></li>
+=======
+          <p>We provide everything you need to build an amazing dealership website developed especially for car sellers dealers or auto motor retailers.</p>
+        </div>
+        <div class="address">
+          <ul>
+            <li><i class="fa fa-map-marker"></i><span>220E Front St. Burlington NC 27215</span></li>
+            <li><i class="fa fa-phone"></i><span>(007) 123 456 7890</span></li>
+            <li><i class="fa fa-envelope-o"></i><span>support@website.com</span></li>
+>>>>>>> 56f418b71e7297c8684b3af2c472b40dff42c5df
           </ul>
           <div class="social">
           <ul>
@@ -371,48 +381,85 @@
       </div>
       <div class="col-lg-3 col-md-3 col-sm-6">
         <div class="usefull-link">
+<<<<<<< HEAD
           <h6 class="text-white">Liên Kết</h6>
           <ul>
             <li><a href="#"><i class="fa fa-angle-double-right"></i> Về chúng tôi </a></li>
             <li><a href="#"><i class="fa fa-angle-double-right"></i> Xem xe </a></li>
             <li><a href="#"><i class="fa fa-angle-double-right"></i> Dịch vụ </a></li>
             <li><a href="#"><i class="fa fa-angle-double-right"></i> Tin tức </a></li>
+=======
+          <h6 class="text-white">Useful Links</h6>
+          <ul>
+            <li><a href="#"><i class="fa fa-angle-double-right"></i> Change Oil and Filter</a></li>
+            <li><a href="#"><i class="fa fa-angle-double-right"></i> Brake Pads Replacement</a></li>
+            <li><a href="#"><i class="fa fa-angle-double-right"></i> Timing Belt Replacement</a></li>
+            <li><a href="#"><i class="fa fa-angle-double-right"></i> Pre-purchase Car Inspection</a></li>
+            <li><a href="#"><i class="fa fa-angle-double-right"></i> Starter Replacement</a></li>
+>>>>>>> 56f418b71e7297c8684b3af2c472b40dff42c5df
           </ul>
         </div>
       </div>
       <div class="col-lg-3 col-md-3 col-sm-6">
         <div class="recent-post-block">
+<<<<<<< HEAD
           <h6 class="text-white">Bài viết</h6>
           <div class="recent-post">
             <div class="recent-post-image"><img class="img-responsive" src="{{ asset('images/car/01.jpg') }}" alt=""></div>
             <div class="recent-post-info">
               <a href="#">Cập nhật tin tức</a>
               <span class="post-date"><i class="fa fa-calendar"></i>07/04/2026</span>
+=======
+          <h6 class="text-white">recent posts</h6>
+          <div class="recent-post">
+            <div class="recent-post-image"><img class="img-responsive" src="{{ asset('images/car/01.jpg') }}" alt=""></div>
+            <div class="recent-post-info">
+              <a href="#">Time to change your</a>
+              <span class="post-date"><i class="fa fa-calendar"></i>JAN 10, 2018</span>
+>>>>>>> 56f418b71e7297c8684b3af2c472b40dff42c5df
             </div>
           </div>
           <div class="recent-post">
             <div class="recent-post-image"><img class="img-responsive" src="{{ asset('images/car/02.jpg') }}" alt=""></div>
             <div class="recent-post-info">
+<<<<<<< HEAD
               <a href="#">Cập nhật tin tức</a>
               <span class="post-date"><i class="fa fa-calendar"></i>07/04/2026</span>
+=======
+              <a href="#">The best time to</a>
+              <span class="post-date"><i class="fa fa-calendar"></i>JAN 10, 2018</span>
+>>>>>>> 56f418b71e7297c8684b3af2c472b40dff42c5df
             </div>
           </div>
           <div class="recent-post">
             <div class="recent-post-image"><img class="img-responsive" src="{{ asset('images/car/03.jpg') }}" alt=""></div>
             <div class="recent-post-info">
+<<<<<<< HEAD
               <a href="#">Cập nhật tin tức</a>
               <span class="post-date"><i class="fa fa-calendar"></i>07/04/2026</span>
+=======
+              <a href="#">Replacing a timing</a>
+              <span class="post-date"><i class="fa fa-calendar"></i>JAN 10, 2018</span>
+>>>>>>> 56f418b71e7297c8684b3af2c472b40dff42c5df
             </div>
           </div>
         </div>
       </div>
       <div class="col-lg-3 col-md-3 col-sm-6">
         <div class="news-letter">
+<<<<<<< HEAD
           <h6 class="text-white">Đăng ký để mua xe</h6>
           <p>Mời bạn nhập email để đăng ký mua xe.</p>
           <form class="news-letter">
             <input type="email" placeholder="Enter your Email" class="form-control placeholder">
             <a class="button red" href="#">Đăng Ký</a>
+=======
+          <h6 class="text-white">subscribe Our Newsletter</h6>
+          <p>Keep up on our always evolving products features and technology. Enter your e-mail and subscribe to our newsletter.</p>
+          <form class="news-letter">
+            <input type="email" placeholder="Enter your Email" class="form-control placeholder">
+            <a class="button red" href="#">Subscribe</a>
+>>>>>>> 56f418b71e7297c8684b3af2c472b40dff42c5df
           </form>
         </div>
       </div>

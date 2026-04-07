@@ -38,7 +38,11 @@ class DatabaseSeeder extends Seeder
                 'model'        => 'TT RS',
                 'year'         => 2022,
                 'price'        => 3200000000,
+<<<<<<< HEAD
                 'price_per_day'=> 3200000000,
+=======
+                'price_per_day'=> 3200000,
+>>>>>>> 56f418b71e7297c8684b3af2c472b40dff42c5df
                 'color'        => 'Đỏ',
                 'mileage'      => 0,
                 'fuel_type'    => 'xăng',
@@ -55,7 +59,11 @@ class DatabaseSeeder extends Seeder
                 'model'        => 'R8',
                 'year'         => 2026,
                 'price'        => 14500000000,
+<<<<<<< HEAD
                 'price_per_day'=> 14500000000,
+=======
+                'price_per_day'=> 14500000,
+>>>>>>> 56f418b71e7297c8684b3af2c472b40dff42c5df
                 'color'        => 'Xám',
                 'mileage'      => 0,
                 'fuel_type'    => 'xăng',
@@ -74,7 +82,11 @@ class DatabaseSeeder extends Seeder
                 'model'        => 'M4',
                 'year'         => 2024,
                 'price'        => 4499000000,
+<<<<<<< HEAD
                 'price_per_day'=> 4499000000,
+=======
+                'price_per_day'=> 4499000,
+>>>>>>> 56f418b71e7297c8684b3af2c472b40dff42c5df
                 'color'        => 'Đen',
                 'mileage'      => 0,
                 'fuel_type'    => 'xăng',
@@ -91,7 +103,11 @@ class DatabaseSeeder extends Seeder
                 'model'        => 'M8',
                 'year'         => 2024,
                 'price'        => 7200000000,
+<<<<<<< HEAD
                 'price_per_day'=> 7200000000,
+=======
+                'price_per_day'=> 7200000,
+>>>>>>> 56f418b71e7297c8684b3af2c472b40dff42c5df
                 'color'        => 'Đen',
                 'mileage'      => 0,
                 'fuel_type'    => 'xăng',
@@ -110,7 +126,11 @@ class DatabaseSeeder extends Seeder
                 'model'        => 'Chiron',
                 'year'         => 2024,
                 'price'        => 75000000000,
+<<<<<<< HEAD
                 'price_per_day'=> 75000000000,
+=======
+                'price_per_day'=> 75000000,
+>>>>>>> 56f418b71e7297c8684b3af2c472b40dff42c5df
                 'color'        => 'Cam',
                 'mileage'      => 0,
                 'fuel_type'    => 'xăng',
@@ -127,7 +147,11 @@ class DatabaseSeeder extends Seeder
                 'model'        => 'La Voiture Noire',
                 'year'         => 2024,
                 'price'        => 450000000000,
+<<<<<<< HEAD
                 'price_per_day'=> 450000000000,
+=======
+                'price_per_day'=> 450000000,
+>>>>>>> 56f418b71e7297c8684b3af2c472b40dff42c5df
                 'color'        => 'Đen',
                 'mileage'      => 0,
                 'fuel_type'    => 'xăng',
@@ -146,7 +170,11 @@ class DatabaseSeeder extends Seeder
                 'model'        => 'Aventador',
                 'year'         => 2024,
                 'price'        => 32000000000,
+<<<<<<< HEAD
                 'price_per_day'=> 32000000000,
+=======
+                'price_per_day'=> 32000000,
+>>>>>>> 56f418b71e7297c8684b3af2c472b40dff42c5df
                 'color'        => 'Đỏ',
                 'mileage'      => 0,
                 'fuel_type'    => 'xăng',
@@ -163,7 +191,11 @@ class DatabaseSeeder extends Seeder
                 'model'        => 'SVJ',
                 'year'         => 2024,
                 'price'        => 40000000000,
+<<<<<<< HEAD
                 'price_per_day'=> 40000000000,
+=======
+                'price_per_day'=> 40000000,
+>>>>>>> 56f418b71e7297c8684b3af2c472b40dff42c5df
                 'color'        => 'Nâu',
                 'mileage'      => 0,
                 'fuel_type'    => 'xăng',
@@ -182,7 +214,11 @@ class DatabaseSeeder extends Seeder
                 'model'        => '911 Carrera',
                 'year'         => 2025,
                 'price'        => 8500000000,
+<<<<<<< HEAD
                 'price_per_day'=> 8500000000,
+=======
+                'price_per_day'=> 8500000,
+>>>>>>> 56f418b71e7297c8684b3af2c472b40dff42c5df
                 'color'        => 'Đen',
                 'mileage'      => 0,
                 'fuel_type'    => 'xăng',
@@ -199,7 +235,11 @@ class DatabaseSeeder extends Seeder
                 'model'        => 'Cayenne',
                 'year'         => 2025,
                 'price'        => 5200000000,
+<<<<<<< HEAD
                 'price_per_day'=> 5200000000,
+=======
+                'price_per_day'=> 5200000,
+>>>>>>> 56f418b71e7297c8684b3af2c472b40dff42c5df
                 'color'        => 'Đen',
                 'mileage'      => 0,
                 'fuel_type'    => 'xăng',
@@ -218,7 +258,11 @@ class DatabaseSeeder extends Seeder
                 'model'        => 'VF 6',
                 'year'         => 2024,
                 'price'        => 675000000,
+<<<<<<< HEAD
                 'price_per_day'=> 675000000,
+=======
+                'price_per_day'=> 675000,
+>>>>>>> 56f418b71e7297c8684b3af2c472b40dff42c5df
                 'color'        => 'Đen',
                 'mileage'      => 0,
                 'fuel_type'    => 'điện',
@@ -235,7 +279,11 @@ class DatabaseSeeder extends Seeder
                 'model'        => 'VF 9',
                 'year'         => 2024,
                 'price'        => 1690000000,
+<<<<<<< HEAD
                 'price_per_day'=> 1690000000,
+=======
+                'price_per_day'=> 1690000,
+>>>>>>> 56f418b71e7297c8684b3af2c472b40dff42c5df
                 'color'        => 'Xanh',
                 'mileage'      => 0,
                 'fuel_type'    => 'điện',
