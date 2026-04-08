@@ -154,7 +154,7 @@ class DatabaseSeeder extends Seeder
                 'condition'    => 'mới',
                 'engine'       => 'V12 6.5L',
                 'seats'        => 2,
-                'image_url'    => 'images/Xe/Lamborghini/Lamborghini Aventador do.avif',
+                'image_url'    => 'images/Xe/Lamborghini/lamborghini svj xanh.png',
             ],
             [
                 'name'         => 'Lamborghini SVJ',

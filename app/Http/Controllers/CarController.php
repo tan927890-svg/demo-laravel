@@ -68,7 +68,7 @@ if ($request->filled('status')) {
         return view('cars.index', compact('cars', 'brands'));
     }
 
-   public function show(Car $car)
+public function show(Car $car)
 {
     $car->load([
         'brand',
@@ -84,14 +84,43 @@ if ($request->filled('status')) {
         ->groupBy('category')
         ->sortBy(fn($group) => $group->first()->category_order);
 
-    // Xe cùng hãng để gợi ý so sánh
-    $relatedCars = Car::with('brand')
+    // Xe cùng hãng — thêm variants + specs cho so sánh
+    $relatedCars = Car::with(['brand', 'variants', 'specs'])  // ← thêm variants, specs
         ->where('brand_id', $car->brand_id)
         ->where('id', '!=', $car->id)
         ->limit(4)
         ->get();
 
-    return view('cars.show', compact('car', 'specsByCategory', 'relatedCars'));
+    // Chuẩn bị dữ liệu cho widget so sánh
+    $compAllCars = collect([$car])
+        ->concat($relatedCars)
+        ->map(fn($c) => [
+            'id'       => $c->id,
+            'name'     => $c->name,
+            'brand'    => $c->brand?->name ?? '',
+            'img'      => $this->carImgUrl($c),
+            'variants' => $c->variants->unique('name')->values()
+                            ->map(fn($v) => ['name' => $v->name, 'price' => (int)$v->price])
+                            ->toArray(),
+            'specs'    => $c->specs
+                            ->groupBy('category')
+                            ->map(fn($g) => $g->pluck('spec_value', 'spec_key'))
+                            ->toArray(),
+        ])
+        ->values()
+        ->toArray();
+
+    return view('cars.show', compact('car', 'specsByCategory', 'relatedCars', 'compAllCars'));  // ← thêm compAllCars
+}
+
+// ← thêm helper này vào cuối class (trước dấu } cuối)
+private function carImgUrl($car): ?string
+{
+    foreach (['image_url', 'image', 'hero_image'] as $field) {
+        $val = $car->$field ?? null;
+        if ($val) return asset(ltrim($val, '/'));
+    }
+    return null;
 }
 public function costEstimate(Car $car) {
     return view('cars.cost-estimate', compact('car'));

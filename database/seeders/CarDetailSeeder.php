@@ -336,7 +336,7 @@ class CarDetailSeeder extends Seeder
 
             CarColor::insert([
                 ['car_id' => $aventador->id, 'name' => 'Đỏ Rosso Mars',    'hex_code' => '#c0152b', 'image' => $this->img('lamborghini', 'Lamborghini Aventador do.avif'),   'is_default' => true,  'sort_order' => 1, 'price_addon' => 0,           'created_at' => now(), 'updated_at' => now()],
-                ['car_id' => $aventador->id, 'name' => 'Xám Grigio Titans', 'hex_code' => '#6b7280', 'image' => $this->img('lamborghini', 'Lamborghini Aventador Nen.avif'),  'is_default' => false, 'sort_order' => 2, 'price_addon' => 0,           'created_at' => now(), 'updated_at' => now()],
+                ['car_id' => $aventador->id, 'name' => 'Xám Grigio Titans', 'hex_code' => '#2faf0f', 'image' => $this->img('lamborghini', 'lamborghini svj xanh.png'),  'is_default' => false, 'sort_order' => 2, 'price_addon' => 0,           'created_at' => now(), 'updated_at' => now()],
                 ['car_id' => $aventador->id, 'name' => 'Vàng Giallo Orion', 'hex_code' => '#d97706', 'image' => $this->img('lamborghini', 'Lamborghini Aventador vang.avif'), 'is_default' => false, 'sort_order' => 3, 'price_addon' => 300_000_000, 'created_at' => now(), 'updated_at' => now()],
             ]);
 
