@@ -523,7 +523,7 @@
                 </div>
                 <div>
                   <div class="social-link-name">Facebook</div>
-                  <div class="social-link-handle">@conceptcardealervn</div>
+                  <div class="social-link-handle">@autoX.vn</div>
                 </div>
                 <span class="social-followers">12.4K</span>
               </a>
@@ -534,7 +534,7 @@
                 </div>
                 <div>
                   <div class="social-link-name">Instagram</div>
-                  <div class="social-link-handle">@conceptcar.vn</div>
+                  <div class="social-link-handle">@autoX.vn</div>
                 </div>
                 <span class="social-followers">8.1K</span>
               </a>
@@ -545,7 +545,7 @@
                 </div>
                 <div>
                   <div class="social-link-name">YouTube</div>
-                  <div class="social-link-handle">AUTO X VN</div>
+                  <div class="social-link-handle">@autoX.vn</div>
                 </div>
                 <span class="social-followers">3.2K</span>
               </a>
