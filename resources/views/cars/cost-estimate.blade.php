@@ -261,8 +261,8 @@
   letter-spacing: 3px; text-transform: uppercase; text-decoration: none;
   cursor: pointer; border: none; transition: all .2s; display: inline-block;
 }
-.dtt-cta-btn.primary { background: var(--red); color: #fff; }
-.dtt-cta-btn.primary:hover { background: #a80000; }
+.dtt-cta-btn.primary { background: var(--red); color: #1f1d1d; }
+.dtt-cta-btn.primary:hover { background: #7a7272; }
 .dtt-cta-btn.secondary { background: transparent; color: #111; border: 2px solid #111; }
 .dtt-cta-btn.secondary:hover { border-color: var(--red); color: var(--red); }
 
@@ -312,9 +312,8 @@
       {{-- Chọn xe --}}
       <div class="dtt-field">
         <label class="dtt-label">Chọn xe</label>
-        <select class="dtt-select" id="sel-car" onchange="onCarChange()">
+        <select class="dtt-select" id="sel-car">
           @if(isset($car))
-            {{-- Đang ở trang xe cụ thể: hiển thị các phiên bản của xe --}}
             @foreach($car->variants as $variant)
               <option value="{{ $variant->id }}"
                       data-price="{{ $variant->price }}"
@@ -329,7 +328,6 @@
               </option>
             @endif
           @elseif(isset($cars))
-            {{-- Trang dùng chung: liệt kê tất cả xe --}}
             <option value="">— Chọn xe —</option>
             @foreach($cars as $c)
               @foreach($c->variants as $v)
@@ -387,7 +385,7 @@
         </div>
         <div class="dtt-field">
           <label class="dtt-label">Khu vực (*)</label>
-          <select class="dtt-select" id="sel-zone" onchange="recalculate()">
+          <select class="dtt-select" id="sel-zone">
             <option value="">Chọn khu vực</option>
             <option value="1" data-rate="0.10">Khu vực I (10%)</option>
             <option value="2" data-rate="0.10">Khu vực II (10%)</option>
@@ -536,56 +534,38 @@
 (function () {
   'use strict';
 
-  /* ────────────────────────────────────────
-     PHÍ CỐ ĐỊNH (đơn vị: VNĐ)
-     Nguồn: Nghị định 10/2020, Thông tư của BTC
-  ──────────────────────────────────────── */
   const FIXED = {
-    regFee    : 1_000_000,   // Lệ phí đăng ký biển số
-    roadFee   : 1_560_000,   // Phí đường bộ / năm (xe ≤9 chỗ)
-    insurance : 480_700,     // Bảo hiểm TNDS / năm (≤6 chỗ, đã gồm VAT)
+    regFee    : 1_000_000,
+    roadFee   : 1_560_000,
+    insurance : 480_700,
   };
 
-  /* Mức trước bạ theo khu vực */
-  const ZONE_RATE = { '1': 0.10, '2': 0.10, '3': 0.08 };
+  const ZONE_RATE  = { '1': 0.10, '2': 0.10, '3': 0.08 };
   const ZONE_LABEL = { '1': '10%', '2': '10%', '3': '8%' };
 
-  /* ── helpers ── */
   const fmt = n => new Intl.NumberFormat('vi-VN').format(Math.round(n));
-
   function el(id) { return document.getElementById(id); }
 
-  /* ── Auto-fill zone khi chọn tỉnh ── */
+  /* Chỉ fill khu vực, KHÔNG tính kết quả */
   window.onProvinceChange = function () {
     const prov = el('sel-province');
     const opt  = prov.options[prov.selectedIndex];
     const zone = opt.dataset.zone;
     const zSel = el('sel-zone');
     if (zone) {
-      // map zone -> option value
       for (let i = 0; i < zSel.options.length; i++) {
         if (zSel.options[i].value === zone) {
           zSel.selectedIndex = i; break;
         }
       }
     }
-    recalculate();
+    // Không gọi recalculate() ở đây
   };
 
-  /* ── Cập nhật tên phiên bản xe hiển thị ── */
-  window.onCarChange = function () {
-    const sel  = el('sel-car');
-    const opt  = sel.options[sel.selectedIndex];
-    const nameEl    = el('result-car-name');
-    const variantEl = el('result-car-variant');
-    if (variantEl) variantEl.textContent = opt.text || '';
-    recalculate();
-  };
-
-  /* ── TÍNH GIÁ ── */
+  /* Chỉ chạy khi bấm nút */
   window.recalculate = function () {
-    const carSel   = el('sel-car');
-    const zoneSel  = el('sel-zone');
+    const carSel  = el('sel-car');
+    const zoneSel = el('sel-zone');
 
     if (!carSel || !zoneSel) return;
 
@@ -596,43 +576,33 @@
     const zone     = zoneOpt?.value;
     const rate     = ZONE_RATE[zone] || null;
 
-    // Chưa đủ dữ liệu
     if (!carPrice || !rate) {
-      el('result-empty').style.display = 'block';
+      el('result-empty').style.display   = 'block';
       el('result-content').style.display = 'none';
       return;
     }
 
-    /* Tính */
-    const tbAmount  = carPrice * rate;
-    const total     = carPrice + tbAmount + FIXED.regFee + FIXED.roadFee + FIXED.insurance;
+    const tbAmount = carPrice * rate;
+    const total    = carPrice + tbAmount + FIXED.regFee + FIXED.roadFee + FIXED.insurance;
 
-    /* Hiển thị */
     el('result-empty').style.display   = 'none';
     el('result-content').style.display = 'block';
 
-    // Animate in
     el('result-content').classList.add('calculating');
     setTimeout(() => el('result-content').classList.remove('calculating'), 600);
 
-    el('r-car-price').textContent  = fmt(carPrice);
-    el('r-tb-total').textContent   = fmt(tbAmount);
-    el('r-tb-rate').textContent    = ZONE_LABEL[zone];
-    el('r-tb-amount').textContent  = fmt(tbAmount);
-    el('r-reg-fee').textContent    = fmt(FIXED.regFee);
-    el('r-road-fee').textContent   = fmt(FIXED.roadFee);
-    el('r-insurance').textContent  = fmt(FIXED.insurance);
-    el('r-total').innerHTML        = fmt(total) + '<small>*Tạm tính</small>';
+    el('r-car-price').textContent = fmt(carPrice);
+    el('r-tb-total').textContent  = fmt(tbAmount);
+    el('r-tb-rate').textContent   = ZONE_LABEL[zone];
+    el('r-tb-amount').textContent = fmt(tbAmount);
+    el('r-reg-fee').textContent   = fmt(FIXED.regFee);
+    el('r-road-fee').textContent  = fmt(FIXED.roadFee);
+    el('r-insurance').textContent = fmt(FIXED.insurance);
+    el('r-total').innerHTML       = fmt(total) + '<small>*Tạm tính</small>';
 
-    /* Variant label */
     const variantEl = el('result-car-variant');
     if (variantEl) variantEl.textContent = carOpt.text || '';
   };
-
-  /* ── Tự động tính nếu đã có giá trị mặc định ── */
-  window.addEventListener('DOMContentLoaded', () => {
-    setTimeout(recalculate, 100);
-  });
 
 })();
 </script>

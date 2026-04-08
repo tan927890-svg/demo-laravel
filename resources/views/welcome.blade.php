@@ -694,11 +694,7 @@
                <div class="separator"></div>
                <div class="price">
                   <span class="new-price">
-<<<<<<< HEAD
                      {{ number_format($car->price_per_day) }} VNĐ
-=======
-                     {{ number_format($car->price_per_day) }} VNĐ/ngày
->>>>>>> 56f418b71e7297c8684b3af2c472b40dff42c5df
                   </span>
                </div>
             </div>
@@ -737,13 +733,8 @@
          <div class="row">
             <div class="col-lg-12 col-md-12">
                <div class="section-title">
-<<<<<<< HEAD
                   <span>Xem tin tức mới nhất</span>
                   <h2>Điểm tin thị trường</h2>
-=======
-                  <span>Read our latest news</span>
-                  <h2>Latest News</h2>
->>>>>>> 56f418b71e7297c8684b3af2c472b40dff42c5df
                   <div class="separator"></div>
                </div>
             </div>
@@ -755,7 +746,6 @@
                </div>
                <div class="col-lg-6 col-md-6 col-sm-6">
                   <div class="blog-content">
-<<<<<<< HEAD
                      <a class="link" href="#">Porsche 911 là văn bản của việc in một bản mẫu chữ và chỉnh sửa nó để tạo thành một cuốn sách mẫu chữ.</a>
                      <span class="uppercase">Ngày 29 tháng 11 năm 2026 |
                      <strong class="text-red">Bài đăng của John Doe</strong>
@@ -763,15 +753,6 @@
                      <p>Chiếc xe mang đến sự kết hợp hoàn hảo giữa thiết kế hiện đại và hiệu suất mạnh mẽ, đem lại trải nghiệm lái mượt mà và đầy cảm hứng.</p>
                      <p>Với động cơ bền bỉ, khả năng vận hành ổn định cùng tiện nghi cao cấp, đây là lựa chọn lý tưởng cho những ai yêu thích sự thoải mái và phong cách trong từng hành trình.</p>
                      <a class="button border" href="#"> Đăng ký </a>
-=======
-                     <a class="link" href="#">Porsche 911 is text of the printin a galley of type and bled it to make a type specimen book.</a>
-                     <span class="uppercase">November 29, 2018 |
-                     <strong class="text-red">post by john doe</strong>
-                     </span>
-                     <p>Sed do eiusmod tempor lorem ipsum dolor sit amet, consectetur adipisicing elit, incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.</p>
-                     <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-                     <a class="button border" href="#">Read more</a>
->>>>>>> 56f418b71e7297c8684b3af2c472b40dff42c5df
                   </div>
                </div>
             </div>
@@ -800,13 +781,8 @@
          <div class="row">
             <div class="col-lg-12 col-md-12">
                <div class="section-title">
-<<<<<<< HEAD
                   <span> Những đánh giá của khách hàng về chúng tôi. </span>
                   <h2>Nhận xét của khách hàng</h2>
-=======
-                  <span>What Our Happy Clients say about us</span>
-                  <h2>our Testimonial</h2>
->>>>>>> 56f418b71e7297c8684b3af2c472b40dff42c5df
                   <div class="separator"></div>
                </div>
             </div>
@@ -820,17 +796,10 @@
                         <div class="testimonial-box">
                            <div class="testimonial-avtar">
                               <img class="img-responsive" src="{{ asset('images/team/01.jpg') }}" alt="" />
-<<<<<<< HEAD
                               <h6>Nguyễn Văn A</h6><span>Auto X</span>
                            </div>
                            <div class="testimonial-content">
                               <p>Tôi rất ấn tượng với không gian hiện đại và sự đón tiếp nồng hậu tại showroom. Đội ngũ nhân viên tư vấn rất am hiểu kỹ thuật, giúp tôi chọn được dòng xe phù hợp với nhu cầu gia đình mà không hề cảm thấy bị áp đặt. Chế độ hậu mãi và bảo dưỡng tại đây cũng rất nhanh chóng</p>
-=======
-                              <h6>Alice Williams</h6><span>Auto Dealer</span>
-                           </div>
-                           <div class="testimonial-content">
-                              <p>It has survived not only five centuries. lorem Ipsum is simply dummy text of the printin a galley of type and bled it to make a type specimen book.</p>
->>>>>>> 56f418b71e7297c8684b3af2c472b40dff42c5df
                               <i class="fa fa-quote-right"></i>
                            </div>
                         </div>
@@ -842,17 +811,10 @@
                         <div class="testimonial-box">
                            <div class="testimonial-avtar">
                               <img class="img-responsive" src="{{ asset('images/team/02.jpg') }}" alt="" />
-<<<<<<< HEAD
                               <h6>Trần Thị B</h6><span>Chủ xe BMW</span>
                            </div>
                            <div class="testimonial-content">
                               <p>Sau 6 tháng cầm lái, tôi hoàn toàn hài lòng với khả năng vận hành của xe. Xe chạy êm, tiết kiệm nhiên liệu và các tính năng an toàn thực sự vượt mong đợi. Cảm ơn hệ thống showroom đã tư vấn tận tình để tôi tìm thấy người bạn đồng hành ưng ý này.</p>
-=======
-                              <h6>Michael Bean</h6><span>Car Dealer</span>
-                           </div>
-                           <div class="testimonial-content">
-                              <p>A galley of type and bled it to make a type specimen book. Ipsum is simply dummy text of the printin It has survived not only five centuries.</p>
->>>>>>> 56f418b71e7297c8684b3af2c472b40dff42c5df
                               <i class="fa fa-quote-right"></i>
                            </div>
                         </div>
@@ -864,17 +826,10 @@
                         <div class="testimonial-box">
                            <div class="testimonial-avtar">
                               <img class="img-responsive" src="{{ asset('images/team/03.jpg') }}" alt="" />
-<<<<<<< HEAD
                               <h6>Lê Hoàng C</h6><span>Khách hàng thân thiết</span>
                            </div>
                            <div class="testimonial-content">
                               <p>Điểm tôi thích nhất ở Auto X là hệ thống chi nhánh có mặt ở nhiều tỉnh thành. Dù đi công tác hay du lịch, tôi vẫn dễ dàng tìm được điểm bảo hành chính hãng. Nhân viên ở mọi chi nhánh đều có chung một phong cách phục vụ chu đáo, tận tâm.</p>
-=======
-                              <h6>Felica Queen</h6><span>Auto Dealer</span>
-                           </div>
-                           <div class="testimonial-content">
-                              <p>Text of the printin a galley of type and bled it to a type specimen book. It has survived not only five centuries make Lorem Ipsum is simply dummy.</p>
->>>>>>> 56f418b71e7297c8684b3af2c472b40dff42c5df
                               <i class="fa fa-quote-right"></i>
                            </div>
                         </div>
@@ -886,17 +841,10 @@
                         <div class="testimonial-box">
                            <div class="testimonial-avtar">
                               <img class="img-responsive" src="{{ asset('images/team/04.jpg') }}" alt="" />
-<<<<<<< HEAD
                               <h6>Phạm Minh D</h6><span>Khách hàng thân thiết</span>
                            </div>
                            <div class="testimonial-content">
                               <p>Xe đẹp, lái chất, dịch vụ 5 sao! Từ lúc xem xe đến khi nhận xe chỉ mất vài ngày. Thủ tục trả góp tại showroom rất đơn giản và minh bạch.Chế độ hậu mãi và bảo dưỡng tại đây cũng rất nhanh chóng.Cảm ơn hệ thống showroom đã tư vấn tận tình để tôi tìm thấy người bạn đồng hành ưng ý này.</p>
-=======
-                              <h6>Sara Lisbon</h6><span>Customer</span>
-                           </div>
-                           <div class="testimonial-content">
-                              <p>Printin a galley of type and bled It has survived not lorem Ipsum is simply dummy text of the it to make a type specimen book only five centuries.</p>
->>>>>>> 56f418b71e7297c8684b3af2c472b40dff42c5df
                               <i class="fa fa-quote-right"></i>
                            </div>
                         </div>
