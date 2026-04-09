@@ -109,26 +109,30 @@
 .pcs-left .section-label::before { background: #c00; }
 .pcs-left .section-title { color: #111; margin-bottom: 32px; }
 .pcs-left .section-title em { color: #c00; }
-.variant-tabs {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-bottom: 32px;
-  max-height: 120px;
-  overflow: hidden;
+
+/* Tên xe đơn (thay variant tabs) */
+.car-name-display {
+  margin-bottom: 28px;
 }
-.variant-tab { font-family: 'Rajdhani', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 9px 20px; background: #e8e6e0; border: 1px solid #d0cec8; color: #555; cursor: pointer; transition: all .2s; }
-.variant-tab.active,.variant-tab:hover { background: #c00; border-color: #c00; color: #fff; }
-.color-swatches { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 8px; }
-.color-swatch { display: flex; flex-direction: column; align-items: center; gap: 10px; cursor: pointer; }
-.swatch-circle { width: 64px; height: 64px; border-radius: 50%; border: 3px solid transparent; box-shadow: 0 6px 16px rgba(0,0,0,.12); transition: border-color .18s, transform .18s; }
-.color-swatch:hover .swatch-circle { transform: scale(1.08); }
-.color-swatch.active .swatch-circle { border-color: transparent; box-shadow: none; }
-.color-swatch::after { content: ''; height: 4px; width: 44px; background: transparent; display: block; margin-top: 6px; border-radius: 4px; transition: background .18s, transform .18s; }
-.color-swatch.active::after { background: #c00; transform: translateY(0); }
-.swatch-name { font-family: 'Rajdhani', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: none; color: #666; transition: color .18s; }
-.color-swatch.active .swatch-name { color: #c00; }
-.color-selected-label { font-family: 'Rajdhani', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #c00; margin-bottom: 24px; min-height: 18px; }
+.car-name-display-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #9a9a9a;
+  margin-bottom: 6px;
+}
+.car-name-display-value {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: #111;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  line-height: 1.1;
+}
+
 .price-display { margin-bottom: 28px; }
 .price-display-label { font-family: 'Rajdhani', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #9a9a9a; margin-bottom: 8px; }
 .price-display-value { font-family: 'Barlow Condensed', sans-serif; font-size: 72px; font-weight: 900; color: #6b6b6b; line-height: 1; }
@@ -335,7 +339,7 @@ function carImgPath($val) {
 
 {{-- STICKY NAV --}}
 <nav class="detail-nav" id="detail-nav">
-  <a href="#gia-mau-sac" class="nav-link">Giá & Màu sắc</a>
+  <a href="#gia-mau-sac" class="nav-link">Giá & Hạng xe</a>
   <a href="#tinh-nang"   class="nav-link">Tính năng nổi bật</a>
   <a href="#thong-so"    class="nav-link">Thông số kỹ thuật</a>
   <a href="#thu-vien"    class="nav-link">Thư viện ảnh</a>
@@ -373,10 +377,10 @@ function carImgPath($val) {
       @endif
     </div>
     <div class="car-hero-right">
-      <div class="car-hero-price-label">Giá thuê từ</div>
+      <div class="car-hero-price-label">Giá từ</div>
       <div class="car-hero-price">
         {{ number_format($car->price_per_day ?? $car->price) }}
-        <small>VNĐ/ngày</small>
+        <small>VNĐ</small>
       </div>
       @php
         $statusMap = [
@@ -391,49 +395,24 @@ function carImgPath($val) {
   </div>
 </section>
 
-{{-- GIA & MAU SAC --}}
+{{-- GIA & HANG XE --}}
 <section class="price-color-section" id="gia-mau-sac">
   <div class="container">
     <div class="price-color-layout">
       <div class="pcs-left">
         <div class="section-label">Bộ sưu tập</div>
-        <div class="section-title">Giá & <em>Màu sắc</em></div>
+        <div class="section-title">Giá & <em>Hạng xe</em></div>
 
-        @if($car->variants->count())
-        @php $uniqueVariants = $car->variants->unique('name')->take(6); @endphp
-        <div class="variant-tabs" id="variant-tabs">
-          @foreach($uniqueVariants as $variant)
-            <button class="variant-tab {{ $loop->first ? 'active' : '' }}"
-                    data-price="{{ $variant->price }}"
-                    onclick="selectVariant(this)">
-              {{ $variant->name }}
-            </button>
-          @endforeach
+        {{-- Chỉ hiển thị tên xe, không có tabs chọn --}}
+        <div class="car-name-display">
+          <div class="car-name-display-label">Dòng xe</div>
+          <div class="car-name-display-value">{{ $car->name }}</div>
         </div>
-        @endif
-
-        @if($car->colors->count())
-        <div class="color-swatches">
-          @foreach($car->colors as $color)
-            @php $colorImgUrl = carImgPath($color->image ?? null); @endphp
-            <div class="color-swatch {{ $color->is_default || $loop->first ? 'active' : '' }}"
-                 data-image="{{ $colorImgUrl ?? '' }}"
-                 data-name="{{ $color->name }}"
-                 onclick="selectColor(this)">
-              <div class="swatch-circle" style="background:{{ $color->hex_code }};"></div>
-              <div class="swatch-name">{{ $color->name }}</div>
-            </div>
-          @endforeach
-        </div>
-        <div class="color-selected-label" id="color-selected-label">
-          {{ $car->colors->firstWhere('is_default', true)?->name ?? $car->colors->first()?->name }}
-        </div>
-        @endif
 
         <div class="price-display">
           <div class="price-display-label">Giá bán lẻ đề xuất</div>
           <div class="price-display-value" id="price-display">
-            {{ number_format($car->variants->first()?->price ?? $car->price_per_day ?? $car->price) }}
+            {{ number_format($car->price_per_day ?? $car->price) }}
             <span>VNĐ</span>
           </div>
         </div>
@@ -454,7 +433,6 @@ function carImgPath($val) {
                   if ($firstColorImg) break;
               }
           }
-          $previewColorName = $defaultColor?->name ?? $car->name;
         @endphp
         @if($firstColorImg)
           <img class="color-preview-img"
@@ -467,7 +445,7 @@ function carImgPath($val) {
              style="{{ $firstColorImg ? 'display:none;' : '' }}">
           <span style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(0,0,0,.2);">{{ $car->name }}</span>
         </div>
-        <div class="color-preview-badge" id="color-preview-badge">{{ $previewColorName }}</div>
+        <div class="color-preview-badge">{{ $car->name }}</div>
       </div>
     </div>
   </div>
@@ -562,7 +540,7 @@ function carImgPath($val) {
   </div>
 </section>
 
-{{-- MODAL — render 1 lần duy nhất, bên trong @if($car->features->count()) --}}
+{{-- MODAL --}}
 <div class="feature-modal-backdrop" id="feature-modal-backdrop">
   <div class="feature-modal">
     <div class="feature-modal-header">
@@ -585,7 +563,7 @@ function carImgPath($val) {
     </div>
   </div>
 </div>
-@endif {{-- end $car->features->count() --}}
+@endif
 
 {{-- THONG SO KY THUAT --}}
 @if($specsByCategory->count())
@@ -603,7 +581,6 @@ function carImgPath($val) {
     <div class="specs-outer-wrap">
       <div class="specs-layout">
 
-        {{-- CỘT TRÁI: Danh mục + key — CỐ ĐỊNH --}}
         <div class="specs-col-fixed">
           <div class="specs-header-fixed">DANH MỤC</div>
 
@@ -621,7 +598,6 @@ function carImgPath($val) {
           @endforeach
         </div>
 
-        {{-- CỘT PHẢI: Variants — CÓ THỂ CUỘN NGANG --}}
         <div class="specs-col-scroll-wrap" id="specs-scroll-wrap">
           <div class="specs-col-scroll">
             @foreach($uniqueVariants as $vIdx => $variant)
@@ -648,9 +624,9 @@ function carImgPath($val) {
           </div>
         </div>
 
-      </div>{{-- .specs-layout --}}
-    </div>{{-- .specs-outer-wrap --}}
-  </div>{{-- .specs-section-inner --}}
+      </div>
+    </div>
+  </div>
 </section>
 @endif
 
@@ -746,7 +722,7 @@ function carImgPath($val) {
           <div class="related-name">{{ $related->name }}</div>
           <div class="related-price">
             {{ number_format($related->price_per_day ?? $related->price) }}
-            <small>VNĐ/ngày</small>
+            <small>VNĐ</small>
           </div>
         </div>
       </a>
@@ -844,43 +820,7 @@ function carImgPath($val) {
   }, { threshold: 0.08 });
   document.querySelectorAll('.feature-slide').forEach(s => revealObs.observe(s));
 
-  /* ── 5. Giá & Màu sắc ── */
-  window.selectVariant = function (btn) {
-    document.querySelectorAll('#variant-tabs .variant-tab').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    const price = parseInt(btn.dataset.price);
-    if (price) {
-      document.getElementById('price-display').innerHTML =
-        new Intl.NumberFormat('vi-VN').format(price) + ' <span>VNĐ</span>';
-    }
-  };
-
-  window.selectColor = function (el) {
-    document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
-    el.classList.add('active');
-    const imgEl      = document.getElementById('color-preview-img');
-    const fallbackEl = document.getElementById('color-preview-fallback');
-    if (el.dataset.image && el.dataset.image !== '') {
-      if (imgEl) {
-        imgEl.style.opacity = '0';
-        setTimeout(() => {
-          imgEl.src = el.dataset.image;
-          imgEl.style.display = 'block';
-          imgEl.style.opacity = '1';
-          if (fallbackEl) fallbackEl.style.display = 'none';
-        }, 280);
-      }
-    } else {
-      if (imgEl) imgEl.style.display = 'none';
-      if (fallbackEl) fallbackEl.style.display = 'flex';
-    }
-    const b = document.getElementById('color-preview-badge');
-    const l = document.getElementById('color-selected-label');
-    if (b) b.textContent = el.dataset.name;
-    if (l) l.textContent = el.dataset.name;
-  };
-
-  /* ── 6. Specs: collapse/expand category ── */
+  /* ── 5. Specs: collapse/expand category ── */
   window.toggleSpecsCat = function (catSlug) {
     const catBtn = document.querySelector(`.specs-cat-fixed[data-cat="${catSlug}"]`);
     if (catBtn) catBtn.classList.toggle('collapsed');
@@ -889,7 +829,7 @@ function carImgPath($val) {
     });
   };
 
-  /* ── 7. Specs: active variant col ── */
+  /* ── 6. Specs: active variant col ── */
   window.activateVariantCol = function (idx) {
     document.querySelectorAll('.specs-header-variant').forEach(h => {
       h.classList.toggle('active', parseInt(h.dataset.vidx) === idx);
@@ -901,7 +841,7 @@ function carImgPath($val) {
     });
   };
 
-  /* ── 8. Gallery ── */
+  /* ── 7. Gallery ── */
   window.selectThumb = function (thumb, src) {
     document.querySelectorAll('.gallery-thumb').forEach(t => t.classList.remove('active'));
     thumb.classList.add('active');
@@ -917,7 +857,7 @@ function carImgPath($val) {
     btn.classList.add('active');
   };
 
-  /* ── 9. Feature Modal + Slider ── */
+  /* ── 8. Feature Modal + Slider ── */
   let sliderIdx = 0, sliderSrcs = [];
 
   window.sliderMove = function (dir) {

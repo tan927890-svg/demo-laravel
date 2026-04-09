@@ -4,19 +4,19 @@
 
 @push('styles')
 <style>
+/* ── VARIABLES (theo theme ivory của custom-override.css) ── */
 :root {
-  --red: #d42b2b;
-  --dark: #1a1a1a;
-  --muted: #888;
-  --border: #e8e8e8;
+  --cars-red:    #d42b2b;
+  --cars-muted:  #6B6056;
+  --cars-border: #DDD0B5;
+  --cars-ivory:  #FAF6EF;
+  --cars-dark:   #1C1C1C;
 }
-*, *::before, *::after { box-sizing: border-box; }
-body { background: #fff; color: var(--dark); }
 
 /* ── HEADER ── */
 .cars-header {
-  background: #fff;
-  border-bottom: 1px solid var(--border);
+  background: #FAF6EF;
+  border-bottom: 1px solid #DDD0B5;
   padding: 28px 60px 0;
 }
 .cars-header-top {
@@ -31,7 +31,7 @@ body { background: #fff; color: var(--dark); }
   font-family: 'Barlow Condensed', sans-serif;
   font-size: clamp(22px, 3vw, 36px);
   font-weight: 900;
-  color: var(--dark);
+  color: #1C1C1C;
   text-transform: uppercase;
   letter-spacing: -.5px;
 }
@@ -42,15 +42,20 @@ body { background: #fff; color: var(--dark); }
   font-weight: 700;
   letter-spacing: 2px;
   text-transform: uppercase;
-  border: 1.5px solid var(--red);
-  color: var(--red);
-  background: #fff;
+  border: 1.5px solid var(--cars-red);
+  color: var(--cars-red) !important;
+  background: transparent !important;
+  box-shadow: none !important;
   padding: 9px 20px;
-  text-decoration: none;
+  text-decoration: none !important;
   transition: background .2s, color .2s;
   white-space: nowrap;
+  border-radius: 0 !important;
 }
-.btn-action:hover { background: var(--red); color: #fff; }
+.btn-action:hover {
+  background: var(--cars-red) !important;
+  color: #fff !important;
+}
 
 /* ── BRAND TABS ── */
 .brand-tabs {
@@ -66,92 +71,159 @@ body { background: #fff; color: var(--dark); }
   font-weight: 700;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--cars-muted) !important;
   padding: 14px 20px;
-  text-decoration: none;
+  text-decoration: none !important;
   white-space: nowrap;
   border-bottom: 2px solid transparent;
-  border-top: none;
-  border-left: none;
-  border-right: none;
-  background: none;
+  border-top: none; border-left: none; border-right: none;
+  background: none !important;
+  box-shadow: none !important;
   cursor: pointer;
   transition: color .2s, border-color .2s;
+  border-radius: 0 !important;
 }
-.brand-tab:hover { color: var(--dark); }
-.brand-tab.active { color: var(--red); border-bottom-color: var(--red); }
+.brand-tab:hover { color: #1C1C1C !important; }
+.brand-tab.active { color: var(--cars-red) !important; border-bottom-color: var(--cars-red); }
 
-/* ── GRID ── */
+/* ── WRAP ── */
 .cars-wrap {
   padding: 44px 60px 60px;
   max-width: 1400px;
   margin: 0 auto;
+  background: transparent;
 }
+
+/* ── GRID ── */
 .cars-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 52px 36px;
+  gap: 48px 32px;
 }
 
-/* ── CAR ITEM — Honda VN: không khung, tên+giá trên, ảnh dưới ── */
-.car-item {
-  text-decoration: none;
-  display: block;
+/* ══════════════════════════════════════════════════════
+   CAR ITEM — override hoàn toàn custom-override.css
+   Dùng selector mạnh hơn để thắng !important của theme
+══════════════════════════════════════════════════════ */
+html body .cars-grid a.car-item,
+html body .cars-grid a.car-item:link,
+html body .cars-grid a.car-item:visited,
+html body .cars-grid a.car-item:hover,
+html body .cars-grid a.car-item:focus,
+html body .cars-grid a.car-item:active {
+  display: block !important;
+  text-decoration: none !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  transform: none !important;
   cursor: pointer;
-  /* KHÔNG border, KHÔNG background, KHÔNG box-shadow */
+  overflow: visible !important;
+  position: static !important;
 }
 
-.car-item-info {
-  padding: 0 0 10px 0;
-   text-align: center;  
-}
-.car-item-name {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 22px;
-  font-weight: 900;
-  color: var(--red);
-  text-transform: uppercase;
-  letter-spacing: -.2px;
-  margin-bottom: 3px;
-}
-.car-item-price-line {
-  font-family: 'Barlow', sans-serif;
-  font-size: 13px;
-  color: var(--dark);
-}
-.car-item-price-line strong { font-weight: 800; }
-.car-item-price-line small {
-  font-size: 11px;
-  color: var(--muted);
-  font-weight: 400;
+/* Tên xe */
+html body .cars-grid a.car-item .car-item-name {
+  font-family: 'Barlow Condensed', sans-serif !important;
+  font-size: 22px !important;
+  font-weight: 900 !important;
+  color: var(--cars-red) !important;
+  text-transform: uppercase !important;
+  letter-spacing: -.2px !important;
+  margin-bottom: 4px !important;
+  line-height: 1.1 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
 }
 
-/* Vùng ảnh: nền xám nhẹ, KHÔNG có border hay border-radius */
-.car-item-img-wrap {
-  background: #f5f5f5;
-  overflow: hidden;
-  /* KHÔNG border, KHÔNG border-radius, KHÔNG box-shadow */
+/* Dòng giá */
+html body .cars-grid a.car-item .car-item-price-line {
+  font-family: 'Barlow', sans-serif !important;
+  font-size: 13px !important;
+  color: #6B6056 !important;
+  margin-bottom: 12px !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
 }
-.car-item-img {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;   
-  display: block;
-  transition: transform .4s ease;
+html body .cars-grid a.car-item .car-item-price-line strong {
+  font-weight: 800 !important;
+  color: #1C1C1C !important;
 }
-.car-item:hover .car-item-img {
-  transform: scale(1.05) translateX(6px);
-}
-.car-item-img-placeholder {
-  width: 100%;
-  height: 180px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f5f5f5;
+html body .cars-grid a.car-item .car-item-price-line small {
+  font-size: 11px !important;
+  color: #8a857e !important;
+  font-weight: 400 !important;
 }
 
-/* ── EMPTY ── */
+/* Vùng ảnh — nền ivory để multiply hoạt động */
+html body .cars-grid a.car-item .car-item-img-wrap {
+  width: 100% !important;
+  overflow: hidden !important;
+  background: #FAF6EF !important;
+  background-color: #FAF6EF !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  position: relative !important;
+}
+
+html body .cars-grid a.car-item .car-item-img {
+  width: 100% !important;
+  height: 175px !important;
+  object-fit: contain !important;
+  display: block !important;
+  transition: transform .4s ease !important;
+  mix-blend-mode: multiply !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+  border-radius: 0 !important;
+}
+
+html body .cars-grid a.car-item:hover .car-item-img {
+  transform: scale(1.05) !important;
+}
+
+/* Scene images */
+html body .cars-grid a.car-item .car-item-img.img-scene {
+  object-fit: cover !important;
+  object-position: center 60% !important;
+  mix-blend-mode: normal !important;
+}
+html body .cars-grid a.car-item .car-item-img-wrap:has(.img-scene) {
+  background: transparent !important;
+}
+
+/* Overlay từ custom-override — ẩn đi */
+html body .cars-grid a.car-item .car-overlay-banner {
+  display: none !important;
+}
+
+/* Placeholder khi ảnh lỗi */
+html body .cars-grid a.car-item .car-item-img-placeholder {
+  width: 100% !important;
+  height: 175px !important;
+  display: none;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #ccc !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* ── EMPTY STATE ── */
 .empty-state {
   grid-column: 1 / -1;
   text-align: center;
@@ -164,6 +236,7 @@ body { background: #fff; color: var(--dark); }
   font-weight: 700;
   text-transform: uppercase;
   margin-top: 16px;
+  color: #ccc;
 }
 
 /* ── PAGINATION ── */
@@ -181,14 +254,24 @@ body { background: #fff; color: var(--dark); }
   letter-spacing: 1.5px;
   text-transform: uppercase;
   padding: 8px 14px;
-  border: 1px solid var(--border);
-  text-decoration: none;
-  color: var(--muted);
-  background: #fff;
+  border: 1px solid #DDD0B5;
+  text-decoration: none !important;
+  color: #6B6056 !important;
+  background: #FAF6EF !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
   transition: background .2s, color .2s, border-color .2s;
 }
-.pagi a:hover { background: var(--red); color: #fff; border-color: var(--red); }
-.pagi .current { background: var(--red); color: #fff; border-color: var(--red); }
+.pagi a:hover {
+  background: var(--cars-red) !important;
+  color: #fff !important;
+  border-color: var(--cars-red) !important;
+}
+.pagi .current {
+  background: var(--cars-red) !important;
+  color: #fff !important;
+  border-color: var(--cars-red) !important;
+}
 .pagi [aria-disabled] { opacity: .35; pointer-events: none; }
 
 /* ── RESPONSIVE ── */
@@ -227,31 +310,42 @@ body { background: #fff; color: var(--dark); }
 <div class="cars-wrap">
   <div class="cars-grid">
     @forelse($cars as $car)
-  @php
-    $imgSrc = $car->image_url
-        ? asset(preg_replace_callback('/[^\x20-\x7E]| /', fn($m) => rawurlencode($m[0]), $car->image_url))
-        : asset('images/car/01.jpg');
-  @endphp
+      @php
+        $rawUrl = trim($car->image_url ?? '');
+
+        if ($rawUrl === '') {
+            $imgSrc = asset('images/car/01.jpg');
+        } elseif (preg_match('#^https?://#i', $rawUrl)) {
+            $imgSrc = $rawUrl;
+        } else {
+            $clean = ltrim($rawUrl, '/');
+            $parts = explode('/', $clean);
+            $encoded = array_map(fn($s) => rawurlencode(rawurldecode($s)), $parts);
+            $imgSrc = asset(implode('/', $encoded));
+        }
+
+        $isTN       = str_contains($rawUrl, 'images/car/') || str_contains($rawUrl, '-TN');
+        $sceneClass = $isTN ? '' : 'img-scene';
+      @endphp
+
       <a href="{{ route('cars.show', $car->id) }}" class="car-item">
 
-        {{-- Tên + giá TRÊN ảnh --}}
-        <div class="car-item-info">
-          <div class="car-item-name">{{ $car->name }}</div>
-          <div class="car-item-price-line">
-            Giá từ <strong>{{ number_format($car->price_per_day ?? $car->price) }}</strong>
-            <small> VNĐ</small>
-          </div>
+        <div class="car-item-name">{{ $car->name }}</div>
+
+        <div class="car-item-price-line">
+          Giá từ <strong>{{ number_format($car->price_per_day ?? $car->price) }}</strong>
+          <small> VNĐ</small>
         </div>
 
-        {{-- Ảnh xe — nền xám nhẹ, không khung --}}
         <div class="car-item-img-wrap">
-          <img class="car-item-img"
-               src="{{ $imgSrc }}"
-               alt="{{ $car->name }}"
-               loading="lazy"
-               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
-          <div class="car-item-img-placeholder" style="display:none;">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1">
+          <img
+            class="car-item-img {{ $sceneClass }}"
+            src="{{ $imgSrc }}"
+            alt="{{ $car->name }}"
+            loading="lazy"
+            onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="car-item-img-placeholder">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
               <rect x="1" y="3" width="15" height="13"/>
               <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
               <circle cx="5.5" cy="18.5" r="2.5"/>
@@ -263,7 +357,7 @@ body { background: #fff; color: var(--dark); }
       </a>
     @empty
       <div class="empty-state">
-        <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#ddd" stroke-width="1">
+        <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1">
           <rect x="1" y="3" width="15" height="13"/>
           <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
           <circle cx="5.5" cy="18.5" r="2.5"/>
