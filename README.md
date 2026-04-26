@@ -1,143 +1,560 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🚗 AutoViet — Website Showroom Mercedes-Benz
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Website giới thiệu, tư vấn và đặt lịch dịch vụ xe Mercedes-Benz, xây dựng bằng Laravel.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 📋 Yêu Cầu Hệ Thống
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+| Công nghệ | Phiên bản tối thiểu |
+|-----------|---------------------|
+| PHP | >= 8.1 |
+| Composer | >= 2.x |
+| MySQL | >= 8.0 |
+| Node.js | >= 18.x |
+| NPM | >= 9.x |
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 🚀 Hướng Dẫn Cài Đặt
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### 1. Clone dự án
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```bash
+git clone https://github.com/your-username/demo-laravel.git
+cd demo-laravel
+```
 
-## Laravel Sponsors
+### 2. Cài đặt dependencies PHP
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```bash
+composer install
+```
 
-### Premium Partners
+### 3. Cài đặt dependencies Node.js
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+```bash
+npm install
+```
 
-## Contributing
+### 4. Tạo file môi trường
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+cp .env.example .env
+```
 
-## Code of Conduct
+### 5. Sinh khóa ứng dụng
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+php artisan key:generate
+```
 
-## Security Vulnerabilities
+### 6. Cấu hình file `.env`
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```env
+APP_NAME=Laravel
+APP_URL=http://demo-laravel.test
 
-## License
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=demo_laravel
+DB_USERNAME=root
+DB_PASSWORD=
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=tan927890@gmail.com
+MAIL_PASSWORD=ulydvzgnecxzjqpc
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=tan927890@gmail.com
+MAIL_FROM_NAME="Mazda Bình Tân"
+MAIL_GARAGE_EMAIL=tan927890@gmail.com
+```
 
-## Model
+### 7. Tạo database
 
-AutoViet — Web Bán Ô Tô Laravel
-Cấu trúc thư mục
-laravel-car/
+```sql
+CREATE DATABASE demo_laravel CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+### 8. Chạy migration và seeder
+
+```bash
+php artisan migrate --seed
+```
+
+### 9. Tạo symbolic link cho storage
+
+```bash
+php artisan storage:link
+```
+
+### 10. Build assets frontend
+
+```bash
+# Development (hot reload)
+npm run dev
+
+# Production
+npm run build
+```
+
+### 11. Khởi chạy server
+
+```bash
+php artisan serve
+```
+
+Truy cập: [http://localhost:8000](http://localhost:8000)
+
+---
+
+## 📁 Cấu Trúc Dự Án
+
+```
+demo-laravel/
+│
 ├── app/
-│ ├── Models/
-│ │ ├── Car.php ← Model xe
-│ │ └── Order.php ← Model đơn đặt cọc
-│ └── Http/Controllers/
-│ ├── CarController.php ← Controller public
-│ └── Admin/CarController.php ← Controller admin
+│   ├── Http/
+│   │   ├── Controllers/
+│   │   │   ├── Admin/                      # Nhóm controller quản trị (admin panel)
+│   │   │   ├── Auth/                       # Đăng nhập, đăng ký, quên mật khẩu
+│   │   │   ├── CarController.php           # Danh sách, chi tiết, so sánh, báo giá xe
+│   │   │   ├── BookingController.php       # Đặt lịch lái thử / dịch vụ
+│   │   │   ├── OrderController.php         # Quản lý đơn hàng
+│   │   │   ├── NewsController.php          # Trang tin tức
+│   │   │   ├── ContactController.php       # Form liên hệ
+│   │   │   ├── BaoGiaNhanhController.php   # Báo giá nhanh
+│   │   │   ├── NewsletterController.php    # Đăng ký nhận bản tin
+│   │   │   ├── PickupDeliveryController.php # Nhận/giao xe miễn phí
+│   │   │   └── MaintenanceReminderController.php # Nhắc lịch bảo dưỡng
+│   │   ├── Middleware/
+│   │   └── Requests/
+│   │       ├── Auth/
+│   │       └── ProfileUpdateRequest.php
+│   │
+│   ├── Mail/
+│   │   ├── BaoGiaMail.php                  # Email báo giá xe
+│   │   ├── MaintenanceReminderMail.php     # Email nhắc bảo dưỡng
+│   │   ├── NewsletterSubscribed.php        # Email xác nhận newsletter
+│   │   └── PickupDeliveryRequest.php       # Email xác nhận nhận/giao xe
+│   │
+│   └── Models/
+│       ├── Car.php                         # Model xe chính
+│       ├── CarVariant.php                  # Phiên bản xe
+│       ├── CarColor.php                    # Màu sắc xe
+│       ├── CarSpec.php                     # Thông số kỹ thuật
+│       ├── CarFeature.php                  # Tính năng xe
+│       ├── CarGallery.php                  # Thư viện ảnh xe
+│       ├── Brand.php                       # Hãng xe
+│       ├── Order.php                       # Đơn hàng
+│       ├── News.php                        # Tin tức
+│       ├── NewsCategory.php                # Danh mục tin tức
+│       ├── NewsTag.php                     # Tag tin tức
+│       ├── Newsletter.php                  # Danh sách đăng ký nhận bản tin
+│       ├── Contact.php                     # Liên hệ từ khách hàng
+│       ├── BaoGiaNhanh.php                 # Yêu cầu báo giá nhanh
+│       ├── Kpi.php                         # Chỉ số KPI
+│       └── User.php                        # Người dùng nội bộ (admin / manager / staff)
+│
 ├── database/
-│ ├── migrations/ ← Tạo bảng cars, orders
-│ └── seeders/ ← Dữ liệu mẫu 8 xe
-├── resources/views/
-│ ├── layouts/app.blade.php ← Layout chính
-│ ├── cars/
-│ │ ├── index.blade.php ← Danh sách + lọc xe
-│ │ ├── show.blade.php ← Chi tiết xe
-│ │ └── order.blade.php ← Form đặt cọc
-│ └── admin/
-│ └── dashboard.blade.php ← Dashboard admin
-└── routes/web.php ← Tất cả routes
-Cài đặt
+│   ├── migrations/                         # Toàn bộ lịch sử cấu trúc DB
+│   └── seeders/
+│       ├── DatabaseSeeder.php              # Seeder chính — tạo accounts + xe + gọi các seeder con
+│       ├── CarDetailSeeder.php             # Seed chi tiết xe (variants, specs, features, gallery)
+│       └── NewsSeeder.php                  # Seed tin tức mẫu
+│
+├── resources/
+│   └── views/
+│       ├── admin/
+│       │   ├── cars/          # Quản lý xe (index, create, edit)
+│       │   ├── contacts/      # Xem liên hệ khách
+│       │   ├── dashboard/     # Dashboard doanh thu
+│       │   ├── kpi/           # Báo cáo KPI
+│       │   ├── news/          # Quản lý tin tức, categories, tags
+│       │   ├── newsletter/    # Quản lý danh sách bản tin
+│       │   ├── orders/        # Quản lý đơn hàng
+│       │   ├── staff/         # Quản lý nhân viên
+│       │   └── users/         # Quản lý tài khoản
+│       ├── auth/              # Đăng nhập, đăng ký, đặt lại mật khẩu (dành cho staff/admin)
+│       ├── cars/              # Trang xe: danh sách, chi tiết, so sánh, báo giá, đặt lịch
+│       ├── emails/            # Template email gửi đi (booking, báo giá, newsletter, bảo dưỡng...)
+│       ├── layouts/           # Layout chính: admin.blade.php, frontend.blade.php, guest.blade.php
+│       ├── orders/            # Theo dõi đơn hàng
+│       ├── partials/          # Các partial tái sử dụng
+│       ├── profile/           # Hồ sơ nội bộ (staff)
+│       ├── services/          # Trang dịch vụ
+│       └── [trang frontend]   # welcome, about, news, services, dat-lich-dich-vu, v.v.
+│
+├── public/
+│   └── images/
+│       ├── car/               # Ảnh xe KHÔNG có nền — dùng trong card, danh sách, so sánh
+│       └── CTN/               # Ảnh xe CÓ nền — dùng trong banner, trang chủ, giới thiệu
+│
+└── routes/
+    └── web.php                # Toàn bộ route của ứng dụng
+```
 
-1. Tạo dự án Laravel mới
-   bashcomposer create-project laravel/laravel autoviet
-   cd autoviet
-2. Copy các file vào dự án
-   Sao chép tất cả file trong thư mục này vào đúng vị trí trong dự án Laravel.
-3. Cài Breeze (Auth)
-   bashcomposer require laravel/breeze --dev
-   php artisan breeze:install blade
-   npm install && npm run build
-4. Cấu hình .env
-   envDB_CONNECTION=mysql
-   DB_HOST=127.0.0.1
-   DB_PORT=3306
-   DB_DATABASE=autoviet
-   DB_USERNAME=root
-   DB_PASSWORD=
-5. Thêm cột is_admin vào users
-   Tạo migration:
-   bashphp artisan make:migration add_is_admin_to_users_table
-   Nội dung:
-   php$table->boolean('is_admin')->default(false);
-6. Thêm middleware admin
-   Tạo file app/Http/Middleware/AdminMiddleware.php:
-   php<?php
-   namespace App\Http\Middleware;
-   use Closure;
-   class AdminMiddleware {
-   public function handle($request, Closure $next) {
-        if (!auth()->check() || !auth()->user()->is_admin) {
-            abort(403);
-        }
-        return $next($request);
-   }
-   }
-   Đăng ký trong bootstrap/app.php:
-   php->withMiddleware(function (Middleware $middleware) {
-   $middleware->alias(['admin' => \App\Http\Middleware\AdminMiddleware::class]);
-   })
-7. Chạy migration + seeder
-   bashphp artisan migrate --seed
-   php artisan storage:link
-8. Chạy server
-   bashphp artisan serve
-   Tài khoản mặc định
+---
 
-Admin: admin@autoviet.vn / password
+## 🖼️ Quy Tắc Ảnh Xe
 
-Tính năng
+| Thư mục | Loại ảnh | Dùng ở đâu |
+|---------|----------|------------|
+| `public/images/car/` | Ảnh **không có nền** (PNG trong suốt) | Card xe, danh sách, trang so sánh |
+| `public/images/CTN/` | Ảnh **có nền** (JPG/PNG với background) | Banner trang chủ, trang giới thiệu |
 
-✅ Danh sách xe + tìm kiếm + lọc (hãng, nhiên liệu, giá, tình trạng)
-✅ Trang chi tiết xe + gallery ảnh + xe liên quan
-✅ Form đặt cọc 10% + xác nhận email
-✅ Dashboard admin + thống kê
-✅ CRUD xe (thêm/sửa/xoá + upload ảnh)
-✅ Quản lý đơn đặt cọc + cập nhật trạng thái
-✅ Auto cập nhật trạng thái xe khi đơn thay đổi
-chay mingrad sẽ có csdl lai
+> Trong seeder, `image_url` trỏ tới `images/car/Ten-Xe-TN.png` (ảnh không nền).
+
+---
+
+## 🔐 Tài Khoản Mặc Định (sau khi seed)
+
+Được tạo tự động bởi `DatabaseSeeder`. **Không có đăng ký tài khoản cho khách hàng** — chỉ nhân viên nội bộ mới cần đăng nhập.
+
+| Vai trò | Email | Mật khẩu |
+|---------|-------|----------|
+| Admin | admin@autoviet.vn | password |
+| Manager | manager@autoviet.vn | password |
+| Staff | staff@autoviet.vn | password |
+
+Truy cập trang quản trị: [http://localhost:8000/admin](http://localhost:8000/admin)
+
+---
+
+## ✨ Tính Năng
+
+### Trang khách — không cần đăng nhập
+- Xem danh sách và chi tiết xe Mercedes
+- So sánh xe, xem thư viện ảnh, thông số kỹ thuật
+- Yêu cầu báo giá nhanh (gửi qua email)
+- Đặt lịch lái thử / dịch vụ
+- Đặt lịch bảo dưỡng định kỳ (gửi nhắc qua email)
+- Đăng ký nhận/giao xe tận nơi miễn phí
+- Xem tin tức, lọc theo danh mục và tag
+- Đăng ký nhận bản tin newsletter
+- Gửi liên hệ, tra cứu chi phí ước tính
+
+### Trang quản trị — cần đăng nhập
+| Quyền | Có thể làm |
+|-------|-----------|
+| **Admin** | Toàn quyền: xe, đơn hàng, tin tức, người dùng, KPI, doanh thu |
+| **Manager** | Quản lý xe, đơn hàng, liên hệ, newsletter |
+| **Staff** | Xem và xử lý đơn hàng, lịch dịch vụ |
+
+---
+
+## 📧 Cấu Hình Email
+
+Dự án tự động gửi email cho các sự kiện: xác nhận đặt lịch, báo giá, nhắc bảo dưỡng, xác nhận newsletter.
+
+**Môi trường development — dùng Mailtrap để test:**
+
+```env
+MAIL_MAILER=smtp
+MAIL_HOST=sandbox.smtp.mailtrap.io
+MAIL_PORT=2525
+MAIL_USERNAME=your_mailtrap_username
+MAIL_PASSWORD=your_mailtrap_password
+MAIL_FROM_ADDRESS=no-reply@autoviet.vn
+MAIL_FROM_NAME="AutoViet"
+```
+
+---
+
+## 🛠 Lệnh Hữu Ích
+
+```bash
+# Reset toàn bộ DB và chạy lại seeder
+php artisan migrate:fresh --seed
+
+# Xóa cache
+php artisan cache:clear && php artisan config:clear && php artisan view:clear
+
+# Xem danh sách route
+php artisan route:list
+
+# Tạo lại symbolic link storage
+php artisan storage:link
+```
+
+---
+
+## 🐛 Xử Lý Lỗi Thường Gặp
+
+**Lỗi 500 khi chạy lần đầu:**
+```bash
+php artisan key:generate && php artisan config:clear
+```
+
+**Lỗi permission trên Linux/macOS:**
+```bash
+chmod -R 775 storage bootstrap/cache
+```
+
+**Ảnh không hiển thị:**
+```bash
+php artisan storage:link
+# Kiểm tra file ảnh có đúng trong public/images/car/ và public/images/CTN/
+```
+
+**Lỗi npm build:**
+```bash
+npm cache clean --force && npm install && npm run build
+```
+** Chat bot **
+layout → partial gọi nút toggle → click mở popup → iframe load GET /chat → ChatController@index → trả về chat/index.blade.php
+# Tích hợp PWA vào laravel 
+User vào web → nhấn "Thêm vào màn hình chính"
+Nó tạo icon trên điện thoại y hệt app thật
+Mở lên thì không có thanh địa chỉ, toàn màn hình như app
+GPS hoạt động bình thường vì chạy HTTPS
+
+B1 ** Tạo public/manifest.json **
+B2   ** Tạo Service Worker 
+         Tạo file public/sw.js **
+ B3 ** Sửa lại views/layout/admin **    
+đổi đia chỉ trong env 
+xong php artisan config:clear     
+# Hướng dẫn setup chấm công GPS
+
+## 1. Cấu hình `.env`
+
+```dotenv
+# Tọa độ văn phòng (lấy từ Google Maps)
+OFFICE_LAT=10.855313
+OFFICE_LNG=106.629887
+OFFICE_RADIUS=150
+OFFICE_WIFI_SSID="Trầm và Tình"
+```
+
+---
+
+## 2. Cấu hình `config/app.php`
+
+Thêm vào cuối mảng, trước dấu `];`:
+
+```php
+'office' => [
+    'lat'    => env('OFFICE_LAT'),
+    'lng'    => env('OFFICE_LNG'),
+    'radius' => env('OFFICE_RADIUS', 150),
+],
+```
+
+---
+
+## 3. Cấu hình `bootstrap/app.php`
+
+```php
+->withMiddleware(function (Middleware $middleware) {
+    $middleware->trustProxies(at: '*');
+    $middleware->alias([
+        'role' => \App\Http\Middleware\RoleMiddleware::class,
+    ]);
+})
+```
+
+---
+
+## 4. Cấu hình `httpd.conf` (Laragon)
+
+Đảm bảo có dòng:
+```apache
+Listen 80
+```
+
+---
+
+## 5. Cấu hình Virtual Host
+
+File: `C:/laragon/etc/apache2/sites-enabled/auto.demo-laravel.test.conf`
+
+```apache
+<VirtualHost *:80>
+    DocumentRoot "C:/laragon/www/demo-laravel/public"
+    ServerName demo-laravel.test
+    ServerAlias *.demo-laravel.test
+    ServerAlias murky-rematch-flaring.ngrok-free.dev
+    <Directory "C:/laragon/www/demo-laravel/public">
+        AllowOverride All
+        Require all granted
+    </Directory>
+</VirtualHost>
+```
+
+---
+
+## 6. Cấu hình `sw.js` (Service Worker)
+
+Thêm danh sách bypass cache:
+
+```javascript
+const NO_CACHE_PATHS = [
+    '/admin/staff/attendance/checkin',
+    '/admin/staff/attendance/checkout',
+    '/api/',
+];
+
+self.addEventListener('fetch', e => {
+    if (e.request.method !== 'GET') return;
+
+    const url = new URL(e.request.url);
+    const noCache = NO_CACHE_PATHS.some(path => url.pathname.startsWith(path));
+    if (noCache) return;
+
+    e.respondWith(
+        fetch(e.request)
+            .then(response => {
+                const clone = response.clone();
+                caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
+                return response;
+            })
+            .catch(() => caches.match(e.request))
+    );
+});
+```
+
+---
+
+## 7. StaffController — logic GPS
+
+File: `app/Http/Controllers/Admin/StaffController.php`
+
+```php
+public function checkIn(Request $request)
+{
+    $officeLat    = (float) config('app.office.lat');
+    $officeLng    = (float) config('app.office.lng');
+    $officeRadius = (int)   config('app.office.radius', 150);
+
+    $dist = $this->getDistance(
+        $request->lat, $request->lng,
+        $officeLat, $officeLng
+    );
+
+    if ($dist > $officeRadius) {
+        return back()->with('error',
+            "Bạn đang cách văn phòng {$dist}m — cần trong vòng {$officeRadius}m!"
+        );
+    }
+    // ... lưu attendance
+}
+```
+
+---
+
+## 8. Blade JS — `attendance.blade.php`
+
+```javascript
+const OFFICE_LAT    = {{ config('app.office.lat') }};
+const OFFICE_LNG    = {{ config('app.office.lng') }};
+const OFFICE_RADIUS = {{ config('app.office.radius', 150) }};
+const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+
+navigator.geolocation.getCurrentPosition(
+    async (pos) => { /* xử lý */ },
+    (err) => { /* báo lỗi */ },
+    {
+        enableHighAccuracy: true,
+        timeout: isIOS ? 15000 : 10000,
+        maximumAge: 0
+    }
+);
+```
+
+---
+
+## 9. Chạy ngrok (test trên điện thoại)
+
+### Cài đặt lần đầu
+
+```cmd
+# Tải ngrok tại https://ngrok.com/download
+# Đăng ký tài khoản tại https://dashboard.ngrok.com/signup
+# Lấy token tại https://dashboard.ngrok.com/get-started/your-authtoken
+
+ngrok config add-authtoken <token>
+```
+
+### Chạy mỗi lần test
+
+```cmd
+ngrok http 80 --host-header=demo-laravel.test
+```
+
+Sẽ hiện link dạng:
+```
+https://xxxx.ngrok-free.app
+```
+
+Cập nhật `.env`:
+```dotenv
+APP_URL=https://xxxx.ngrok-free.app
+```
+
+Chạy:
+```cmd
+php artisan config:clear
+php artisan cache:clear
+```
+
+### URL đúng trên điện thoại
+
+```
+https://xxxx.ngrok-free.app/admin/staff/attendance
+```
+
+> ⚠️ Link ngrok thay đổi mỗi lần restart (bản free). Cần cập nhật lại `APP_URL` và `ServerAlias` mỗi lần.
+
+---
+
+## 10. Lệnh hay dùng
+
+```cmd
+# Xóa cache config
+php artisan config:clear
+php artisan cache:clear
+
+# Kiểm tra route
+php artisan route:list | findstr attendance
+
+# Kiểm tra port 80
+netstat -ano | findstr :80 | findstr LISTENING
+```
+
+---
+
+## Lưu ý quan trọng
+
+| | Android | iOS |
+|---|---|---|
+| GPS | ✅ Hoạt động tốt | ✅ Cần cấp quyền trong Settings |
+| WiFi SSID | ✅ Đọc được | ❌ Không hỗ trợ |
+| Zalo WebView | ⚠️ GPS hạn chế | ❌ GPS bị chặn |
+| Giải pháp Zalo | Mở bằng Chrome | Mở bằng Safari |
+| Timeout GPS | 10 giây | 15 giây |
+
+> **Tọa độ văn phòng**: `10.855313, 106.629887`  
+> Công viên phần mềm Quang, Tòa nhà JPVE, Đường Số 2, Trung Mỹ Tây, HCM
+chạy AI chat bằng groq
+Bước 1 — Clone project
+git clone <your-repo-url>
+chạy lệnh 
+cd dealership-ai-chat-vn
+Bước 2 — Cài thư viện
+pip install -r requirements.txt
+Bước 3 — Tạo file .env
+cp .env.example .env
+Mở file .env vừa tạo, điền vào:
+GROQ_API_KEY=your_groq_api_key_here
+MYSQL_PASSWORD=your_mysql_password
+>  dùng MySQL localhost giữ nguyên 
+Bước 4 — Tạo database
+mysql -u root -p -e "CREATE DATABASE demo_laravel;"
+mysql -u root -p demo_laravel < init.sql
+Bước 5 — Chạy project
+> uvicorn app.main:app --reload
+>  Lấy Groq API key miễn phí tại: https://console.groq.com/keys

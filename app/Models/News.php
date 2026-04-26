@@ -20,6 +20,7 @@ class News extends Model
         'views',
         'status',
         'published_at',
+        'is_cover',
     ];
 
     protected $casts = [
@@ -41,7 +42,6 @@ class News extends Model
             if ($model->status === 'published' && empty($model->published_at)) {
                 $model->published_at = now();
             }
-            // Tự tính read_time (~200 từ/phút)
             if ($model->content) {
                 $wordCount = str_word_count(strip_tags($model->content));
                 $model->read_time = max(1, (int) ceil($wordCount / 200));
@@ -75,7 +75,7 @@ class News extends Model
         return $this->belongsToMany(NewsTag::class, 'news_news_tag');
     }
 
-    // ── Scopes ──────────────────────────────────────────────────
+    // ── Scopes ───────────────────────────────────────────────────
     public function scopePublished(Builder $query): Builder
     {
         return $query->where('status', 'published')
@@ -84,9 +84,10 @@ class News extends Model
     }
 
     public function scopeByDate(Builder $query): Builder
-{
-    return $query->orderByDesc('published_at');
-}
+    {
+        return $query->orderByDesc('published_at');
+    }
+
     public function scopePopular(Builder $query): Builder
     {
         return $query->orderByDesc('views');
@@ -113,8 +114,13 @@ class News extends Model
         return 'slug';
     }
 
+    /**
+     * Trả về URL đầy đủ của thumbnail.
+     * Thumbnail lưu dạng: images/news/news_abc.jpg
+     * → asset('images/news/news_abc.jpg')
+     */
     public function getThumbnailUrlAttribute(): ?string
     {
-        return $this->thumbnail ? asset('storage/' . $this->thumbnail) : null;
+        return $this->thumbnail ? asset($this->thumbnail) : null;
     }
 }

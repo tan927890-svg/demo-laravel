@@ -1,79 +1,78 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Đơn hàng của tôi
-        </h2>
-    </x-slot>
+{{-- resources/views/orders/index.blade.php --}}
+@extends('layouts.admin')
+@section('page-title', 'Đơn hàng của tôi')
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+@section('content')
 
-            @if(session('success'))
-                <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
-                    {{ session('success') }}
-                </div>
-            @endif
+@if(session('success'))
+  <div class="alert alert-success" style="margin-bottom:16px">{{ session('success') }}</div>
+@endif
 
-            @if(session('error'))
-                <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-                    {{ session('error') }}
-                </div>
-            @endif
+@if(session('error'))
+  <div class="alert alert-error" style="margin-bottom:16px">{{ session('error') }}</div>
+@endif
 
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6">
-                    @if($orders->isEmpty())
-                        <p class="text-gray-500 text-center py-8">Bạn chưa có đơn hàng nào. <a href="{{ route('cars.index') }}" class="text-blue-600 underline">Xem xe ngay</a></p>
-                    @else
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="bg-gray-100">
-                                    <th class="p-3 border">#</th>
-                                    <th class="p-3 border">Xe</th>
-                                    <th class="p-3 border">Ngày thuê</th>
-                                    <th class="p-3 border">Ngày trả</th>
-                                    <th class="p-3 border">Tổng tiền</th>
-                                    <th class="p-3 border">Trạng thái</th>
-                                    <th class="p-3 border">Hành động</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($orders as $order)
-                                <tr class="hover:bg-gray-50">
-                                    <td class="p-3 border">{{ $order->id }}</td>
-                                    <td class="p-3 border">{{ $order->car->name ?? 'N/A' }}</td>
-                                    <td class="p-3 border">{{ \Carbon\Carbon::parse($order->start_date)->format('d/m/Y') }}</td>
-                                    <td class="p-3 border">{{ \Carbon\Carbon::parse($order->end_date)->format('d/m/Y') }}</td>
-                                    <td class="p-3 border">{{ number_format($order->total_price, 0, ',', '.') }}đ</td>
-                                    <td class="p-3 border">
-                                        @php
-                                            $statusMap = [
-                                                'pending'   => ['label' => 'Chờ xác nhận', 'class' => 'bg-yellow-100 text-yellow-800'],
-                                                'confirmed' => ['label' => 'Đã xác nhận',  'class' => 'bg-blue-100 text-blue-800'],
-                                                'completed' => ['label' => 'Hoàn thành',   'class' => 'bg-green-100 text-green-800'],
-                                                'cancelled' => ['label' => 'Đã hủy',        'class' => 'bg-red-100 text-red-800'],
-                                            ];
-                                            $s = $statusMap[$order->status] ?? ['label' => $order->status, 'class' => 'bg-gray-100'];
-                                        @endphp
-                                        <span class="px-2 py-1 rounded text-sm {{ $s['class'] }}">{{ $s['label'] }}</span>
-                                    </td>
-                                    <td class="p-3 border space-x-2">
-                                        <a href="{{ route('orders.show', $order) }}" class="text-blue-600 hover:underline">Xem</a>
-                                        @if($order->status === 'pending')
-                                        <form action="{{ route('orders.destroy', $order) }}" method="POST" class="inline" onsubmit="return confirm('Hủy đơn hàng này?')">
-                                            @csrf @method('DELETE')
-                                            <button type="submit" class="text-red-600 hover:underline">Hủy</button>
-                                        </form>
-                                        @endif
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                        <div class="mt-4">{{ $orders->links() }}</div>
-                    @endif
-                </div>
-            </div>
-        </div>
-    </div>
-</x-app-layout>
+<div class="card">
+  <div style="padding:16px 20px;border-bottom:1px solid var(--border)">
+    <span style="font-weight:600">Danh sách đơn hàng</span>
+  </div>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Xe</th>
+        <th>Ngày thuê</th>
+        <th>Ngày trả</th>
+        <th>Tổng tiền</th>
+        <th>Trạng thái</th>
+        <th style="text-align:right">Hành động</th>
+      </tr>
+    </thead>
+    <tbody>
+      @forelse($orders as $order)
+      <tr>
+        <td style="color:var(--text-muted)">{{ $order->id }}</td>
+        <td style="font-weight:600">{{ $order->car->name ?? 'N/A' }}</td>
+        <td style="color:var(--text-muted)">{{ \Carbon\Carbon::parse($order->start_date)->format('d/m/Y') }}</td>
+        <td style="color:var(--text-muted)">{{ \Carbon\Carbon::parse($order->end_date)->format('d/m/Y') }}</td>
+        <td style="font-weight:600">{{ number_format($order->total_price, 0, ',', '.') }}đ</td>
+        <td>
+          @if($order->status === 'pending')
+            <span class="badge badge-warning">Chờ xác nhận</span>
+          @elseif($order->status === 'confirmed')
+            <span class="badge badge-info">Đã xác nhận</span>
+          @elseif($order->status === 'completed')
+            <span class="badge badge-success">Hoàn thành</span>
+          @else
+            <span class="badge badge-danger">Đã hủy</span>
+          @endif
+        </td>
+        <td style="text-align:right;display:flex;gap:6px;justify-content:flex-end">
+          <a href="{{ route('orders.show', $order) }}" class="btn btn-sm">Xem</a>
+          @if($order->status === 'pending')
+          <form method="POST" action="{{ route('orders.destroy', $order) }}" onsubmit="return confirm('Hủy đơn hàng này?')">
+            @csrf @method('DELETE')
+            <button class="btn btn-sm btn-danger" type="submit">Hủy</button>
+          </form>
+          @endif
+        </td>
+      </tr>
+      @empty
+      <tr>
+        <td colspan="7" style="text-align:center;padding:40px;color:var(--text-muted)">
+          Bạn chưa có đơn hàng nào. <a href="{{ route('cars.index') }}" style="color:var(--primary)">Xem xe ngay</a>
+        </td>
+      </tr>
+      @endforelse
+    </tbody>
+  </table>
+
+  @if($orders->hasPages())
+  <div style="padding:16px 20px;border-top:1px solid var(--border)">
+    {{ $orders->links() }}
+  </div>
+  @endif
+</div>
+
+@endsection

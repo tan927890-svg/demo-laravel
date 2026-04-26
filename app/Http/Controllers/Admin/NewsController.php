@@ -5,176 +5,192 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\News;
 use App\Models\NewsCategory;
-use App\Models\NewsTag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Auth;
 
 class NewsController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $query = News::with('category', 'author')->latest();
-
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-        if ($request->filled('category')) {
-            $query->byCategory($request->category);
-        }
-        if ($request->filled('q')) {
-            $q = $request->q;
-            $query->where('title', 'like', "%{$q}%");
-        }
-
-        $newsList   = $query->paginate(15)->withQueryString();
-        $categories = NewsCategory::all();
-
-        return view('admin.news.index', compact('newsList', 'categories'));
+        $news = News::with('category')->latest('published_at')->paginate(20);
+        return view('admin.news.index', compact('news'));
     }
 
     public function create()
     {
-        $categories = NewsCategory::all();
-        $tags       = NewsTag::all();
-        return view('admin.news.form', compact('categories', 'tags'));
+        $categories = NewsCategory::orderBy('name')->get();
+        return view('admin.news.form', compact('categories'));
     }
 
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'title'            => 'required|string|max:255',
-            'slug'             => 'nullable|string|max:255|unique:news,slug',
-            'news_category_id' => 'nullable|exists:news_categories,id',
-            'excerpt'          => 'nullable|string|max:500',
-            'content'          => 'required|string',
-            'thumbnail'        => 'nullable|image|max:2048',
-            'status'           => 'required|in:draft,published',
-            'tags'             => 'nullable|array',
-            'tags.*'           => 'exists:news_tags,id',
+        $request->validate([
+            'title'   => 'required|string|max:255',
+            'content' => 'nullable|string',
+            'status'  => 'required|in:published,draft,scheduled',
         ]);
 
-        $data['user_id'] = Auth::id();
-        $data['slug']    = $data['slug'] ?? Str::slug($data['title']);
+        $data = $request->only([
+            'title', 'slug', 'news_category_id', 'excerpt',
+            'content', 'status', 'published_at',
+        ]);
 
-        if ($request->hasFile('thumbnail')) {
-            $data['thumbnail'] = $request->file('thumbnail')
-                ->store('news/thumbnails', 'public');
+        $data['slug']    = $this->makeUniqueSlug(!empty($data['slug']) ? $data['slug'] : $data['title']);
+        $data['user_id'] = auth()->id();
+
+        // Xử lý ảnh
+        if (isset($_FILES['thumbnail']) && $_FILES['thumbnail']['error'] === UPLOAD_ERR_OK) {
+            $path = $this->uploadImage($_FILES['thumbnail']);
+            if ($path) $data['thumbnail'] = $path;
         }
 
-        $news = News::create($data);
+        News::create($data);
 
-        if ($request->filled('tags')) {
-            $news->tags()->sync($request->tags);
-        }
-
-        return redirect()->route('admin.news.index')
-            ->with('success', 'Bài viết đã được tạo thành công!');
+        return redirect()->route('admin.news.index')->with('success', 'Đăng bài thành công!');
     }
 
     public function edit(News $news)
     {
-        $categories = NewsCategory::all();
-        $tags       = NewsTag::all();
-        return view('admin.news.form', compact('news', 'categories', 'tags'));
+        $categories = NewsCategory::orderBy('name')->get();
+        return view('admin.news.form', compact('news', 'categories'));
     }
 
     public function update(Request $request, News $news)
     {
-        $data = $request->validate([
-            'title'            => 'required|string|max:255',
-            'slug'             => "nullable|string|max:255|unique:news,slug,{$news->id}",
-            'news_category_id' => 'nullable|exists:news_categories,id',
-            'excerpt'          => 'nullable|string|max:500',
-            'content'          => 'required|string',
-            'thumbnail'        => 'nullable|image|max:2048',
-            'status'           => 'required|in:draft,published',
-            'tags'             => 'nullable|array',
-            'tags.*'           => 'exists:news_tags,id',
+        $request->validate([
+            'title'   => 'required|string|max:255',
+            'content' => 'nullable|string',
+            'status'  => 'required|in:published,draft,scheduled',
         ]);
 
-        if ($request->hasFile('thumbnail')) {
-            if ($news->thumbnail) {
-                Storage::disk('public')->delete($news->thumbnail);
+        $data = $request->only([
+            'title', 'slug', 'news_category_id', 'excerpt',
+            'content', 'status', 'published_at',
+        ]);
+
+        $data['slug'] = $this->makeUniqueSlug(
+            !empty($data['slug']) ? $data['slug'] : $data['title'],
+            $news->id
+        );
+
+        // Xử lý ảnh bằng $_FILES trực tiếp — tránh mọi vấn đề với Laravel Request
+        if (isset($_FILES['thumbnail']) && $_FILES['thumbnail']['error'] === UPLOAD_ERR_OK) {
+            // Có file upload mới → xóa ảnh cũ, lưu ảnh mới
+            $this->deleteImage($news->thumbnail);
+            $path = $this->uploadImage($_FILES['thumbnail']);
+            if ($path) {
+                $data['thumbnail'] = $path;
             }
-            $data['thumbnail'] = $request->file('thumbnail')
-                ->store('news/thumbnails', 'public');
+        } elseif ($request->input('remove_thumbnail') === '1') {
+            // Bấm xóa ảnh
+            $this->deleteImage($news->thumbnail);
+            $data['thumbnail'] = null;
         }
+        // Không upload, không xóa → giữ nguyên thumbnail cũ
 
         $news->update($data);
-        $news->tags()->sync($request->tags ?? []);
 
-        return redirect()->route('admin.news.index')
-            ->with('success', 'Bài viết đã được cập nhật!');
+        return redirect()->route('admin.news.index')->with('success', 'Cập nhật thành công!');
     }
 
     public function destroy(News $news)
     {
-        if ($news->thumbnail) {
-            Storage::disk('public')->delete($news->thumbnail);
-        }
-        $news->tags()->detach();
+        $this->deleteImage($news->thumbnail);
         $news->delete();
 
-        return redirect()->route('admin.news.index')
-            ->with('success', 'Đã xóa bài viết.');
+        return redirect()->route('admin.news.index')->with('success', 'Đã xóa bài viết.');
     }
 
-    public function toggleStatus(News $news)
-    {
-        $news->update([
-            'status'       => $news->status === 'published' ? 'draft' : 'published',
-            'published_at' => $news->status === 'draft' ? now() : $news->published_at,
-        ]);
+    // ── Helpers ──────────────────────────────────────────────────────────────
 
-        return response()->json([
-            'status'  => $news->status,
-            'message' => $news->status === 'published' ? 'Đã xuất bản' : 'Đã chuyển về bản nháp',
-        ]);
+    /**
+     * Upload ảnh dùng $_FILES trực tiếp + GD resize
+     * Trả về path tương đối: images/news/news_xxx.jpg
+     */
+    private function uploadImage(array $fileInfo): ?string
+    {
+        $srcPath = $fileInfo['tmp_name'];
+
+        if (!$srcPath || !file_exists($srcPath)) {
+            return null;
+        }
+
+        $dir = public_path('images/news');
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        $filename = 'news_' . time() . '_' . rand(1000, 9999) . '.jpg';
+        $destPath = $dir . '/' . $filename;
+
+        // Lấy extension từ mime type để xử lý đúng
+        $mime = mime_content_type($srcPath);
+        $src  = match ($mime) {
+            'image/png'  => @imagecreatefrompng($srcPath),
+            'image/webp' => @imagecreatefromwebp($srcPath),
+            'image/gif'  => @imagecreatefromgif($srcPath),
+            default      => @imagecreatefromjpeg($srcPath),
+        };
+
+        // Nếu GD không đọc được → copy thẳng
+        if (!$src) {
+            copy($srcPath, $destPath);
+            return 'images/news/' . $filename;
+        }
+
+        $origW = imagesx($src);
+        $origH = imagesy($src);
+        $maxW  = 1200;
+
+        if ($origW > $maxW) {
+            $newW = $maxW;
+            $newH = (int) round($origH * $maxW / $origW);
+        } else {
+            $newW = $origW;
+            $newH = $origH;
+        }
+
+        $dst = imagecreatetruecolor($newW, $newH);
+
+        // Xử lý transparency (PNG)
+        imagealphablending($dst, false);
+        imagesavealpha($dst, true);
+        imagefilledrectangle($dst, 0, 0, $newW, $newH,
+            imagecolorallocatealpha($dst, 255, 255, 255, 127));
+
+        imagecopyresampled($dst, $src, 0, 0, 0, 0, $newW, $newH, $origW, $origH);
+        imagejpeg($dst, $destPath, 85);
+
+        imagedestroy($src);
+        imagedestroy($dst);
+
+        return 'images/news/' . $filename;
     }
 
-    public function categories()
+    private function deleteImage(?string $path): void
     {
-        $categories = NewsCategory::withCount('news')->get();
-        return view('admin.news.categories', compact('categories'));
+        if ($path) {
+            $full = public_path($path);
+            if (file_exists($full)) {
+                @unlink($full);
+            }
+        }
     }
 
-    public function storeCategory(Request $request)
+    private function makeUniqueSlug(string $value, ?int $exceptId = null): string
     {
-        $data = $request->validate([
-            'name' => 'required|string|max:100|unique:news_categories,name',
-            'slug' => 'nullable|string|max:100|unique:news_categories,slug',
-        ]);
-        NewsCategory::create($data);
-        return back()->with('success', 'Đã thêm chuyên mục!');
-    }
+        $base  = Str::slug($value);
+        $slug  = $base;
+        $count = 1;
 
-    public function destroyCategory(NewsCategory $category)
-    {
-        $category->delete();
-        return back()->with('success', 'Đã xóa chuyên mục.');
-    }
+        while (
+            News::where('slug', $slug)
+                ->when($exceptId, fn($q) => $q->where('id', '!=', $exceptId))
+                ->exists()
+        ) {
+            $slug = $base . '-' . $count++;
+        }
 
-    public function tags()
-    {
-        $tags = NewsTag::withCount('news')->get();
-        return view('admin.news.tags', compact('tags'));
-    }
-
-    public function storeTag(Request $request)
-    {
-        $data = $request->validate([
-            'name' => 'required|string|max:100|unique:news_tags,name',
-            'slug' => 'nullable|string|max:100|unique:news_tags,slug',
-        ]);
-        NewsTag::create($data);
-        return back()->with('success', 'Đã thêm tag!');
-    }
-
-    public function destroyTag(NewsTag $tag)
-    {
-        $tag->delete();
-        return back()->with('success', 'Đã xóa tag.');
+        return $slug;
     }
 }

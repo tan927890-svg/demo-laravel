@@ -586,7 +586,7 @@ footer h6.text-white, .footer h6.text-white {
   text-transform: uppercase !important;
   padding-bottom: 12px !important;
   margin-bottom: 24px !important;
-  border-bottom: 1px solid var(--border) !important;
+   border-bottom: none !important;   /* ✅ đổi từ 1px → none */
 }
 
 /* Text màu tối cho nền sáng */
@@ -709,3 +709,6 @@ footer .copyright ul li a:hover { color: var(--gold) !important; }
   .search-divider { width: 100% !important; height: 1px !important; }
   .search-btn { width: 100% !important; justify-content: center !important; padding: 16px !important; clip-path: none !important; }
 }
+/* ── FIX CARS PAGE ── */
+body:not(.home-page) main { margin-top: 0 !important; }
+.cars-hero { margin-top: 0 !important; }

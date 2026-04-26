@@ -10,9 +10,14 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function (Middleware $middleware): void {
+    ->withMiddleware(function (Middleware $middleware) {
+        $middleware->trustProxies(at: '*');
         $middleware->alias([
-            'admin' => \App\Http\Middleware\AdminMiddleware::class,
+            'role' => \App\Http\Middleware\RoleMiddleware::class,
+        ]);
+        $middleware->validateCsrfTokens(except: [
+            'bao-gia-nhanh',
+            'bao-gia-nhanh/*',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

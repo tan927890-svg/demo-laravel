@@ -1,8 +1,12 @@
 <?php
-
+// ══════════════════════════════════════════════
+// BaoGiaNhanhController.php
+// ══════════════════════════════════════════════
 namespace App\Http\Controllers;
 
+use App\Mail\BaoGiaMail;
 use App\Models\BaoGiaNhanh;
+use App\Models\Contact;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
@@ -17,35 +21,23 @@ class BaoGiaNhanhController extends Controller
             'dong_xe'       => 'nullable|string|max:100',
         ]);
 
-        $data = BaoGiaNhanh::create($request->only(['ten', 'so_dien_thoai', 'dong_xe']));
+        $data = BaoGiaNhanh::create(
+            $request->only(['ten', 'so_dien_thoai', 'dong_xe'])
+        );
+
+        // Lưu vào bảng contacts
+        Contact::create([
+            'name'         => $request->ten,
+            'phone'        => $request->so_dien_thoai,
+            'email'        => null,
+            'subject'      => 'Báo giá nhanh',
+            'car_interest' => $request->dong_xe,
+            'message'      => 'Khách yêu cầu báo giá nhanh cho xe: ' . ($request->dong_xe ?? 'Không rõ'),
+            'is_read'      => false,
+        ]);
 
         try {
-            Mail::send([], [], function ($message) use ($data) {
-                $message->to('tan927890@gmail.com')
-                        ->subject('Có khách hàng mới đăng ký báo giá!')
-                        ->html("
-                            <h2 style='color:#1a7a3c;'>Khách hàng mới đăng ký báo giá</h2>
-                            <table style='border-collapse:collapse;width:100%;'>
-                                <tr>
-                                    <td style='padding:8px;border:1px solid #ddd;'><strong>Tên</strong></td>
-                                    <td style='padding:8px;border:1px solid #ddd;'>{$data->ten}</td>
-                                </tr>
-                                <tr>
-                                    <td style='padding:8px;border:1px solid #ddd;'><strong>Số điện thoại</strong></td>
-                                    <td style='padding:8px;border:1px solid #ddd;'>{$data->so_dien_thoai}</td>
-                                </tr>
-                                <tr>
-                                    <td style='padding:8px;border:1px solid #ddd;'><strong>Dòng xe quan tâm</strong></td>
-                                    <td style='padding:8px;border:1px solid #ddd;'>{$data->dong_xe}</td>
-                                </tr>
-                                <tr>
-                                    <td style='padding:8px;border:1px solid #ddd;'><strong>Thời gian</strong></td>
-                                    <td style='padding:8px;border:1px solid #ddd;'>{$data->created_at}</td>
-                                </tr>
-                            </table>
-                            <p style='color:#999;margin-top:16px;'>Vui lòng liên hệ khách hàng sớm nhất có thể!</p>
-                        ");
-            });
+            Mail::to('tan927890@gmail.com')->send(new BaoGiaMail($data));
         } catch (\Exception $e) {
             Log::error('Gửi mail báo giá thất bại: ' . $e->getMessage());
         }

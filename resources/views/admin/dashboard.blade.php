@@ -1,698 +1,627 @@
 @extends('layouts.admin')
+@section('page-title', 'Bảng tổng')
 
-@section('title', 'AutoAdmin – Quản lý hệ thống xe')
-
-@section('styles')
+@push('styles')
 <style>
-  :root {
-    --bg-base: #0f1117;
-    --bg-surface: #181c27;
-    --bg-card: #1e2232;
-    --bg-hover: #252a3a;
-    --border: #2a3050;
-    --border-light: #323859;
-    --text-primary: #e8eaf6;
-    --text-secondary: #8892b0;
-    --text-muted: #4a5270;
-    --accent: #4f8cff;
-    --accent-glow: rgba(79,140,255,0.18);
-    --green: #22d3a5;
-    --green-dim: rgba(34,211,165,0.12);
-    --red: #ff5c7a;
-    --red-dim: rgba(255,92,122,0.12);
-    --yellow: #ffb84f;
-    --yellow-dim: rgba(255,184,79,0.12);
-    --radius: 10px;
-    --sidebar-w: 240px;
+/* ── Stat cards ── */
+.dash-stat {
+  border-radius: 10px; padding: 18px 20px;
+  position: relative; overflow: hidden;
+  border-left: 5px solid transparent;
+}
+.dash-stat.s-blue   { border-left-color: #3b82f6 }
+.dash-stat.s-green  { border-left-color: #22c55e }
+.dash-stat.s-amber  { border-left-color: #f59e0b }
+.dash-stat.s-red    { border-left-color: #ef4444 }
+.dash-stat.s-purple { border-left-color: #a855f7 }
+.dash-stat-icon {
+  position:absolute;top:14px;right:16px;
+  font-size:40px;opacity:.65;
+  line-height:1;
+}
+.dash-stat-label { font-size:14px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px }
+.dash-stat-val   { font-size:32px;font-weight:700;line-height:1 }
+.dash-stat-sub   { font-size:13px;color:var(--text-muted);margin-top:5px }
+
+/* ── Donut ── */
+.donut-wrap { position:relative;flex-shrink:0 }
+.donut-wrap svg { display:block }
+.donut-center {
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+.donut-pct { font-size:26px;font-weight:700;line-height:1 }
+.donut-lbl { font-size:13px;color:var(--text-muted);margin-top:2px }
+
+/* ── Legend ── */
+.leg-row {
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:15px;padding:8px 0;border-bottom:1px solid var(--border);
+}
+.leg-row:last-child { border-bottom:none }
+.leg-dot { width:11px;height:11px;border-radius:50%;margin-right:8px;flex-shrink:0;display:inline-block }
+
+/* ── Layout ── */
+.dash-grid-stats {
+  display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px;
+}
+.dash-grid-main {
+  display:grid;gap:14px;
+  height: calc(100vh - 232px);
+  min-height: 380px;
+}
+.dash-grid-main.col-3 { grid-template-columns: 1.6fr 1fr 1fr }
+.dash-panel { display:flex;flex-direction:column;overflow:hidden }
+
+/* ── Table trong panel ── */
+.dash-panel .table th { font-size:13px }
+.dash-panel .table td { font-size:15px;padding:10px 12px }
+
+/* ── Panel header ── */
+.panel-hd {
+  padding:14px 18px;border-bottom:1px solid var(--border);
+  font-weight:600;font-size:16px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:space-between;
+}
+
+/* ══════════════════════════════
+   RESPONSIVE — Tablet (≤ 1024px)
+══════════════════════════════ */
+@media (max-width: 1024px) {
+  .dash-grid-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .dash-grid-main.col-3 {
+    grid-template-columns: 1fr 1fr;
+  }
+  .dash-grid-main.col-3 > .card:first-child {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ══════════════════════════════
+   RESPONSIVE — Mobile (≤ 768px)
+══════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* Stats: 2 cột */
+  .dash-grid-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 10px;
   }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    font-family: 'Be Vietnam Pro', sans-serif;
-    background: var(--bg-base);
-    color: var(--text-primary);
-    display: flex;
-    min-height: 100vh;
-    font-size: 14px;
+  .dash-stat {
+    padding: 16px 14px;
   }
 
-  /* ── SIDEBAR ── */
-  .sidebar {
-    width: var(--sidebar-w);
-    background: var(--bg-surface);
-    border-right: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    top: 0; left: 0; bottom: 0;
-    z-index: 50;
+  .dash-stat-icon {
+    font-size: 34px;
+    top: 12px; right: 12px;
   }
 
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 20px 18px;
-    border-bottom: 1px solid var(--border);
+  .dash-stat-label { font-size: 11px; margin-bottom: 4px; letter-spacing: .4px; }
+  .dash-stat-val   { font-size: 28px; }
+  .dash-stat-sub   { font-size: 12px; }
+
+  /* Main grid: 1 cột dọc */
+  .dash-grid-main,
+  .dash-grid-main.col-3 {
+    grid-template-columns: 1fr !important;
+    height: auto !important;
+    min-height: unset;
   }
 
-  .logo-icon {
-    width: 38px; height: 38px;
-    background: var(--accent);
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px;
-    flex-shrink: 0;
+  .dash-panel {
+    min-height: 220px;
   }
 
-  .logo-text h2 { font-size: 15px; font-weight: 700; color: var(--text-primary); }
-  .logo-text p  { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
-
-  .nav-section { padding: 18px 12px 6px; }
-  .nav-label {
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    padding: 0 6px;
-    margin-bottom: 6px;
+  .panel-hd {
+    font-size: 15px;
+    padding: 12px 14px;
   }
 
-  .nav-item {
-    display: flex; align-items: center; gap: 10px;
-    padding: 9px 10px;
-    border-radius: var(--radius);
-    cursor: pointer;
-    color: var(--text-secondary);
-    font-size: 13.5px;
-    font-weight: 500;
-    transition: all 0.15s;
-    margin-bottom: 2px;
-    text-decoration: none;
+  .dash-panel .table th { font-size: 12px; padding: 8px 10px; }
+  .dash-panel .table td { font-size: 14px; padding: 9px 10px; }
+
+  .leg-row  { font-size: 14px; padding: 7px 0; }
+  .leg-dot  { width: 10px; height: 10px; }
+
+  .donut-pct { font-size: 24px; }
+  .donut-lbl { font-size: 12px; }
+
+  /* Thao tác nhanh — nút to hơn trên mobile */
+  .dash-panel .btn {
+    padding: 14px !important;
+    font-size: 15px;
   }
-  .nav-item:hover { background: var(--bg-hover); color: var(--text-primary); }
-  .nav-item.active { background: var(--accent-glow); color: var(--accent); }
-  .nav-item .icon { font-size: 16px; width: 20px; text-align: center; }
-  .badge {
-    margin-left: auto;
-    background: var(--accent);
-    color: #fff;
-    font-size: 10px;
-    font-weight: 700;
-    padding: 2px 7px;
-    border-radius: 99px;
-  }
+}
 
-  .sidebar-bottom {
-    margin-top: auto;
-    padding: 12px;
-    border-top: 1px solid var(--border);
-  }
+/* ══════════════════════════════
+   RESPONSIVE — Small Mobile (≤ 480px)
+══════════════════════════════ */
+@media (max-width: 480px) {
 
-  /* ── MAIN ── */
-  .main {
-    margin-left: var(--sidebar-w);
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
-
-  /* ── TOPBAR ── */
-  .topbar {
-    display: flex; align-items: center;
-    padding: 14px 28px;
-    border-bottom: 1px solid var(--border);
-    background: var(--bg-surface);
-    gap: 12px;
-  }
-
-  .topbar h1 { font-size: 17px; font-weight: 700; flex: 1; }
-
-  .btn {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 8px 14px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    border: 1px solid var(--border);
-    background: var(--bg-card);
-    color: var(--text-primary);
-    transition: all 0.15s;
-    font-family: inherit;
-  }
-  .btn:hover { background: var(--bg-hover); border-color: var(--border-light); }
-  .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-  .btn-primary:hover { background: #3a78f0; border-color: #3a78f0; }
-
-  /* ── CONTENT ── */
-  .content { padding: 24px 28px; flex: 1; }
-
-  /* ── STAT CARDS ── */
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 14px;
-    margin-bottom: 24px;
-  }
-
-  .stat-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 18px 20px;
-    transition: border-color 0.15s;
-  }
-  .stat-card:hover { border-color: var(--border-light); }
-
-  .stat-label { font-size: 12px; color: var(--text-secondary); font-weight: 500; margin-bottom: 8px; }
-  .stat-value { font-size: 28px; font-weight: 700; font-family: 'JetBrains Mono', monospace; line-height: 1; margin-bottom: 6px; }
-  .stat-change { font-size: 11.5px; font-weight: 500; }
-  .stat-change.up   { color: var(--green); }
-  .stat-change.warn { color: var(--red); }
-  .stat-change.info { color: var(--yellow); }
-
-  /* ── TABS ── */
-  .tabs { display: flex; gap: 4px; margin-bottom: 18px; }
-  .tab {
-    padding: 8px 18px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 13.5px;
-    border: 1px solid transparent;
-    color: var(--text-secondary);
-    transition: all 0.15s;
-  }
-  .tab.active { background: var(--bg-card); border-color: var(--border); color: var(--text-primary); }
-  .tab:hover:not(.active) { color: var(--text-primary); }
-
-  /* ── TABLE PANEL ── */
-  .panel {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-  }
-
-  .panel-toolbar {
-    display: flex; align-items: center; gap: 10px;
-    padding: 14px 18px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .search-wrap {
-    display: flex; align-items: center;
-    background: var(--bg-surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 7px 12px;
+  .dash-grid-stats {
+    grid-template-columns: 1fr 1fr;
     gap: 8px;
-    flex: 1; max-width: 300px;
-    transition: border-color 0.15s;
-  }
-  .search-wrap:focus-within { border-color: var(--accent); }
-  .search-wrap input {
-    background: none; border: none; outline: none;
-    color: var(--text-primary); font-size: 13px;
-    font-family: inherit; width: 100%;
-  }
-  .search-wrap input::placeholder { color: var(--text-muted); }
-  .search-icon { color: var(--text-muted); font-size: 14px; }
-
-  select {
-    background: var(--bg-surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 7px 30px 7px 12px;
-    color: var(--text-primary);
-    font-size: 13px;
-    font-family: inherit;
-    outline: none;
-    cursor: pointer;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238892b0' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    transition: border-color 0.15s;
-  }
-  select:focus { border-color: var(--accent); }
-
-  /* ── TABLE ── */
-  table { width: 100%; border-collapse: collapse; }
-  thead th {
-    text-align: left;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    padding: 10px 18px;
-    border-bottom: 1px solid var(--border);
-  }
-  tbody tr {
-    border-bottom: 1px solid var(--border);
-    transition: background 0.1s;
-    cursor: pointer;
-  }
-  tbody tr:last-child { border-bottom: none; }
-  tbody tr:hover { background: var(--bg-hover); }
-
-  td { padding: 14px 18px; vertical-align: middle; }
-
-  .car-name { font-weight: 600; font-size: 14px; color: var(--text-primary); }
-  .car-sub  { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
-
-  .brand-tag {
-    display: inline-flex; align-items: center; gap: 5px;
-    font-size: 13px; font-weight: 500;
   }
 
-  .type-pill {
-    display: inline-block;
-    padding: 3px 10px;
-    border-radius: 99px;
-    font-size: 11.5px;
-    font-weight: 600;
-  }
-  .type-oto   { background: var(--accent-glow); color: var(--accent); }
-  .type-suv   { background: var(--green-dim); color: var(--green); }
-  .type-dien  { background: var(--yellow-dim); color: var(--yellow); }
-
-  .price {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13.5px;
-    font-weight: 600;
-    color: var(--text-primary);
+  .dash-stat {
+    padding: 13px 12px;
   }
 
-  .stock-num { font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 14px; }
-  .stock-num.out { color: var(--red); }
-  .stock-num.low { color: var(--yellow); }
-  .stock-num.ok  { color: var(--green); }
+  .dash-stat-icon  { font-size: 28px; opacity: .60; }
+  .dash-stat-label { font-size: 10px; letter-spacing: .2px; }
+  .dash-stat-val   { font-size: 24px; }
+  .dash-stat-sub   { font-size: 11px; }
 
-  .action-btn {
-    background: none; border: none; cursor: pointer;
-    color: var(--text-muted); font-size: 17px;
-    padding: 4px 6px; border-radius: 6px;
-    transition: all 0.12s;
-    line-height: 1;
-  }
-  .action-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+  .panel-hd { font-size: 14px; padding: 11px 12px; }
 
-  /* ── PAGINATION ── */
-  .pagination {
-    display: flex; align-items: center; gap: 6px;
-    padding: 14px 18px;
-    border-top: 1px solid var(--border);
-    background: var(--bg-surface);
-  }
-  .pg-info { font-size: 12.5px; color: var(--text-muted); flex: 1; }
-  .pg-btn {
-    width: 32px; height: 32px;
-    display: flex; align-items: center; justify-content: center;
-    border-radius: 7px;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 600;
-    border: 1px solid var(--border);
-    background: var(--bg-card);
-    color: var(--text-secondary);
-    transition: all 0.12s;
-  }
-  .pg-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
-  .pg-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .dash-panel .table th { font-size: 11px; }
+  .dash-panel .table td { font-size: 13px; padding: 8px 8px; }
 
-  /* ── MODAL ── */
-  .modal-overlay {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(3px);
-    z-index: 100;
-    align-items: center; justify-content: center;
-  }
-  .modal-overlay.open { display: flex; }
-  .modal {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    width: 440px;
-    max-width: 95vw;
-    padding: 28px;
-    animation: slideUp 0.2s ease;
-  }
-  @keyframes slideUp {
-    from { opacity: 0; transform: translateY(16px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  .modal-title { font-size: 17px; font-weight: 700; margin-bottom: 22px; }
-  .form-group { margin-bottom: 16px; }
-  .form-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; display: block; }
-  .form-input {
-    width: 100%;
-    background: var(--bg-surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 9px 12px;
-    color: var(--text-primary);
-    font-size: 13.5px;
-    font-family: inherit;
-    outline: none;
-    transition: border-color 0.15s;
-  }
-  .form-input:focus { border-color: var(--accent); }
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .modal-actions { display: flex; gap: 10px; margin-top: 24px; justify-content: flex-end; }
+  .leg-row  { font-size: 13px; }
 
-  /* scrollbar */
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 99px; }
+  .donut-pct { font-size: 20px; }
+}
 </style>
-@endsection
+@endpush
 
 @section('content')
 
-<!-- ═══ SIDEBAR ═══ -->
-<aside class="sidebar">
-  <div class="logo">
-    <div class="logo-icon">🚗</div>
-    <div class="logo-text">
-      <h2>AutoAdmin</h2>
-      <p>Quản lý hệ thống xe</p>
+{{-- ═══════════════════════════════════
+     ADMIN DASHBOARD
+═══════════════════════════════════ --}}
+@if(auth()->user()->isAdmin())
+
+<div class="dash-grid-stats">
+  <div class="card dash-stat s-blue">
+    <div class="dash-stat-icon">💰</div>
+    <div class="dash-stat-label">Tổng doanh thu</div>
+    <div class="dash-stat-val" style="font-size:24px;color:var(--primary)">
+      {{ number_format($stats['total_revenue'] ?? 0, 0, ',', '.') }}đ
     </div>
+    <div class="dash-stat-sub">Đơn đã chốt</div>
   </div>
-
-  <div class="nav-section">
-    <div class="nav-label">Tổng quan</div>
-    <a href="{{ route('admin.dashboard') }}" class="nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-      <span class="icon">≡</span> Dashboard
-    </a>
+  <div class="card dash-stat s-green">
+    <div class="dash-stat-icon">📦</div>
+    <div class="dash-stat-label">Tổng đơn hàng</div>
+    <div class="dash-stat-val">{{ $stats['total_orders'] ?? 0 }}</div>
+    <div class="dash-stat-sub" style="color:var(--success)">{{ $stats['closed_orders'] ?? 0 }} đã chốt</div>
   </div>
-
-  <div class="nav-section">
-    <div class="nav-label">Quản lý</div>
-    <a href="{{ route('admin.cars.index') }}" class="nav-item {{ request()->routeIs('admin.cars.*') ? 'active' : '' }}">
-      <span class="icon">🚗</span> Sản phẩm xe
-      <span class="badge">{{ $stats['total_cars'] ?? 0 }}</span>
-    </a>
-    <a href="{{ route('admin.orders.index') }}" class="nav-item {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
-      <span class="icon">📋</span> Đơn đặt cọc
-      @if(($stats['pending_orders'] ?? 0) > 0)
-        <span class="badge" style="background:var(--yellow)">{{ $stats['pending_orders'] }}</span>
-      @endif
-    </a>
-    <a href="#" class="nav-item">
-      <span class="icon">👥</span> Người dùng
-    </a>
+  <div class="card dash-stat s-amber">
+    <div class="dash-stat-icon">🚗</div>
+    <div class="dash-stat-label">Xe sẵn có</div>
+    <div class="dash-stat-val">{{ $stats['available_cars'] ?? 0 }}</div>
+    <div class="dash-stat-sub">/ {{ $stats['total_cars'] ?? 0 }} tổng</div>
   </div>
-
-  <div class="sidebar-bottom">
-    <div class="nav-label" style="padding:0 6px;margin-bottom:6px;">Hệ thống</div>
-    <a href="#" class="nav-item">
-      <span class="icon">⚙️</span> Cài đặt
-    </a>
-    <form method="POST" action="{{ route('logout') }}">
-      @csrf
-      <button type="submit" class="nav-item" style="width:100%;background:none;border:none;text-align:left;">
-        <span class="icon">🚪</span> Đăng xuất
-      </button>
-    </form>
+  <div class="card dash-stat s-red">
+    <div class="dash-stat-icon">📧</div>
+    <div class="dash-stat-label">Liên hệ chưa đọc</div>
+    <div class="dash-stat-val" style="color:var(--danger)">{{ $stats['unread_contacts'] ?? 0 }}</div>
+    <div class="dash-stat-sub">/ {{ $stats['total_contacts'] ?? 0 }} tổng</div>
   </div>
-</aside>
+</div>
 
-<!-- ═══ MAIN ═══ -->
-<main class="main">
+@if(isset($topStaff) && $topStaff->count())
+@php
+  $totalOrd  = max($stats['total_orders'] ?? 1, 1);
+  $closedOrd = $stats['closed_orders'] ?? 0;
+  $openOrd   = $totalOrd - $closedOrd;
+  $r1 = 42; $c1 = 2*M_PI*$r1;
+  $d1close = $c1*($closedOrd/$totalOrd);
+  $d1open  = $c1*($openOrd /$totalOrd);
+  $pct1    = round($closedOrd/$totalOrd*100);
 
-  <!-- Topbar -->
-  <div class="topbar">
-    <h1>Sản phẩm xe</h1>
-    <button class="btn" onclick="openModal('news')">＋ Thêm tin tức</button>
-    <a href="{{ route('admin.cars.create') }}" class="btn btn-primary">＋ Thêm xe mới</a>
-  </div>
+  $totalCars = max($stats['total_cars'] ?? 1, 1);
+  $availCars = $stats['available_cars'] ?? 0;
+  $usedCars  = $totalCars - $availCars;
+  $r2 = 42; $c2 = 2*M_PI*$r2;
+  $d2avail = $c2*($availCars/$totalCars);
+  $d2used  = $c2*($usedCars /$totalCars);
+  $pct2    = round($availCars/$totalCars*100);
+@endphp
 
-  <!-- Content -->
-  <div class="content">
+<div class="dash-grid-main col-3">
 
-    <!-- Stats — lấy từ controller -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-label">Tổng sản phẩm</div>
-        <div class="stat-value">{{ $stats['total_cars'] ?? 0 }}</div>
-        <div class="stat-change up">Tổng xe trong hệ thống</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Đang bán</div>
-        <div class="stat-value" style="color:var(--green)">{{ $stats['available_cars'] ?? 0 }}</div>
-        <div class="stat-change up">Còn hàng</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Đã bán</div>
-        <div class="stat-value" style="color:var(--red)">{{ $stats['sold_cars'] ?? 0 }}</div>
-        <div class="stat-change warn">Xe đã bán ra</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Đơn chờ duyệt</div>
-        <div class="stat-value">{{ $stats['pending_orders'] ?? 0 }}</div>
-        <div class="stat-change info">Cần xử lý</div>
-      </div>
-    </div>
-
-    <!-- Tabs -->
-    <div class="tabs">
-      <div class="tab active" onclick="switchTab(this,'cars')">Sản phẩm xe</div>
-      <div class="tab" onclick="switchTab(this,'news')">Tin tức</div>
-    </div>
-
-    <!-- Table Panel -->
-    <div class="panel" id="carsPanel">
-      <div class="panel-toolbar">
-        <div class="search-wrap">
-          <span class="search-icon">🔍</span>
-          <input type="text" placeholder="Tìm kiếm..." id="searchInput" oninput="filterTable()">
-        </div>
-        <select id="filterType" onchange="filterTable()">
-          <option value="">Tất cả loại</option>
-          <option value="Ô tô">Ô tô</option>
-          <option value="SUV">SUV</option>
-          <option value="Xe điện">Xe điện</option>
-        </select>
-        <select id="filterStatus" onchange="filterTable()">
-          <option value="">Tất cả trạng thái</option>
-          <option value="ok">Còn hàng</option>
-          <option value="out">Hết hàng</option>
-        </select>
-      </div>
-
-      <table id="carTable">
-        <thead>
+  {{-- Top nhân viên --}}
+  <div class="card dash-panel">
+    <div class="panel-hd">🏆 Top nhân viên bán hàng</div>
+    <div style="flex:1;overflow-y:auto">
+      <table class="table">
+        <thead><tr><th>#</th><th>Nhân viên</th><th>Đơn chốt</th><th>Doanh thu</th></tr></thead>
+        <tbody>
+          @foreach($topStaff as $i => $staff)
           <tr>
-            <th>Tên xe</th>
-            <th>Hãng</th>
-            <th>Loại</th>
-            <th>Giá (VNĐ)</th>
-            <th>Tồn kho</th>
-            <th></th>
+            <td>
+              @if($i==0)🥇@elseif($i==1)🥈@elseif($i==2)🥉
+              @else<span style="color:var(--text-muted)">{{ $i+1 }}</span>@endif
+            </td>
+            <td style="font-weight:500">{{ $staff->name }}</td>
+            <td>{{ $staff->closed_count }}</td>
+            <td style="color:var(--primary);font-weight:600">
+              {{ number_format($staff->revenue_sum ?? 0, 0, ',', '.') }}đ
+            </td>
           </tr>
-        </thead>
-        <tbody id="carTableBody"></tbody>
+          @endforeach
+        </tbody>
       </table>
-
-      <div class="pagination">
-        <div class="pg-info" id="pgInfo"></div>
-        <div id="pgButtons"></div>
-      </div>
     </div>
-
-    <!-- News Panel (hidden) -->
-    <div class="panel" id="newsPanel" style="display:none; padding:40px; text-align:center; color:var(--text-muted);">
-      📰 Quản lý tin tức xe — Coming soon
+    <div style="padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0">
+      <a href="{{ route('admin.users.index') }}"  class="btn btn-sm" style="flex:1;text-align:center">👥 Quản lý NV</a>
+      <a href="{{ route('admin.orders.index') }}" class="btn btn-sm" style="flex:1;text-align:center">📦 Đơn hàng</a>
     </div>
-
   </div>
-</main>
 
-<!-- ═══ MODAL THÊM XE ═══ -->
-<div class="modal-overlay" id="carModal">
-  <div class="modal">
-    <div class="modal-title">🚗 Đăng xe mới</div>
-    <form method="POST" action="{{ route('admin.cars.store') }}">
-      @csrf
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Tên xe</label>
-          <input class="form-input" name="name" placeholder="VD: Camry 2025" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Hãng</label>
-          <input class="form-input" name="brand" placeholder="VD: Toyota" required>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Loại xe</label>
-          <select class="form-input" name="type">
-            <option>Ô tô</option>
-            <option>SUV</option>
-            <option>Xe điện</option>
-            <option>Pickup</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Tồn kho</label>
-          <input class="form-input" name="stock" type="number" placeholder="0" min="0">
+  {{-- Donut: tỉ lệ đơn --}}
+  <div class="card dash-panel">
+    <div class="panel-hd">🥧 Tỉ lệ đơn hàng</div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:20px 18px">
+      <div class="donut-wrap" style="width:130px;height:130px">
+        <svg viewBox="0 0 100 100" width="130" height="130" style="transform:rotate(-90deg)">
+          <circle cx="50" cy="50" r="{{ $r1 }}" fill="none" stroke="var(--border)" stroke-width="13"/>
+          @if($openOrd > 0)
+          <circle cx="50" cy="50" r="{{ $r1 }}" fill="none" stroke="#e2e8f0" stroke-width="13"
+            stroke-dasharray="{{ $d1open }} {{ $c1 }}" stroke-dashoffset="{{ -$d1close }}"/>
+          @endif
+          @if($closedOrd > 0)
+          <circle cx="50" cy="50" r="{{ $r1 }}" fill="none" stroke="#22c55e" stroke-width="13"
+            stroke-dasharray="{{ $d1close }} {{ $c1 }}" stroke-dashoffset="0"/>
+          @endif
+        </svg>
+        <div class="donut-center">
+          <span class="donut-pct">{{ $pct1 }}%</span>
+          <span class="donut-lbl">chốt</span>
         </div>
       </div>
-      <div class="form-group">
-        <label class="form-label">Phân khúc</label>
-        <input class="form-input" name="sub" placeholder="VD: Sedan hạng D">
+      <div style="width:100%">
+        <div class="leg-row">
+          <span><span class="leg-dot" style="background:#22c55e"></span>Đã chốt</span>
+          <strong>{{ $closedOrd }}</strong>
+        </div>
+        <div class="leg-row">
+          <span><span class="leg-dot" style="background:#e2e8f0"></span>Chưa chốt</span>
+          <strong>{{ $openOrd }}</strong>
+        </div>
+        <div class="leg-row">
+          <span style="color:var(--text-muted)">Tổng cộng</span>
+          <strong>{{ $totalOrd }}</strong>
+        </div>
       </div>
-      <div class="form-group">
-        <label class="form-label">Giá bán (VNĐ)</label>
-        <input class="form-input" name="price" type="number" placeholder="1150000000" required>
+    </div>
+  </div>
+
+  {{-- Donut: kho xe + thao tác nhanh --}}
+  <div class="card dash-panel">
+    <div class="panel-hd">🚗 Kho xe</div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:16px 18px">
+      <div class="donut-wrap" style="width:120px;height:120px">
+        <svg viewBox="0 0 100 100" width="120" height="120" style="transform:rotate(-90deg)">
+          <circle cx="50" cy="50" r="{{ $r2 }}" fill="none" stroke="var(--border)" stroke-width="13"/>
+          @if($usedCars > 0)
+          <circle cx="50" cy="50" r="{{ $r2 }}" fill="none" stroke="#f59e0b" stroke-width="13"
+            stroke-dasharray="{{ $d2used }} {{ $c2 }}" stroke-dashoffset="{{ -$d2avail }}"/>
+          @endif
+          @if($availCars > 0)
+          <circle cx="50" cy="50" r="{{ $r2 }}" fill="none" stroke="#3b82f6" stroke-width="13"
+            stroke-dasharray="{{ $d2avail }} {{ $c2 }}" stroke-dashoffset="0"/>
+          @endif
+        </svg>
+        <div class="donut-center">
+          <span class="donut-pct">{{ $pct2 }}%</span>
+          <span class="donut-lbl">sẵn có</span>
+        </div>
       </div>
-      <div class="modal-actions">
-        <button type="button" class="btn" onclick="closeModal('carModal')">Hủy</button>
-        <button type="submit" class="btn btn-primary">Đăng</button>
+      <div style="width:100%">
+        <div class="leg-row">
+          <span><span class="leg-dot" style="background:#3b82f6"></span>Sẵn có</span>
+          <strong>{{ $availCars }}</strong>
+        </div>
+        <div class="leg-row">
+          <span><span class="leg-dot" style="background:#f59e0b"></span>Đang sử dụng</span>
+          <strong>{{ $usedCars }}</strong>
+        </div>
       </div>
-    </form>
+      <div style="width:100%;display:flex;flex-direction:column;gap:8px">
+        <a href="{{ route('admin.cars.create') }}"       class="btn" style="text-align:center">+ Thêm xe mới</a>
+        <a href="{{ route('admin.dashboard.revenue') }}" class="btn" style="text-align:center">📊 Báo cáo doanh thu</a>
+        <a href="{{ route('admin.contacts.index') }}"    class="btn" style="text-align:center">📧 Liên hệ</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+@endif
+
+
+{{-- ═══════════════════════════════════
+     MANAGER DASHBOARD
+═══════════════════════════════════ --}}
+@elseif(auth()->user()->isManager())
+
+<div class="dash-grid-stats">
+  <div class="card dash-stat s-blue">
+    <div class="dash-stat-icon">💰</div>
+    <div class="dash-stat-label">Doanh thu team</div>
+    <div class="dash-stat-val" style="font-size:24px;color:var(--primary)">
+      {{ number_format($stats['team_revenue'] ?? 0, 0, ',', '.') }}đ
+    </div>
+  </div>
+  <div class="card dash-stat s-green">
+    <div class="dash-stat-icon">✅</div>
+    <div class="dash-stat-label">Đơn đã chốt</div>
+    <div class="dash-stat-val" style="color:var(--success)">{{ $stats['closed_orders'] ?? 0 }}</div>
+  </div>
+  <div class="card dash-stat s-amber">
+    <div class="dash-stat-icon">⏳</div>
+    <div class="dash-stat-label">Chờ duyệt</div>
+    <div class="dash-stat-val" style="color:var(--warning)">{{ $stats['pending_review'] ?? 0 }}</div>
+    <div class="dash-stat-sub">Đơn "Đã tư vấn"</div>
+  </div>
+  <div class="card dash-stat s-purple">
+    <div class="dash-stat-icon">📋</div>
+    <div class="dash-stat-label">Tổng đơn</div>
+    <div class="dash-stat-val">{{ $stats['team_orders'] ?? 0 }}</div>
   </div>
 </div>
 
-<!-- MODAL TIN TỨC -->
-<div class="modal-overlay" id="newsModal">
-  <div class="modal">
-    <div class="modal-title">📰 Thêm tin tức</div>
-    <div class="form-group">
-      <label class="form-label">Tiêu đề</label>
-      <input class="form-input" placeholder="Tiêu đề bài viết...">
+@php
+  $tTotal   = max($stats['team_orders'] ?? 1, 1);
+  $tClosed  = $stats['closed_orders']  ?? 0;
+  $tPending = $stats['pending_review'] ?? 0;
+  $tOther   = max($tTotal - $tClosed - $tPending, 0);
+  $rT = 42; $cT = 2*M_PI*$rT;
+  $dTC = $cT*($tClosed /$tTotal);
+  $dTP = $cT*($tPending/$tTotal);
+  $dTO = $cT*($tOther  /$tTotal);
+  $pctT = round($tClosed/$tTotal*100);
+@endphp
+
+<div class="dash-grid-main col-3">
+
+  {{-- Đơn chờ chốt --}}
+  <div class="card dash-panel">
+    <div class="panel-hd">
+      <span>⏳ Đơn chờ chốt</span>
+      <a href="{{ route('admin.orders.index', ['consultation_status' => 'da_tu_van']) }}"
+         style="font-size:14px;color:var(--primary);font-weight:400">Xem tất cả →</a>
     </div>
-    <div class="form-group">
-      <label class="form-label">Tóm tắt</label>
-      <textarea class="form-input" rows="3" placeholder="Nội dung tóm tắt..." style="resize:vertical"></textarea>
+    <div style="flex:1;overflow-y:auto">
+      <table class="table">
+        <thead><tr><th>Khách</th><th>Xe</th><th>NV</th><th></th></tr></thead>
+        <tbody>
+          @forelse($recentOrders ?? [] as $order)
+          <tr>
+            <td style="font-weight:500">{{ $order->customer_name }}</td>
+            <td style="color:var(--text-muted)">{{ $order->car->name ?? 'N/A' }}</td>
+            <td>{{ $order->assignedStaff->name ?? '—' }}</td>
+            <td><a href="{{ route('admin.orders.show', $order) }}" class="btn btn-sm">Chốt</a></td>
+          </tr>
+          @empty
+          <tr><td colspan="4" style="text-align:center;padding:40px;color:var(--text-muted)">Không có đơn chờ duyệt</td></tr>
+          @endforelse
+        </tbody>
+      </table>
     </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Chuyên mục</label>
-        <select class="form-input">
-          <option>Đánh giá xe</option>
-          <option>Tin thị trường</option>
-          <option>Kỹ thuật</option>
-        </select>
+  </div>
+
+  {{-- Donut: tỉ lệ team --}}
+  <div class="card dash-panel">
+    <div class="panel-hd">🥧 Tỉ lệ đơn team</div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:20px 18px">
+      <div class="donut-wrap" style="width:130px;height:130px">
+        <svg viewBox="0 0 100 100" width="130" height="130" style="transform:rotate(-90deg)">
+          <circle cx="50" cy="50" r="{{ $rT }}" fill="none" stroke="var(--border)" stroke-width="13"/>
+          @if($tOther > 0)
+          <circle cx="50" cy="50" r="{{ $rT }}" fill="none" stroke="#e2e8f0" stroke-width="13"
+            stroke-dasharray="{{ $dTO }} {{ $cT }}" stroke-dashoffset="{{ -$dTC - $dTP }}"/>
+          @endif
+          @if($tPending > 0)
+          <circle cx="50" cy="50" r="{{ $rT }}" fill="none" stroke="#f59e0b" stroke-width="13"
+            stroke-dasharray="{{ $dTP }} {{ $cT }}" stroke-dashoffset="{{ -$dTC }}"/>
+          @endif
+          @if($tClosed > 0)
+          <circle cx="50" cy="50" r="{{ $rT }}" fill="none" stroke="#22c55e" stroke-width="13"
+            stroke-dasharray="{{ $dTC }} {{ $cT }}" stroke-dashoffset="0"/>
+          @endif
+        </svg>
+        <div class="donut-center">
+          <span class="donut-pct">{{ $pctT }}%</span>
+          <span class="donut-lbl">chốt</span>
+        </div>
       </div>
-      <div class="form-group">
-        <label class="form-label">Tác giả</label>
-        <input class="form-input" placeholder="Tên tác giả">
+      <div style="width:100%">
+        <div class="leg-row">
+          <span><span class="leg-dot" style="background:#22c55e"></span>Đã chốt</span>
+          <strong>{{ $tClosed }}</strong>
+        </div>
+        <div class="leg-row">
+          <span><span class="leg-dot" style="background:#f59e0b"></span>Chờ duyệt</span>
+          <strong>{{ $tPending }}</strong>
+        </div>
+        <div class="leg-row">
+          <span><span class="leg-dot" style="background:#e2e8f0"></span>Đang xử lý</span>
+          <strong>{{ $tOther }}</strong>
+        </div>
       </div>
     </div>
-    <div class="modal-actions">
-      <button class="btn" onclick="closeModal('newsModal')">Hủy</button>
-      <button class="btn btn-primary">Đăng bài</button>
+  </div>
+
+  {{-- Hiệu suất nhân viên --}}
+  <div class="card dash-panel">
+    <div class="panel-hd">👥 Hiệu suất nhân viên</div>
+    <div style="flex:1;overflow-y:auto;padding:16px 18px">
+      @forelse($staffPerformance ?? [] as $staff)
+      @php
+        $swTotal  = (int) $staff->total_orders_count;
+        $swClosed = (int) $staff->closed_count;
+        $sw = $swTotal > 0 ? round($swClosed / $swTotal * 100) : 0;
+        $sc = $sw >= 60 ? '#22c55e' : ($sw >= 40 ? '#3b82f6' : '#f59e0b');
+      @endphp
+      <div style="margin-bottom:18px">
+        <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:500;margin-bottom:6px">
+          <span>{{ $staff->name }}</span>
+          <span style="color:var(--text-muted);font-weight:400">{{ $swClosed }}/{{ $swTotal }} đơn</span>
+        </div>
+        <div style="background:var(--border);border-radius:5px;height:10px;overflow:hidden">
+          <div style="width:{{ $sw }}%;height:100%;border-radius:5px;background:{{ $sc }};transition:width .4s ease"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-top:5px">
+          <span style="color:var(--text-muted)">{{ number_format($staff->revenue_sum ?? 0, 0, ',', '.') }}đ</span>
+          <span style="color:{{ $sc }};font-weight:600">{{ $sw }}% chốt</span>
+        </div>
+      </div>
+      @empty
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text-muted)">
+        <div style="font-size:40px;margin-bottom:12px">📭</div>
+        <div style="font-size:15px">Chưa có dữ liệu nhân viên</div>
+      </div>
+      @endforelse
+    </div>
+  </div>
+
+</div>
+
+
+{{-- ═══════════════════════════════════
+     STAFF DASHBOARD
+═══════════════════════════════════ --}}
+@else
+
+<div class="dash-grid-stats">
+  <div class="card dash-stat s-blue">
+    <div class="dash-stat-icon">👥</div>
+    <div class="dash-stat-label">Tổng khách</div>
+    <div class="dash-stat-val">{{ $stats['my_orders'] ?? 0 }}</div>
+  </div>
+  <div class="card dash-stat s-amber">
+    <div class="dash-stat-icon">💬</div>
+    <div class="dash-stat-label">Đang tư vấn</div>
+    <div class="dash-stat-val" style="color:var(--warning)">{{ $stats['my_consulting'] ?? 0 }}</div>
+  </div>
+  <div class="card dash-stat s-green">
+    <div class="dash-stat-icon">✅</div>
+    <div class="dash-stat-label">Đã chốt đơn</div>
+    <div class="dash-stat-val" style="color:var(--success)">{{ $stats['my_closed'] ?? 0 }}</div>
+  </div>
+  <div class="card dash-stat s-purple">
+    <div class="dash-stat-icon">🎁</div>
+    <div class="dash-stat-label">Hoa hồng</div>
+    <div class="dash-stat-val" style="font-size:24px;color:var(--primary)">
+      {{ number_format($stats['my_commission'] ?? 0, 0, ',', '.') }}đ
     </div>
   </div>
 </div>
 
-@endsection
+@php
+  $myTotal   = max($stats['my_orders']    ?? 1, 1);
+  $myClosed  = $stats['my_closed']        ?? 0;
+  $myConsult = $stats['my_consulting']    ?? 0;
+  $myOther   = max($myTotal - $myClosed - $myConsult, 0);
+  $rM = 42; $cM = 2*M_PI*$rM;
+  $dMC = $cM*($myClosed /$myTotal);
+  $dMK = $cM*($myConsult/$myTotal);
+  $dMO = $cM*($myOther  /$myTotal);
+  $pctM = round($myClosed/$myTotal*100);
 
-@section('scripts')
-<script>
-// ── DATA từ Laravel (PHP → JS) ──
-const cars = @json($cars ?? []);
+  $commTarget = 5000000;
+  $commVal    = $stats['my_commission'] ?? 0;
+  $commPct    = min(100, $commTarget > 0 ? round($commVal/$commTarget*100) : 0);
+  $commColor  = $commPct >= 100 ? '#22c55e' : ($commPct >= 60 ? '#3b82f6' : '#f59e0b');
+@endphp
 
-const typeClass = { 'Ô tô':'type-oto', 'SUV':'type-suv', 'Xe điện':'type-dien' };
-const fmtPrice = n => Number(n).toLocaleString('vi-VN');
+<div class="dash-grid-main col-3">
 
-// ── PAGINATION ──
-let page = 1;
-const PER = 5;
-let filtered = [...cars];
+  {{-- Đơn hàng của tôi --}}
+  <div class="card dash-panel">
+    <div class="panel-hd">
+      <span>📋 Đơn hàng của tôi</span>
+      <a href="{{ route('admin.staff.orders.index') }}" style="font-size:14px;color:var(--primary);font-weight:400">Xem tất cả →</a>
+    </div>
+    <div style="flex:1;overflow-y:auto">
+      <table class="table">
+        <thead><tr><th>Khách</th><th>Xe</th><th>Trạng thái</th></tr></thead>
+        <tbody>
+          @forelse($myOrders ?? [] as $order)
+          <tr>
+            <td style="font-weight:500">{{ $order->customer_name }}</td>
+            <td style="color:var(--text-muted)">{{ $order->car->name ?? 'N/A' }}</td>
+            <td><span class="badge {{ $order->consultation_badge }}">{{ $order->consultation_label }}</span></td>
+          </tr>
+          @empty
+          <tr><td colspan="3" style="text-align:center;padding:40px;color:var(--text-muted)">Chưa có đơn hàng</td></tr>
+          @endforelse
+        </tbody>
+      </table>
+    </div>
+  </div>
 
-function renderTable() {
-  const start = (page-1)*PER, end = start+PER;
-  const slice = filtered.slice(start, end);
-  const tbody = document.getElementById('carTableBody');
+  {{-- Donut: hiệu suất cá nhân --}}
+  <div class="card dash-panel">
+    <div class="panel-hd">🥧 Hiệu suất của tôi</div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:20px 18px">
+      <div class="donut-wrap" style="width:130px;height:130px">
+        <svg viewBox="0 0 100 100" width="130" height="130" style="transform:rotate(-90deg)">
+          <circle cx="50" cy="50" r="{{ $rM }}" fill="none" stroke="var(--border)" stroke-width="13"/>
+          @if($myOther > 0)
+          <circle cx="50" cy="50" r="{{ $rM }}" fill="none" stroke="#e2e8f0" stroke-width="13"
+            stroke-dasharray="{{ $dMO }} {{ $cM }}" stroke-dashoffset="{{ -$dMC - $dMK }}"/>
+          @endif
+          @if($myConsult > 0)
+          <circle cx="50" cy="50" r="{{ $rM }}" fill="none" stroke="#f59e0b" stroke-width="13"
+            stroke-dasharray="{{ $dMK }} {{ $cM }}" stroke-dashoffset="{{ -$dMC }}"/>
+          @endif
+          @if($myClosed > 0)
+          <circle cx="50" cy="50" r="{{ $rM }}" fill="none" stroke="#22c55e" stroke-width="13"
+            stroke-dasharray="{{ $dMC }} {{ $cM }}" stroke-dashoffset="0"/>
+          @endif
+        </svg>
+        <div class="donut-center">
+          <span class="donut-pct">{{ $pctM }}%</span>
+          <span class="donut-lbl">chốt</span>
+        </div>
+      </div>
+      <div style="width:100%">
+        <div class="leg-row">
+          <span><span class="leg-dot" style="background:#22c55e"></span>Đã chốt</span>
+          <strong>{{ $myClosed }}</strong>
+        </div>
+        <div class="leg-row">
+          <span><span class="leg-dot" style="background:#f59e0b"></span>Đang tư vấn</span>
+          <strong>{{ $myConsult }}</strong>
+        </div>
+        <div class="leg-row">
+          <span><span class="leg-dot" style="background:#e2e8f0"></span>Chờ xử lý</span>
+          <strong>{{ $myOther }}</strong>
+        </div>
+      </div>
+    </div>
+  </div>
 
-  if (slice.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted)">Không tìm thấy xe nào</td></tr>`;
-    document.getElementById('pgInfo').textContent = '';
-    document.getElementById('pgButtons').innerHTML = '';
-    return;
-  }
+  {{-- Thao tác nhanh + progress hoa hồng --}}
+  <div class="card dash-panel">
+    <div class="panel-hd">⚡ Thao tác nhanh</div>
+    <div style="flex:1;display:flex;flex-direction:column;padding:16px 18px;gap:10px">
+      <a href="{{ route('admin.staff.orders.create') }}" class="btn" style="text-align:center;padding:14px;font-size:15px">+ Tạo đơn hàng mới</a>
+      <a href="{{ route('admin.staff.customers') }}"     class="btn" style="text-align:center;padding:14px;font-size:15px">👥 Xem khách hàng</a>
+      <a href="{{ route('admin.staff.attendance') }}"    class="btn" style="text-align:center;padding:14px;font-size:15px">📍 Chấm công GPS</a>
+      <a href="{{ route('admin.staff.performance') }}"   class="btn" style="text-align:center;padding:14px;font-size:15px">📊 Hiệu suất cá nhân</a>
+      <div style="margin-top:auto;padding:14px;background:var(--border);border-radius:10px">
+        <div style="font-size:13px;color:var(--text-muted);margin-bottom:8px">🎯 Hoa hồng tháng này</div>
+        <div style="background:rgba(255,255,255,.6);border-radius:5px;height:10px;overflow:hidden;margin-bottom:8px">
+          <div style="width:{{ $commPct }}%;height:100%;background:{{ $commColor }};border-radius:5px;transition:width .4s ease"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:14px">
+          <span style="font-weight:600;color:{{ $commColor }}">{{ number_format($commVal,0,',','.') }}đ</span>
+          <span style="color:var(--text-muted)">{{ $commPct }}% mục tiêu</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
-  tbody.innerHTML = slice.map(c => {
-    const stock = parseInt(c.stock ?? 0);
-    const sc = stock === 0 ? 'out' : stock <= 5 ? 'low' : 'ok';
-    const editUrl = `/admin/cars/${c.id}/edit`;
-    return `<tr onclick="window.location='${editUrl}'">
-      <td><div class="car-name">${c.name}</div><div class="car-sub">${c.sub ?? ''}</div></td>
-      <td><span class="brand-tag">${c.brand}</span></td>
-      <td><span class="type-pill ${typeClass[c.type]||'type-oto'}">${c.type}</span></td>
-      <td><span class="price">${fmtPrice(c.price)}</span></td>
-      <td><span class="stock-num ${sc}">${stock}</span></td>
-      <td>
-        <a href="${editUrl}" onclick="event.stopPropagation()" class="action-btn" title="Sửa">✏️</a>
-      </td>
-    </tr>`;
-  }).join('');
+</div>
 
-  document.getElementById('pgInfo').textContent =
-    `Hiển thị ${start+1}–${Math.min(end, filtered.length)} / ${filtered.length} sản phẩm`;
-  renderPagination();
-}
+@endif
 
-function renderPagination() {
-  const total = Math.ceil(filtered.length / PER);
-  const wrap = document.getElementById('pgButtons');
-  let btns = '';
-  for (let i = 1; i <= total; i++) {
-    if (i===1 || i===total || Math.abs(i-page)<=1)
-      btns += `<button class="pg-btn${i===page?' active':''}" onclick="goPage(${i})">${i}</button>`;
-    else if (Math.abs(i-page)===2)
-      btns += `<button class="pg-btn" style="cursor:default;pointer-events:none;">…</button>`;
-  }
-  wrap.innerHTML = `<div style="display:flex;gap:5px">${btns}</div>`;
-}
-
-function goPage(n) { page = n; renderTable(); }
-
-function filterTable() {
-  const q = document.getElementById('searchInput').value.toLowerCase();
-  const t = document.getElementById('filterType').value;
-  const s = document.getElementById('filterStatus').value;
-  filtered = cars.filter(c => {
-    const matchQ = !q || c.name.toLowerCase().includes(q) || c.brand.toLowerCase().includes(q);
-    const matchT = !t || c.type === t;
-    const stock  = parseInt(c.stock ?? 0);
-    const matchS = !s || (s==='out' ? stock===0 : stock>0);
-    return matchQ && matchT && matchS;
-  });
-  page = 1;
-  renderTable();
-}
-
-// ── TABS ──
-function switchTab(el, panel) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('carsPanel').style.display = panel==='cars' ? '' : 'none';
-  document.getElementById('newsPanel').style.display = panel==='news' ? '' : 'none';
-}
-
-// ── MODAL ──
-function openModal(type) {
-  document.getElementById(type==='car' ? 'carModal' : 'newsModal').classList.add('open');
-}
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-
-document.querySelectorAll('.modal-overlay').forEach(m => {
-  m.addEventListener('click', e => { if (e.target===m) m.classList.remove('open'); });
-});
-
-// ── INIT ──
-renderTable();
-</script>
 @endsection

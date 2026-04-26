@@ -29,13 +29,13 @@ class NewsController extends Controller
             });
         }
 
-        $latestNews   = (clone $query)->byDate()->paginate(6);
+        // Dùng get() + collection thay vì paginate() để slice() hoạt động
+        $latestNews = News::published()->byDate()->limit(6)->get(); // tăng từ 3 lên 6
         $popularPosts = News::published()->popular()->limit(5)->get();
         $recentPosts  = News::published()->byDate()->limit(5)->get();
         $tags         = NewsTag::all();
         $totalCount   = News::published()->count();
 
-        // Cover story: lấy bài đánh dấu is_cover, nếu không có thì lấy bài mới nhất
         $coverStory = News::published()
             ->with('category', 'author')
             ->where('is_cover', true)
@@ -43,7 +43,6 @@ class NewsController extends Controller
             ->first()
             ?? News::published()->with('category', 'author')->byDate()->first();
 
-        // Đếm số bài theo slug của từng category
         $categoryCounts = NewsCategory::withCount(['news' => function ($q) {
             $q->published();
         }])->get()->pluck('news_count', 'slug');

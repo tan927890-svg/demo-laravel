@@ -3,21 +3,15 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
+use App\Models\Contact;
 
 class ContactController extends Controller
 {
-    /**
-     * Hiển thị trang liên hệ
-     */
     public function index()
     {
-        return view('contact');
+        return redirect()->route('services.booking');
     }
 
-    /**
-     * Xử lý form liên hệ
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -35,9 +29,15 @@ class ContactController extends Controller
             'consent.accepted' => 'Bạn cần đồng ý với chính sách bảo mật.',
         ]);
 
-        // TODO: Gửi email thông báo cho admin
-        // Mail::to('support@website.com')->send(new ContactMail($validated));
+        Contact::create([
+            'name'    => $validated['name'],
+            'email'   => $validated['email'] ?? null,
+            'phone'   => $validated['phone'],
+            'subject' => $validated['subject'] ?? $validated['car_interest'] ?? null,
+            'message' => $validated['message'],
+            'is_read' => false,
+        ]);
 
-        return redirect()->route('contact')->with('success', 'Cảm ơn bạn đã liên hệ! Chúng tôi sẽ phản hồi trong vòng 2 giờ làm việc.');
+        return redirect()->back()->with('success', 'Cảm ơn bạn đã liên hệ! Chúng tôi sẽ phản hồi trong vòng 2 giờ làm việc.');
     }
 }

@@ -2,59 +2,91 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ProfileUpdateRequest;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\View\View;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 
 class ProfileController extends Controller
 {
-    /**
-     * Display the user's profile form.
-     */
-    public function edit(Request $request): View
+    public function index()
     {
-        return view('profile.edit', [
-            'user' => $request->user(),
-        ]);
+        return view('admin.profile.edit', ['user' => auth()->user()]);
     }
 
     /**
-     * Update the user's profile information.
+     * Cập nhật thông tin cá nhân + avatar
+     * Avatar lưu vào: public/images/avatars/
+     * Hiển thị qua: /images/avatars/filename.jpg
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(Request $request)
     {
-        $request->user()->fill($request->validated());
+        $user = auth()->user();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        $request->validate([
+            'name'     => 'required|string|max:255',
+            'username' => 'required|string|max:255|unique:users,username,' . $user->id,
+            'email'    => 'required|email|max:255|unique:users,email,' . $user->id,
+            'avatar'   => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+        ]);
+
+        $data = $request->only('name', 'username', 'email');
+
+        // Xử lý upload avatar
+        if ($request->hasFile('avatar') && $request->file('avatar')->isValid()) {
+            // Xóa avatar cũ nếu có
+            if ($user->avatar) {
+                $oldPath = public_path('images/' . $user->avatar);
+                if (file_exists($oldPath)) {
+                    unlink($oldPath);
+                }
+            }
+
+            $file      = $request->file('avatar');
+            $filename  = time() . '_' . $user->id . '.' . $file->getClientOriginalExtension();
+            $destDir   = public_path('images/avatars');
+
+            // Tạo thư mục nếu chưa có
+            if (!is_dir($destDir)) {
+                mkdir($destDir, 0755, true);
+            }
+
+            $file->move($destDir, $filename);
+
+            // Lưu path tương đối vào DB: "avatars/filename.jpg"
+            $data['avatar'] = 'avatars/' . $filename;
         }
 
-        $request->user()->save();
+        $user->update($data);
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        return redirect()->route('admin.profile')
+            ->with('success', 'Cập nhật thông tin thành công!')
+            ->with('tab', 'info');
     }
 
     /**
-     * Delete the user's account.
+     * Đổi mật khẩu
      */
-    public function destroy(Request $request): RedirectResponse
+    public function password(Request $request)
     {
-        $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current_password'],
+        $user = auth()->user();
+
+        $request->validate([
+            'current_password' => 'required',
+            'password'         => ['required', 'confirmed', Password::min(6)],
         ]);
 
-        $user = $request->user();
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()
+                ->withErrors(['current_password' => 'Mật khẩu hiện tại không đúng.'])
+                ->with('tab', 'password');
+        }
 
-        Auth::logout();
+        $user->update([
+            'password' => Hash::make($request->password),
+        ]);
 
-        $user->delete();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return Redirect::to('/');
+        return redirect()->route('admin.profile')
+            ->with('success', 'Đổi mật khẩu thành công!')
+            ->with('tab', 'password');
     }
 }

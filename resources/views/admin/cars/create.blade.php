@@ -1,165 +1,227 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Đăng xe mới</h2>
-    </x-slot>
+@extends('layouts.admin')
+@section('page-title', 'Thêm xe mới')
 
-    <div class="py-12">
-        <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white shadow-sm sm:rounded-lg p-6">
-                <form action="{{ route('admin.cars.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
-                    @csrf
+@section('topbar-actions')
+  <a href="{{ route('admin.cars.index') }}" class="btn btn-sm">← Quay lại</a>
+@endsection
 
-                    {{-- Hãng xe --}}
-                    <div>
-                        <label class="block font-medium text-sm text-gray-700">Hãng xe</label>
-                        <select name="brand_id" id="brand_id"
-                            class="mt-1 w-full border rounded px-3 py-2 @error('brand_id') border-red-500 @enderror">
-                            <option value="">-- Chọn hãng xe --</option>
-                            @foreach($brands as $brand)
-                                <option value="{{ $brand->id }}"
-                                    data-price="{{ $brand->default_price_per_day }}"
-                                    data-fuel="{{ $brand->default_fuel_type }}"
-                                    data-transmission="{{ $brand->default_transmission }}"
-                                    data-seats="{{ $brand->default_seats }}"
-                                    {{ old('brand_id') == $brand->id ? 'selected' : '' }}>
-                                    {{ $brand->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('brand_id')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
-                    </div>
+@section('content')
+<form method="POST" action="{{ route('admin.cars.store') }}" enctype="multipart/form-data">
+  @csrf
 
-                    {{-- Tên xe --}}
-                    <div>
-                        <label class="block font-medium text-sm text-gray-700">Tên xe</label>
-                        <input type="text" name="name" value="{{ old('name') }}"
-                            class="mt-1 w-full border rounded px-3 py-2 @error('name') border-red-500 @enderror">
-                        @error('name')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
-                    </div>
+  @if($errors->any())
+    <div class="alert alert-error">
+      <ul style="margin:0;padding-left:18px">
+        @foreach($errors->all() as $e) <li>{{ $e }}</li> @endforeach
+      </ul>
+    </div>
+  @endif
 
-                    {{-- Năm sản xuất --}}
-                    <div>
-                        <label class="block font-medium text-sm text-gray-700">Năm sản xuất</label>
-                        <input type="number" name="year" value="{{ old('year', date('Y')) }}"
-                            class="mt-1 w-full border rounded px-3 py-2 @error('year') border-red-500 @enderror">
-                        @error('year')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
-                    </div>
+  <div style="display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start">
 
-                    {{-- Giá thuê --}}
-                    <div>
-                        <label class="block font-medium text-sm text-gray-700">
-                            Giá thuê / ngày (VNĐ)
-                            <span class="text-xs text-gray-400 font-normal ml-1">— tự điền theo hãng, có thể sửa</span>
-                        </label>
-                        <input type="number" name="price_per_day" id="price_per_day" value="{{ old('price_per_day') }}"
-                            class="mt-1 w-full border rounded px-3 py-2 @error('price_per_day') border-red-500 @enderror">
-                        @error('price_per_day')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
-                    </div>
-
-                    {{-- Nhiên liệu --}}
-                    <div>
-                        <label class="block font-medium text-sm text-gray-700">Nhiên liệu</label>
-                        <select name="fuel_type" id="fuel_type"
-                            class="mt-1 w-full border rounded px-3 py-2">
-                            <option value="">-- Chọn --</option>
-                            @foreach(['Xăng','Diesel','Điện','Hybrid'] as $fuel)
-                                <option value="{{ $fuel }}" {{ old('fuel_type') == $fuel ? 'selected' : '' }}>
-                                    {{ $fuel }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    {{-- Hộp số --}}
-                    <div>
-                        <label class="block font-medium text-sm text-gray-700">Hộp số</label>
-                        <select name="transmission" id="transmission"
-                            class="mt-1 w-full border rounded px-3 py-2">
-                            <option value="">-- Chọn --</option>
-                            @foreach(['Tự động','Số sàn','CVT'] as $trans)
-                                <option value="{{ $trans }}" {{ old('transmission') == $trans ? 'selected' : '' }}>
-                                    {{ $trans }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    {{-- Số chỗ --}}
-                    <div>
-                        <label class="block font-medium text-sm text-gray-700">Số chỗ ngồi</label>
-                        <input type="number" name="seats" id="seats" value="{{ old('seats') }}"
-                            class="mt-1 w-full border rounded px-3 py-2" min="2" max="16">
-                    </div>
-
-                    {{-- Màu sắc --}}
-                    <div>
-                        <label class="block font-medium text-sm text-gray-700">Màu sắc</label>
-                        <input type="text" name="color" value="{{ old('color') }}"
-                            placeholder="Trắng, Đen, Bạc..."
-                            class="mt-1 w-full border rounded px-3 py-2">
-                    </div>
-
-                    {{-- Số km --}}
-                    <div>
-                        <label class="block font-medium text-sm text-gray-700">Số km đã đi</label>
-                        <input type="number" name="mileage" value="{{ old('mileage', 0) }}"
-                            class="mt-1 w-full border rounded px-3 py-2">
-                    </div>
-
-                    {{-- Mô tả --}}
-                    <div>
-                        <label class="block font-medium text-sm text-gray-700">Mô tả</label>
-                        <textarea name="description" rows="3"
-                            class="mt-1 w-full border rounded px-3 py-2">{{ old('description') }}</textarea>
-                    </div>
-
-                    {{-- Ảnh xe --}}
-                    <div>
-                        <label class="block font-medium text-sm text-gray-700">Ảnh xe</label>
-                        <input type="file" name="image" id="image" accept="image/*" class="mt-1 w-full"
-                            onchange="previewImage(this)">
-                        <img id="preview" src="" alt="" class="mt-2 rounded hidden" style="max-height:200px">
-                        @error('image')<p class="text-red-500 text-sm mt-1">{{ $message }}</p>@enderror
-                    </div>
-
-                    {{-- Có sẵn --}}
-                    <div class="flex items-center gap-2">
-                        <input type="checkbox" name="is_available" id="is_available" value="1" checked>
-                        <label for="is_available" class="text-sm text-gray-700">Có sẵn để thuê</label>
-                    </div>
-
-                    <div class="flex gap-3 pt-2">
-                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Đăng</button>
-                        <a href="{{ route('admin.cars.index') }}" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Hủy</a>
-                    </div>
-                </form>
-            </div>
+    {{-- ══ LEFT ══ --}}
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="card card-pad">
+        <div style="font-size:13px;font-weight:600;margin-bottom:14px;color:var(--text-muted);letter-spacing:.3px">THÔNG TIN CƠ BẢN</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Tên xe <span style="color:red">*</span></label>
+            <input class="form-control" name="name" value="{{ old('name') }}" required placeholder="VD: Camry 2.5Q">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Thương hiệu <span style="color:red">*</span></label>
+            <select class="form-control" name="brand_id" id="brand_id" required>
+              <option value="">-- Chọn thương hiệu --</option>
+              @foreach($brands as $brand)
+                <option value="{{ $brand->id }}"
+                  data-price="{{ $brand->default_price_per_day }}"
+                  data-fuel="{{ $brand->default_fuel_type }}"
+                  data-transmission="{{ $brand->default_transmission }}"
+                  data-seats="{{ $brand->default_seats }}"
+                  {{ old('brand_id') == $brand->id ? 'selected' : '' }}>
+                  {{ $brand->name }}
+                </option>
+              @endforeach
+            </select>
+          </div>
         </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Giá bán (VNĐ) <span style="color:red">*</span></label>
+            <input class="form-control" type="number" name="price_per_day" value="{{ old('price_per_day') }}" required placeholder="VD: 1235000000">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Năm sản xuất <span style="color:red">*</span></label>
+            <input class="form-control" type="number" name="year" value="{{ old('year', date('Y')) }}" required min="2000" max="{{ date('Y')+2 }}">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Số chỗ ngồi</label>
+            <select class="form-control" name="seats" id="seats">
+              @foreach([2,4,5,7,8,9] as $s)
+                <option value="{{ $s }}" {{ old('seats', 5) == $s ? 'selected' : '' }}>{{ $s }} chỗ</option>
+              @endforeach
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Loại nhiên liệu</label>
+            <select class="form-control" name="fuel_type" id="fuel_type">
+              @foreach(['Xăng','Dầu','Điện','Hybrid'] as $f)
+                <option value="{{ $f }}" {{ old('fuel_type', 'Xăng') == $f ? 'selected' : '' }}>{{ $f }}</option>
+              @endforeach
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Mô tả ngắn</label>
+          <textarea class="form-control" name="description" rows="3" placeholder="Mô tả ngắn gọn về xe...">{{ old('description') }}</textarea>
+        </div>
+
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Nội dung chi tiết</label>
+          <textarea class="form-control" name="content" rows="8" placeholder="Nội dung trang chi tiết xe...">{{ old('content') }}</textarea>
+        </div>
+      </div>
+
+      <div class="card card-pad">
+        <div style="font-size:13px;font-weight:600;margin-bottom:14px;color:var(--text-muted);letter-spacing:.3px">THÔNG SỐ KỸ THUẬT</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Động cơ</label>
+            <input class="form-control" name="engine" value="{{ old('engine') }}" placeholder="VD: 2.5L 4 xi-lanh">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Hộp số</label>
+            <select class="form-control" name="transmission" id="transmission">
+              @foreach(['Tự động','Sàn','CVT','DCT'] as $t)
+                <option value="{{ $t }}" {{ old('transmission', 'Tự động') == $t ? 'selected' : '' }}>{{ $t }}</option>
+              @endforeach
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Công suất (HP)</label>
+            <input class="form-control" name="horsepower" type="number" value="{{ old('horsepower') }}" placeholder="VD: 182">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Mức tiêu thụ (L/100km)</label>
+            <input class="form-control" name="fuel_consumption" value="{{ old('fuel_consumption') }}" placeholder="VD: 7.2">
+          </div>
+        </div>
+      </div>
     </div>
 
-    <script>
-    // ── Tự động điền khi chọn hãng ──────────────────────────
-    document.getElementById('brand_id').addEventListener('change', function () {
-        const opt = this.options[this.selectedIndex];
+    {{-- ══ RIGHT ══ --}}
+    <div style="display:flex;flex-direction:column;gap:14px">
 
-        const price        = opt.dataset.price;
-        const fuel         = opt.dataset.fuel;
-        const transmission = opt.dataset.transmission;
-        const seats        = opt.dataset.seats;
+      {{-- TRẠNG THÁI --}}
+      <div class="card card-pad">
+        <div style="font-size:13px;font-weight:600;margin-bottom:14px;color:var(--text-muted);letter-spacing:.3px">TRẠNG THÁI</div>
+        <div class="form-group">
+          <label class="form-label">Trạng thái hàng</label>
+          <select class="form-control" name="status">
+            <option value="available"    {{ old('status','available') == 'available'    ? 'selected':'' }}>Còn hàng</option>
+            <option value="out_of_stock" {{ old('status') == 'out_of_stock' ? 'selected':'' }}>Hết hàng</option>
+            <option value="coming_soon"  {{ old('status') == 'coming_soon'  ? 'selected':'' }}>Sắp ra mắt</option>
+          </select>
+        </div>
 
-        if (price)        document.getElementById('price_per_day').value  = price;
-        if (fuel)         document.getElementById('fuel_type').value       = fuel;
-        if (transmission) document.getElementById('transmission').value    = transmission;
-        if (seats)        document.getElementById('seats').value           = seats;
-    });
+        {{-- XE NỔI BẬT --}}
+        <div class="form-group">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px">
+            <input type="checkbox" name="is_featured" value="1" id="cb_featured"
+                   {{ old('is_featured') ? 'checked' : '' }}>
+            Hiển thị trong "Xe Nổi Bật"
+          </label>
+        </div>
 
-    // ── Preview ảnh trước khi upload ────────────────────────
-    function previewImage(input) {
-        const preview = document.getElementById('preview');
-        if (input.files && input.files[0]) {
-            preview.src = URL.createObjectURL(input.files[0]);
-            preview.classList.remove('hidden');
-        }
-    }
-    </script>
-</x-app-layout>
+        {{-- BADGE --}}
+        <div class="form-group" id="featured-fields" style="{{ old('is_featured') ? '' : 'display:none;' }}">
+          <label class="form-label">Nhãn badge</label>
+          <input class="form-control" type="text" name="badge_label"
+                 value="{{ old('badge_label') }}"
+                 placeholder="VD: Flagship, Bán chạy, Full Electric...">
+          <div class="form-hint">Hiển thị kèm xe nổi bật (để trống nếu không cần)</div>
+        </div>
+
+        {{-- PREFIX ẢNH 360 --}}
+        <div class="form-group" id="prefix360-field" style="{{ old('is_featured') ? '' : 'display:none;' }}margin-bottom:0">
+          <label class="form-label">Prefix ảnh 360°</label>
+          <input class="form-control" type="text" name="image_360_prefix"
+                 value="{{ old('image_360_prefix') }}"
+                 placeholder="VD: Mercedes-AMG GLE">
+          <div class="form-hint">
+            Tên prefix file trong <code>public/images/quay360/</code><br>
+            VD: nhập <strong>Mercedes-AMG GLE</strong> → dùng file <strong>Mercedes-AMG GLE1.png</strong> … <strong>8.png</strong>
+          </div>
+        </div>
+      </div>
+
+      {{-- ẢNH ĐẠI DIỆN --}}
+      <div class="card card-pad">
+        <div style="font-size:13px;font-weight:600;margin-bottom:14px;color:var(--text-muted);letter-spacing:.3px">ẢNH ĐẠI DIỆN</div>
+        <div id="preview-wrap" style="display:none;margin-bottom:12px">
+          <img id="img-preview" style="width:100%;height:120px;object-fit:cover;border-radius:8px;border:1px solid var(--border)">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Upload ảnh</label>
+          <input class="form-control" type="file" name="images[]" id="img-input" multiple accept="image/*">
+          <div class="form-hint">Chọn nhiều ảnh. Ảnh đầu tiên sẽ là ảnh chính.</div>
+        </div>
+      </div>
+
+      {{-- SEO --}}
+      <div class="card card-pad">
+        <div style="font-size:13px;font-weight:600;margin-bottom:14px;color:var(--text-muted);letter-spacing:.3px">SEO</div>
+        <div class="form-group">
+          <label class="form-label">Slug URL</label>
+          <input class="form-control" name="slug" value="{{ old('slug') }}" placeholder="ten-xe-hang-nam">
+          <div class="form-hint">Để trống sẽ tự tạo từ tên xe</div>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Meta description</label>
+          <textarea class="form-control" name="meta_description" rows="2" placeholder="Mô tả hiển thị trên Google...">{{ old('meta_description') }}</textarea>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px">
+        <button type="submit" class="btn btn-primary" style="flex:1;justify-content:center">Thêm xe</button>
+        <a href="{{ route('admin.cars.index') }}" class="btn" style="flex:1;justify-content:center">Hủy</a>
+      </div>
+    </div>
+
+  </div>
+</form>
+
+<script>
+// Toggle featured fields khi check/uncheck
+document.getElementById('cb_featured').addEventListener('change', function () {
+  const show = this.checked;
+  document.getElementById('featured-fields').style.display  = show ? '' : 'none';
+  document.getElementById('prefix360-field').style.display  = show ? '' : 'none';
+});
+
+document.getElementById('brand_id').addEventListener('change', function () {
+  const opt = this.options[this.selectedIndex];
+  if (opt.dataset.price)        document.querySelector('[name=price_per_day]').value = opt.dataset.price;
+  if (opt.dataset.fuel)         document.getElementById('fuel_type').value    = opt.dataset.fuel;
+  if (opt.dataset.transmission) document.getElementById('transmission').value = opt.dataset.transmission;
+  if (opt.dataset.seats) {
+    for (let o of document.getElementById('seats').options)
+      if (o.value == opt.dataset.seats) o.selected = true;
+  }
+});
+
+document.getElementById('img-input').addEventListener('change', function () {
+  if (this.files && this.files[0]) {
+    document.getElementById('img-preview').src = URL.createObjectURL(this.files[0]);
+    document.getElementById('preview-wrap').style.display = '';
+  }
+});
+</script>
+@endsection

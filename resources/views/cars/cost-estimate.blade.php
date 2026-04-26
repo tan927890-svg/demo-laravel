@@ -10,7 +10,7 @@
 /* ── ROOT VARS (match AUTO X theme) ── */
 :root {
   --red:    #D42B2B;
-  --gold:   #C9A84C;
+  --gold:   #f3f3f3;
   --white:  #FFFFFF;
   --bg1:    #0d0d0f;
   --bg2:    #111113;
@@ -36,7 +36,7 @@
   font-family: 'Barlow', sans-serif; font-size: 13px; color: #555;
 }
 .page-breadcrumb a { color: #555; text-decoration: none; transition: color .2s; }
-.page-breadcrumb a:hover { color: #9A6F28; }
+.page-breadcrumb a:hover { color: #e8e2d8; }
 .page-breadcrumb span { color: #9A6F28; font-weight: 600; }
 
 /* ── HERO BANNER ── */
@@ -133,7 +133,7 @@
   margin-top: 8px; transition: background .2s, transform .15s;
   display: flex; align-items: center; justify-content: center; gap: 10px;
 }
-.dtt-submit-btn:hover { background: #a80000; transform: translateY(-1px); }
+.dtt-submit-btn:hover { background: #181616; transform: translateY(-1px); }
 .dtt-submit-btn svg { transition: transform .2s; }
 .dtt-submit-btn:hover svg { transform: translateX(4px); }
 
@@ -261,8 +261,8 @@
   letter-spacing: 3px; text-transform: uppercase; text-decoration: none;
   cursor: pointer; border: none; transition: all .2s; display: inline-block;
 }
-.dtt-cta-btn.primary { background: var(--red); color: #1f1d1d; }
-.dtt-cta-btn.primary:hover { background: #7a7272; }
+.dtt-cta-btn.primary { background: var(--red); color: #ffe7e7; }
+.dtt-cta-btn.primary:hover { background: #000000; }
 .dtt-cta-btn.secondary { background: transparent; color: #111; border: 2px solid #111; }
 .dtt-cta-btn.secondary:hover { border-color: var(--red); color: var(--red); }
 
@@ -277,6 +277,26 @@
   .page-breadcrumb { padding: 13px 20px; }
   .dtt-region-row { grid-template-columns: 1fr; }
   .dtt-hero { padding: 40px 20px 36px; }
+}
+/* PANEL */
+.dtt-form-panel,
+.dtt-result-box {
+  border-radius: 14px;
+}
+
+/* SELECT */
+.dtt-select {
+  border-radius: 10px;
+}
+
+/* BUTTON */
+.dtt-submit-btn {
+  border-radius: 10px;
+}
+
+/* RESULT ROW */
+.dtt-row {
+  border-radius: 8px;
 }
 </style>
 @endpush
@@ -514,7 +534,10 @@
 
           <div class="dtt-cta-row">
             @if(isset($car))
-              <a href="{{ route('orders.create', $car) }}" class="dtt-cta-btn primary">ĐẶT XE NGAY →</a>
+             <a href="{{ route('services.booking', ['car_id' => $car->id]) }}"
+              class="dtt-cta-btn primary">
+                ĐẶT XE NGAY →
+            </a>
               <a href="{{ route('cars.show', $car->id) }}" class="dtt-cta-btn secondary">XEM XE</a>
             @else
               <a href="{{ route('cars.index') }}" class="dtt-cta-btn primary">XEM TẤT CẢ XE →</a>
