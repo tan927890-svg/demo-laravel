@@ -73,17 +73,8 @@
 .status-available   { background: rgba(34,197,94,.15);  border: 1px solid rgba(34,197,94,.4);  color: #4ade80; }
 .status-rented      { background: rgba(212,43,43,.15);  border: 1px solid rgba(212,43,43,.4);  color: #f87171; }
 .status-maintenance { background: rgba(234,179,8,.15);  border: 1px solid rgba(234,179,8,.4);  color: #fbbf24; }
-/* ── [THÊM MỚI] 2 status class ── */
-.status-out-of-stock {
-  background: rgba(212,43,43,.15);
-  border: 1px solid rgba(212,43,43,.4);
-  color: #f87171;
-}
-.status-coming-soon {
-  background: rgba(234,179,8,.15);
-  border: 1px solid rgba(234,179,8,.4);
-  color: #fbbf24;
-}
+.status-out-of-stock { background: rgba(212,43,43,.15); border: 1px solid rgba(212,43,43,.4);  color: #f87171; }
+.status-coming-soon  { background: rgba(234,179,8,.15); border: 1px solid rgba(234,179,8,.4);  color: #fbbf24; }
 .car-hero-placeholder { position: absolute; inset: 0; background: linear-gradient(160deg,#1c1c1e 0%,#2a1616 45%,#1c1c1e 100%); }
 .car-hero-name { color: #fff !important; }
 .car-hero-eyebrow { color: #d42b2b !important; }
@@ -113,9 +104,169 @@
 .btn-outline-alt { font-family: 'Rajdhani', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; background: #fff; color: #c00; border: 2px solid #c00; padding: 14px 32px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: background .15s, color .15s, transform .12s; }
 .btn-outline-alt:hover { background: #c00; color: #fff; transform: translateY(-2px); }
 .btn-outline-alt.secondary { border-color: #c00; color: #c00; }
-.color-preview { position: relative; display: flex; align-items: center; justify-content: center; min-height: 400px; background: transparent; }
-.color-preview-watermark { position: absolute; top: 10px; right: 0; font-family: 'Barlow Condensed', sans-serif; font-size: clamp(52px,8vw,100px); font-weight: 900; text-transform: uppercase; letter-spacing: -3px; color: rgba(0,0,0,.05); line-height: 1; pointer-events: none; user-select: none; white-space: nowrap; }
-.color-preview-img { width: 100%; max-height: 460px; object-fit: contain; display: block; transition: opacity .4s ease; filter: drop-shadow(0 28px 56px rgba(0,0,0,.22)) drop-shadow(0 8px 20px rgba(0,0,0,.12)); position: relative; z-index: 1; background: transparent; }
+
+/* ── 360 VIEWER ── */
+.car-360-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.car-360-wrap:active { cursor: grabbing; }
+.color-preview {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+.color-preview-watermark {
+  position: absolute;
+  top: 10px; right: 0;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: clamp(52px,8vw,100px);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -3px;
+  color: rgba(0,0,0,.05);
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+  white-space: nowrap;
+}
+.car-360-img {
+  width: 100%;
+  max-height: 460px;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 28px 56px rgba(0,0,0,.22)) drop-shadow(0 8px 20px rgba(0,0,0,.12));
+  pointer-events: none;
+  position: relative;
+  z-index: 1;
+}
+.color-preview-img {
+  width: 100%;
+  max-height: 460px;
+  object-fit: contain;
+  display: block;
+  transition: opacity .4s ease;
+  filter: drop-shadow(0 28px 56px rgba(0,0,0,.22)) drop-shadow(0 8px 20px rgba(0,0,0,.12));
+  position: relative;
+  z-index: 1;
+  background: transparent;
+}
+.car-360-hint {
+  position: absolute;
+  bottom: 52px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(0,0,0,.4);
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 4;
+  transition: opacity .5s;
+}
+.car-360-hint svg { width: 18px; height: 18px; opacity: .6; flex-shrink: 0; }
+.car-360-dots {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 5px;
+  z-index: 4;
+}
+.car-360-dots span {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(0,0,0,.15);
+  display: block;
+  transition: background .15s, transform .15s;
+}
+.car-360-dots span.active {
+  background: #c00;
+  transform: scale(1.4);
+}
+.car-360-bar {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 3px;
+  background: rgba(0,0,0,.08);
+  border-radius: 2px;
+  overflow: hidden;
+  z-index: 4;
+}
+.car-360-bar-fill {
+  height: 100%;
+  background: #c00;
+  border-radius: 2px;
+  transition: width .08s linear;
+}
+.car-360-auto-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 36px; height: 36px;
+  background: rgba(255,255,255,.9);
+  border: 1.5px solid #ddd;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  z-index: 5;
+  transition: background .2s, border-color .2s, transform .15s;
+  box-shadow: 0 2px 8px rgba(0,0,0,.12);
+}
+.car-360-auto-btn:hover {
+  background: #c00;
+  border-color: #c00;
+  transform: scale(1.08);
+}
+.car-360-auto-btn:hover .btn-icon-stroke { stroke: #fff !important; }
+.car-360-auto-btn:hover .btn-icon-fill  { fill: #fff !important; }
+.car-360-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #c00;
+  background: rgba(255,255,255,.9);
+  border: 1px solid rgba(204,0,0,.2);
+  padding: 4px 10px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.car-360-badge::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #c00;
+  animation: pulse360 1.2s ease-in-out infinite;
+}
+@keyframes pulse360 {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: .4; transform: scale(.7); }
+}
 
 /* ── TINH NANG ── */
 .features-section { background: #fff; }
@@ -203,7 +354,7 @@
 .specs-val-cell { padding: 10px 16px; border-bottom: 1px solid #ececec; font-family: 'Barlow', sans-serif; font-size: 13px; color: #111; font-weight: 500; min-height: 40px; display: flex; align-items: center; justify-content: center; text-align: center; line-height: 1.4; background: #fff; }
 .specs-row-group.collapsed .specs-key-cell,.specs-row-group.collapsed .specs-val-cell { display: none; }
 
-/* ── THU VIEN MỚI ── */
+/* ── THU VIEN ── */
 .tv-section { background: #000; padding: 64px 0; }
 .tv-head { text-align: center; margin-bottom: 24px; }
 .tv-head-title { font-family: 'Barlow Condensed', sans-serif; font-size: clamp(28px,4vw,44px); font-weight: 900; text-transform: uppercase; font-style: italic; letter-spacing: 2px; color: #fff; }
@@ -212,8 +363,6 @@
 .tv-tab { background: none; border: none; color: rgba(255,255,255,.45); font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 10px 32px 14px; cursor: pointer; border-bottom: 3px solid transparent; position: relative; top: 1px; transition: color .2s, border-color .2s; }
 .tv-tab.active { color: #fff; border-bottom-color: #fff; }
 .tv-tab:hover:not(.active) { color: rgba(255,255,255,.75); }
-
-/* PHOTO */
 .tv-photo { display: none; padding-top: 0; }
 .tv-video { display: none; padding: 32px 60px 0; }
 .tv-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; height: 380px; gap: 3px; margin-bottom: 8px; position: relative; }
@@ -229,15 +378,10 @@
 .tv-thumb { flex-shrink: 0; width: 96px; height: 64px; overflow: hidden; cursor: pointer; border: 2px solid transparent; transition: border-color .2s; }
 .tv-thumb.tv-thumb-active { border-color: #c00; }
 .tv-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-
-/* VIDEO */
-.tv-video { display: none; padding: 32px 60px 0; }
-.tv-video.tv-active { display: block; }
 .tv-video-wrap { max-width: 900px; margin: 0 auto 16px; }
 .tv-video-main { position: relative; background: #000; cursor: pointer; overflow: hidden; }
 .tv-video-main img { width: 100%; display: block; aspect-ratio: 16/9; object-fit: cover; }
-.tv-video-main iframe,
-.tv-video-main video { width: 100%; display: block; aspect-ratio: 16/9; border: none; background: #000; }
+.tv-video-main iframe, .tv-video-main video { width: 100%; display: block; aspect-ratio: 16/9; border: none; background: #000; }
 .tv-play-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,.22); transition: background .2s; }
 .tv-video-main:hover .tv-play-overlay { background: rgba(0,0,0,.38); }
 .tv-play-circle { width: 74px; height: 74px; background: rgba(255,255,255,.93); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: transform .2s; }
@@ -308,8 +452,8 @@
   .tv-slot:nth-child(2),.tv-slot:nth-child(3) { display: none; }
   .tv-thumbs { padding: 4px 12px 0; }
   .tv-video { padding: 20px 16px 0; }
+  .car-360-wrap { min-height: 260px; }
 }
-
 </style>
 @endpush
 
@@ -346,8 +490,6 @@ function carImgPath($val) {
         $hasOffroad = $specCats->contains(fn($c) => str_contains(strtoupper($c), 'ĐỊA HÌNH'));
       @endphp
       @if($hasSafety)  <a href="#thong-so" class="nav-link" data-cat="an-toan">An toàn</a>@endif
-      <!-- @if($hasBattery) <a href="#thong-so" class="nav-link" data-cat="pin-sac">Pin & Sạc</a>@endif -->
-      <!-- @if($hasOffroad) <a href="#thong-so" class="nav-link" data-cat="dia-hinh">Địa hình</a>@endif -->
     @endif
     <a href="#thong-so"  class="nav-link">Thông số kỹ thuật</a>
     <a href="#thu-vien"  class="nav-link">Thư viện ảnh</a>
@@ -360,20 +502,19 @@ function carImgPath($val) {
 
 {{-- HERO --}}
 <section class="car-hero">
- @php
-  $bannerNum = ($car->id % 7) + 1;
-  $base = 'images/car/Banner' . $bannerNum;
-
-  if (file_exists(public_path($base . '.png'))) {
-      $heroSrc = asset($base . '.png');
-  } elseif (file_exists(public_path($base . '.jpg'))) {
-      $heroSrc = asset($base . '.jpg');
-  } elseif (file_exists(public_path($base . '.jpeg'))) {
-      $heroSrc = asset($base . '.jpeg');
-  } else {
-      $heroSrc = '';
-  }
-@endphp
+  @php
+    $bannerNum = ($car->id % 7) + 1;
+    $base = 'images/car/Banner' . $bannerNum;
+    if (file_exists(public_path($base . '.png'))) {
+        $heroSrc = asset($base . '.png');
+    } elseif (file_exists(public_path($base . '.jpg'))) {
+        $heroSrc = asset($base . '.jpg');
+    } elseif (file_exists(public_path($base . '.jpeg'))) {
+        $heroSrc = asset($base . '.jpeg');
+    } else {
+        $heroSrc = '';
+    }
+  @endphp
   <img class="car-hero-img" src="{{ $heroSrc }}" alt="{{ $car->name }}"
        onerror="this.style.display='none';this.closest('.car-hero').querySelector('.car-hero-placeholder').style.display='block';">
   <div class="car-hero-overlay"></div>
@@ -387,7 +528,6 @@ function carImgPath($val) {
     <div class="car-hero-right">
       <div class="car-hero-price-label">Giá từ</div>
       <div class="car-hero-price">{{ number_format($car->price_per_day ?? $car->price) }}<small>VNĐ</small></div>
-      {{-- ① [SỬA] $statusMap mở rộng thêm out_of_stock & coming_soon --}}
       @php
         $statusMap = [
           'available'    => ['class' => 'status-available',    'label' => 'Còn xe'],
@@ -407,6 +547,8 @@ function carImgPath($val) {
 <section class="price-color-section" id="gia-mau-sac">
   <div class="container">
     <div class="price-color-layout">
+
+      {{-- LEFT: thông tin giá --}}
       <div class="pcs-left">
         <div class="section-label">Bộ sưu tập</div>
         <div class="section-title" style="color:#111;margin-bottom:32px;">Giá & <em style="color:#c00;">Hạng xe</em></div>
@@ -423,27 +565,103 @@ function carImgPath($val) {
           <a href="{{ route('services.booking') }}?chu_de=Test+drive+(lái+thử+xe)&svc=kiemtra" class="btn-outline-alt secondary">ĐĂNG KÝ LÁI THỬ →</a>
         </div>
       </div>
+
+      {{-- RIGHT: 360° Viewer hoặc ảnh tĩnh --}}
+      @php
+        /* Tìm ảnh 360° từ public/images/quay360/{slug}/ */
+        $carSlug360 = Str::slug($car->name);
+        $frames360  = [];
+        $ext360     = ['png', 'jpg', 'jpeg', 'webp'];
+        for ($fi = 1; $fi <= 36; $fi++) {
+            foreach ($ext360 as $ext) {
+                $p = "images/quay360/{$carSlug360}/{$fi}.{$ext}";
+                if (file_exists(public_path($p))) {
+                    $frames360[] = asset($p);
+                    break;
+                }
+            }
+        }
+        $has360 = count($frames360) >= 2;
+
+        /* Fallback: ảnh tĩnh */
+        $previewImg = carImgPath($car->image_url ?? null);
+        if (!$previewImg) {
+            $defaultColor = $car->colors->firstWhere('is_default', true) ?? $car->colors->first();
+            $previewImg = carImgPath($defaultColor?->image ?? null);
+        }
+        if (!$previewImg) {
+            $fg = $car->galleries->where('type','image')
+                    ->filter(fn($g) => str_contains($g->file_path ?? '', 'images/car/'))
+                    ->sortBy('sort_order')->first();
+            $previewImg = carImgPath($fg?->file_path ?? null);
+        }
+      @endphp
+
+      @if($has360)
+      {{-- ===== 360° VIEWER ===== --}}
+      <div class="car-360-wrap" id="car360wrap"
+           data-frames='@json($frames360)'
+           data-total="{{ count($frames360) }}">
+
+        {{-- Watermark tên xe --}}
+        <div class="color-preview-watermark">{{ $car->name }}</div>
+
+        {{-- Badge 360 --}}
+        <div class="car-360-badge">360°</div>
+
+        {{-- Ảnh hiển thị --}}
+        <img class="car-360-img" id="car360img"
+             src="{{ $frames360[0] }}" alt="{{ $car->name }}">
+
+        {{-- Nút play/pause --}}
+        <button class="car-360-auto-btn" id="car360autoBtn" title="Bật/tắt tự xoay" type="button">
+          {{-- Icon Pause (đang chạy) --}}
+          <svg id="car360iconPause" viewBox="0 0 24 24" fill="none" width="16" height="16">
+            <rect x="5"  y="4" width="4" height="16" rx="1" fill="#555" class="btn-icon-fill"/>
+            <rect x="15" y="4" width="4" height="16" rx="1" fill="#555" class="btn-icon-fill"/>
+          </svg>
+          {{-- Icon Play (đang dừng) --}}
+          <svg id="car360iconPlay" viewBox="0 0 24 24" fill="none" width="16" height="16" style="display:none;">
+            <path d="M6 4l13 8-13 8V4z" fill="#555" class="btn-icon-fill"/>
+          </svg>
+        </button>
+
+        {{-- Dots chỉ frame --}}
+        <div class="car-360-dots" id="car360dots">
+          @foreach($frames360 as $fi => $_)
+            <span class="{{ $fi === 0 ? 'active' : '' }}"></span>
+          @endforeach
+        </div>
+
+        {{-- Gợi ý kéo --}}
+        <div class="car-360-hint" id="car360hint">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+            <path d="M5 12h14M14 7l5 5-5 5"/>
+          </svg>
+          KÉO ĐỂ XOAY 360°
+        </div>
+
+        {{-- Thanh tiến trình --}}
+        <div class="car-360-bar">
+          <div class="car-360-bar-fill" id="car360fill" style="width:0%"></div>
+        </div>
+
+      </div>
+      {{-- END 360° VIEWER --}}
+
+      @elseif($previewImg)
       <div class="color-preview">
         <div class="color-preview-watermark">{{ $car->name }}</div>
-        @php
-          $previewImg = carImgPath($car->image_url ?? null);
-          if (!$previewImg) {
-              $defaultColor = $car->colors->firstWhere('is_default', true) ?? $car->colors->first();
-              $previewImg = carImgPath($defaultColor?->image ?? null);
-          }
-          if (!$previewImg) {
-              $fg = $car->galleries->where('type','image')
-                      ->filter(fn($g) => str_contains($g->file_path ?? '', 'images/car/'))
-                      ->sortBy('sort_order')->first();
-              $previewImg = carImgPath($fg?->file_path ?? null);
-          }
-        @endphp
-        @if($previewImg)
-          <img class="color-preview-img" src="{{ $previewImg }}" alt="{{ $car->name }}">
-        @else
-          <div style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(24px,3vw,40px);font-weight:900;letter-spacing:2px;text-transform:uppercase;color:rgba(0,0,0,.15);text-align:center;padding:60px 0;">{{ $car->name }}</div>
-        @endif
+        <img class="color-preview-img" src="{{ $previewImg }}" alt="{{ $car->name }}">
       </div>
+
+      @else
+      <div class="color-preview">
+        <div class="color-preview-watermark">{{ $car->name }}</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(24px,3vw,40px);font-weight:900;letter-spacing:2px;text-transform:uppercase;color:rgba(0,0,0,.15);text-align:center;padding:60px 0;">{{ $car->name }}</div>
+      </div>
+      @endif
+
     </div>
   </div>
 </section>
@@ -454,10 +672,12 @@ function carImgPath($val) {
   <div class="features-snap-wrap">
     @php
       $uniqueFeatures = $car->features->unique('id')->sortBy('sort_order')->values();
+      /* Lấy path của frame đầu tiên từ 360° để dùng làm fallback cho feature */
+      $frame0path = isset($frames360[0]) ? ltrim(parse_url($frames360[0], PHP_URL_PATH), '/') : null;
     @endphp
     @foreach($uniqueFeatures as $feature)
       @php
-        $rawImg1   = !empty(trim($feature->image ?? '')) ? $feature->image : 'images/CTN/TN.png';
+        $rawImg1   = !empty(trim($feature->image ?? '')) ? $feature->image : ($frame0path ?? 'images/CTN/TN.png');
         $modalImg1 = carImgPath(!empty(trim($feature->image ?? ''))  ? $feature->image  : null);
         $modalImg2 = carImgPath(!empty(trim($feature->image2 ?? '')) ? $feature->image2 : null);
         if (!$modalImg2) {
@@ -579,16 +799,12 @@ function carImgPath($val) {
 </section>
 @endif
 
-{{-- ===== THU VIEN ANH & VIDEO ===== --}}
+{{-- THU VIEN ANH & VIDEO --}}
 @if($car->galleries->count())
 @php
   $imageGalleries = $car->galleries->where('type','image')->sortBy('sort_order')->values();
   $videoGalleries = $car->galleries->where('type','video')->sortBy('sort_order')->values();
-
-  /* Danh sách URL ảnh đã encode đúng đường dẫn CTN */
   $tvImgUrls = $imageGalleries->map(fn($g) => carImgPath($g->file_path ?? null))->filter()->values();
-
-  /* Danh sách video: src + thumbnail */
   $tvVideos = $videoGalleries->map(function($g) {
       return [
           'src'     => $g->file_path ?? '',
@@ -596,19 +812,14 @@ function carImgPath($val) {
           'caption' => $g->caption ?? '',
       ];
   })->values();
-
   $hasPhoto = $tvImgUrls->count() > 0;
   $hasVideo = $tvVideos->count() > 0;
 @endphp
 
 <section class="tv-section" id="thu-vien">
-
-  {{-- TIÊU ĐỀ --}}
   <div class="tv-head">
     <div class="tv-head-title"><em id="tv-title-em">Thư Viện</em>&nbsp;<span id="tv-title-word">Ảnh</span></div>
   </div>
-
-  {{-- TABS --}}
   <div class="tv-tabs">
     @if($hasPhoto)
       <button class="tv-tab tv-active" onclick="tvSwitch('photo',this)">Ảnh</button>
@@ -618,10 +829,8 @@ function carImgPath($val) {
     @endif
   </div>
 
-  {{-- ===== PHOTO ===== --}}
-@if($hasPhoto)
-<div class="tv-photo {{ $hasPhoto ? 'tv-active' : '' }}" id="tv-photo">
-
+  @if($hasPhoto)
+  <div class="tv-photo {{ $hasPhoto ? 'tv-active' : '' }}" id="tv-photo">
     <div class="tv-single" id="tv-grid" style="position:relative;width:100%;max-width:1000px;margin:0 auto;background:#000;">
       <button class="tv-arrow tv-arrow-prev" onclick="tvShift(-1)">&#8249;</button>
       <img id="tv-img-0" src="{{ $tvImgUrls[0] ?? '' }}" alt=""
@@ -629,25 +838,19 @@ function carImgPath($val) {
            onerror="this.style.display='none';">
       <button class="tv-arrow tv-arrow-next" onclick="tvShift(1)">&#8250;</button>
     </div>
-
     <div class="tv-thumbs" id="tv-thumbs">
       @foreach($tvImgUrls as $i => $url)
         <div class="tv-thumb {{ $i === 0 ? 'tv-thumb-active' : '' }}" onclick="tvGoTo({{ $i }})">
-          <img src="{{ $url }}" alt=""
-               onerror="this.closest('.tv-thumb').style.display='none';">
+          <img src="{{ $url }}" alt="" onerror="this.closest('.tv-thumb').style.display='none';">
         </div>
       @endforeach
     </div>
+  </div>
+  @endif
 
-</div>
-@endif
-
-  {{-- ===== VIDEO ===== --}}
   @if($hasVideo)
   <div class="tv-video {{ !$hasPhoto ? 'tv-active' : '' }}" id="tv-video">
     <div class="tv-video-wrap">
-
-      {{-- Player chính --}}
       <div class="tv-video-main" id="tv-video-main">
         <div id="tv-player-inner">
           @php $fv = $tvVideos[0]; @endphp
@@ -661,15 +864,12 @@ function carImgPath($val) {
           </div>
         </div>
       </div>
-
-      {{-- Thumbnails video (nếu có nhiều hơn 1) --}}
       @if($tvVideos->count() > 1)
       <div class="tv-vthumbs" style="margin-top:10px;">
         @foreach($tvVideos as $vi => $vid)
           <div class="tv-vthumb {{ $vi === 0 ? 'tv-vthumb-active' : '' }}" onclick="tvSelectVideo({{ $vi }},this)">
             @if($vid['thumb'])
-              <img src="{{ $vid['thumb'] }}" alt=""
-                   onerror="this.closest('.tv-vthumb').style.background='#222';this.style.display='none';">
+              <img src="{{ $vid['thumb'] }}" alt="" onerror="this.closest('.tv-vthumb').style.background='#222';this.style.display='none';">
             @else
               <div style="width:100%;height:100%;background:#222;"></div>
             @endif
@@ -678,21 +878,16 @@ function carImgPath($val) {
         @endforeach
       </div>
       @endif
-
     </div>
   </div>
   @endif
-
 </section>
 
 @push('scripts')
 <script>
 (function(){
 'use strict';
-var tvIdx     = 0;
-var tvVidIdx  = 0;
-
-/* ── Khởi tạo display ban đầu ── */
+/* ── init display ── */
 (function(){
   var photoEl = document.getElementById('tv-photo');
   var videoEl = document.getElementById('tv-video');
@@ -700,13 +895,11 @@ var tvVidIdx  = 0;
   if (videoEl) videoEl.style.display = 'none';
 })();
 
-/* ── DATA TỪ BLADE ── */
 var TV_IMGS   = @json($tvImgUrls->values());
 var TV_VIDEOS = @json($tvVideos->values());
 var tvIdx     = 0;
 var tvVidIdx  = 0;
 
-/* ══ PHOTO ══ */
 function tvUpdateGrid() {
   var n = TV_IMGS.length;
   if (!n) return;
@@ -718,109 +911,62 @@ function tvUpdateGrid() {
   var thumbs = document.querySelectorAll('.tv-thumb');
   if (thumbs[tvIdx]) thumbs[tvIdx].scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' });
 }
-
 window.tvShift = function(dir) {
   if (!TV_IMGS.length) return;
   tvIdx = (tvIdx + dir + TV_IMGS.length) % TV_IMGS.length;
   tvUpdateGrid();
 };
+window.tvGoTo = function(i) { tvIdx = i; tvUpdateGrid(); };
 
-window.tvGoTo = function(i) {
-  tvIdx = i;
-  tvUpdateGrid();
-};
-
-window.tvThumbClick = function(slotOffset) {
-  tvIdx = (tvIdx + slotOffset) % TV_IMGS.length;
-  tvUpdateGrid();
-};
-
-/* ══ VIDEO ══ */
 function tvLoadVideo(idx) {
   var vid = TV_VIDEOS[idx];
   if (!vid) return;
   var inner = document.getElementById('tv-player-inner');
   if (!inner) return;
-
   var src = vid.src || '';
-
-  /* YouTube */
   var ytMatch = src.match(/(?:youtu\.be\/|[?&]v=)([A-Za-z0-9_-]{11})/);
-  if (ytMatch) {
-    inner.innerHTML = '<iframe src="https://www.youtube.com/embed/'+ytMatch[1]+'?autoplay=1&rel=0" allowfullscreen allow="autoplay;fullscreen" style="width:100%;aspect-ratio:16/9;border:none;display:block;background:#000;"></iframe>';
-    return;
-  }
-
-  /* Vimeo */
+  if (ytMatch) { inner.innerHTML = '<iframe src="https://www.youtube.com/embed/'+ytMatch[1]+'?autoplay=1&rel=0" allowfullscreen allow="autoplay;fullscreen" style="width:100%;aspect-ratio:16/9;border:none;display:block;background:#000;"></iframe>'; return; }
   var vmMatch = src.match(/vimeo\.com\/(\d+)/);
-  if (vmMatch) {
-    inner.innerHTML = '<iframe src="https://player.vimeo.com/video/'+vmMatch[1]+'?autoplay=1" allowfullscreen allow="autoplay;fullscreen" style="width:100%;aspect-ratio:16/9;border:none;display:block;background:#000;"></iframe>';
-    return;
-  }
-
-  /* File mp4/webm local */
-  if (/\.(mp4|webm|ogg)$/i.test(src)) {
-    inner.innerHTML = '<video src="'+src+'" controls autoplay playsinline style="width:100%;aspect-ratio:16/9;display:block;background:#000;"></video>';
-    return;
-  }
-
-  /* Fallback: chỉ show thumbnail */
+  if (vmMatch) { inner.innerHTML = '<iframe src="https://player.vimeo.com/video/'+vmMatch[1]+'?autoplay=1" allowfullscreen allow="autoplay;fullscreen" style="width:100%;aspect-ratio:16/9;border:none;display:block;background:#000;"></iframe>'; return; }
+  if (/\.(mp4|webm|ogg)$/i.test(src)) { inner.innerHTML = '<video src="'+src+'" controls autoplay playsinline style="width:100%;aspect-ratio:16/9;display:block;background:#000;"></video>'; return; }
   if (vid.thumb) {
-    inner.innerHTML = '<img src="'+vid.thumb+'" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block;">'
-      + '<div class="tv-play-overlay"><div class="tv-play-circle"><div class="tv-play-tri"></div></div></div>';
-    document.querySelector('#tv-player-inner .tv-play-overlay')?.addEventListener('click', function(){ tvLoadVideo(tvVidIdx); });
+    inner.innerHTML = '<img src="'+vid.thumb+'" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block;"><div class="tv-play-overlay"><div class="tv-play-circle"><div class="tv-play-tri"></div></div></div>';
+    inner.querySelector('.tv-play-overlay')?.addEventListener('click', function(){ tvLoadVideo(tvVidIdx); });
   }
 }
-
 window.tvSelectVideo = function(idx, el) {
   tvVidIdx = idx;
   document.querySelectorAll('.tv-vthumb').forEach(function(t){ t.classList.remove('tv-vthumb-active'); });
   el.classList.add('tv-vthumb-active');
-
-  /* Reset player về thumbnail trước khi load */
   var vid = TV_VIDEOS[idx];
   var inner = document.getElementById('tv-player-inner');
   if (inner && vid) {
-    var thumbHtml = vid.thumb
-      ? '<img src="'+vid.thumb+'" alt="" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block;">'
-      : '<div class="tv-no-thumb"><span class="tv-no-thumb-txt">Video</span></div>';
+    var thumbHtml = vid.thumb ? '<img src="'+vid.thumb+'" alt="" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block;">' : '<div class="tv-no-thumb"><span class="tv-no-thumb-txt">Video</span></div>';
     inner.innerHTML = thumbHtml + '<div class="tv-play-overlay" id="tv-play-overlay"><div class="tv-play-circle"><div class="tv-play-tri"></div></div></div>';
     document.getElementById('tv-play-overlay')?.addEventListener('click', function(){ tvLoadVideo(tvVidIdx); });
   }
 };
+document.getElementById('tv-play-overlay')?.addEventListener('click', function(){ tvLoadVideo(tvVidIdx); });
 
-/* ── Gắn sự kiện play ban đầu ── */
-document.getElementById('tv-play-overlay')?.addEventListener('click', function(){
-  tvLoadVideo(tvVidIdx);
-});
-
-/* ══ SWITCH TAB ══ */
 window.tvSwitch = function(tab, btn) {
   document.querySelectorAll('.tv-tab').forEach(function(b){ b.classList.remove('tv-active'); });
   btn.classList.add('tv-active');
-
   var photoEl = document.getElementById('tv-photo');
   var videoEl = document.getElementById('tv-video');
   var word    = document.getElementById('tv-title-word');
-
-  if (photoEl) { photoEl.style.display = tab === 'photo' ? 'block' : 'none'; }
-  if (videoEl) { videoEl.style.display = tab === 'video' ? 'block' : 'none'; }
-  if (word)    word.textContent = tab === 'photo' ? 'Ảnh' : 'Video';
-
-  /* Dừng video khi chuyển tab */
+  if (photoEl) photoEl.style.display = tab === 'photo' ? 'block' : 'none';
+  if (videoEl) videoEl.style.display = tab === 'video' ? 'block' : 'none';
+  if (word) word.textContent = tab === 'photo' ? 'Ảnh' : 'Video';
   if (tab === 'photo') {
     var inner = document.getElementById('tv-player-inner');
     var vid   = TV_VIDEOS[tvVidIdx];
     if (inner && vid) {
-      var thumbHtml = vid.thumb
-        ? '<img src="'+vid.thumb+'" alt="" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block;">'
-        : '<div class="tv-no-thumb"><span class="tv-no-thumb-txt">Video</span></div>';
+      var thumbHtml = vid.thumb ? '<img src="'+vid.thumb+'" alt="" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block;">' : '<div class="tv-no-thumb"><span class="tv-no-thumb-txt">Video</span></div>';
       inner.innerHTML = thumbHtml + '<div class="tv-play-overlay" id="tv-play-overlay"><div class="tv-play-circle"><div class="tv-play-tri"></div></div></div>';
       document.getElementById('tv-play-overlay')?.addEventListener('click', function(){ tvLoadVideo(tvVidIdx); });
     }
   }
 };
-
 })();
 </script>
 @endpush
@@ -831,24 +977,16 @@ window.tvSwitch = function(tab, btn) {
 {{-- THONG TIN CHI TIET --}}
 <section class="section" id="thong-tin" style="padding:0;">
   <div class="info-cta" style="position:relative;overflow:hidden;padding:100px 60px;background:#0d0d0f;">
-   @php
-    $index = ($car->id % 4) + 1;
-
-    $extensions = ['png', 'jpeg', 'jpg'];
-    $image = null;
-
-    foreach ($extensions as $ext) {
-        $path = "images/car/Banner{$index}.{$ext}";
-        if (file_exists(public_path($path))) {
-            $image = $path;
-            break;
-        }
-    }
-@endphp
- <div style="position:absolute; inset:0;
-        background:url('{{ asset($image) }}') center/cover no-repeat;
-        opacity:0.80;">
-    </div>
+    @php
+      $index = ($car->id % 4) + 1;
+      $extensions = ['png', 'jpeg', 'jpg'];
+      $image = null;
+      foreach ($extensions as $ext) {
+          $path = "images/car/Banner{$index}.{$ext}";
+          if (file_exists(public_path($path))) { $image = $path; break; }
+      }
+    @endphp
+    <div style="position:absolute;inset:0;background:url('{{ asset($image) }}') center/cover no-repeat;opacity:0.80;"></div>
     <div style="position:relative;z-index:1;">
       <div class="info-cta-title">Thông Tin Chi Tiết</div>
       <div class="info-cta-btns">
@@ -869,19 +1007,19 @@ window.tvSwitch = function(tab, btn) {
   <div class="related-grid">
     @foreach($relatedCars as $related)
       @php
-       $rc = $related->colors->firstWhere('is_default',true) ?? $related->colors->first();
-$ri = carImgPath($rc?->image ?? null);
-if (!$ri) $ri = carImgPath($related->image_url ?? null);
-if (!$ri) {
-    $rg = $related->galleries->where('type','image')
-            ->filter(fn($g) => str_contains($g->file_path ?? '', '-TN'))
-            ->sortBy('sort_order')->first();
-    $ri = carImgPath($rg?->file_path ?? null);
-}
-if (!$ri) {
-    $rg = $related->galleries->where('type','image')->sortBy('sort_order')->first();
-    $ri = carImgPath($rg?->file_path ?? null);
-}
+        $rc = $related->colors->firstWhere('is_default',true) ?? $related->colors->first();
+        $ri = carImgPath($rc?->image ?? null);
+        if (!$ri) $ri = carImgPath($related->image_url ?? null);
+        if (!$ri) {
+            $rg = $related->galleries->where('type','image')
+                    ->filter(fn($g) => str_contains($g->file_path ?? '', '-TN'))
+                    ->sortBy('sort_order')->first();
+            $ri = carImgPath($rg?->file_path ?? null);
+        }
+        if (!$ri) {
+            $rg = $related->galleries->where('type','image')->sortBy('sort_order')->first();
+            $ri = carImgPath($rg?->file_path ?? null);
+        }
       @endphp
       <a href="{{ route('cars.show',$related->id) }}" class="related-card">
         @if($ri)
@@ -909,152 +1047,296 @@ if (!$ri) {
 (function(){
 'use strict';
 
-/* ── Sticky offset theo header ── */
-const wrap  = document.getElementById('detail-sticky-wrap');
-const nav   = document.getElementById('detail-nav');
-const links = Array.from(nav?.querySelectorAll('a.nav-link') || []);
+/* ══════════════════════════════════════════════
+   360° VIEWER
+══════════════════════════════════════════════ */
+(function(){
+  var wrap = document.getElementById('car360wrap');
+  if (!wrap) return;
+
+  var frames = [];
+  try { frames = JSON.parse(wrap.dataset.frames || '[]'); } catch(e) { return; }
+  if (frames.length < 2) return;
+
+  var img        = document.getElementById('car360img');
+  var dotsWrap   = document.getElementById('car360dots');
+  var fillEl     = document.getElementById('car360fill');
+  var autoBtn    = document.getElementById('car360autoBtn');
+  var iconPlay   = document.getElementById('car360iconPlay');
+  var iconPause  = document.getElementById('car360iconPause');
+  var hintEl     = document.getElementById('car360hint');
+
+  var total      = frames.length;
+  var curIdx     = 0;
+  var autoPlay   = true;
+  var autoTimer  = null;
+  var isDrag     = false;
+  var dragStartX = 0;
+  var dragStartIdx = 0;
+  var sensitivity = Math.max(1, Math.round(280 / total));
+
+  frames.forEach(function(src) {
+    var im = new Image();
+    im.src = src;
+  });
+
+  function showFrame(idx) {
+    curIdx = ((idx % total) + total) % total;
+    if (img) img.src = frames[curIdx];
+    if (dotsWrap) {
+      var allDots = dotsWrap.querySelectorAll('span');
+      allDots.forEach(function(d, i) {
+        d.classList.toggle('active', i === curIdx);
+      });
+    }
+    if (fillEl) {
+      fillEl.style.width = (total > 1 ? (curIdx / (total - 1)) * 100 : 100) + '%';
+    }
+  }
+
+  function startAuto() {
+    clearInterval(autoTimer);
+    autoTimer = null;
+    autoPlay = true;
+    if (iconPlay)  iconPlay.style.display  = 'none';
+    if (iconPause) iconPause.style.display = '';
+    autoTimer = setInterval(function() { showFrame(curIdx + 1); }, 280);
+  }
+
+  function stopAuto() {
+    clearInterval(autoTimer);
+    autoTimer = null;
+    autoPlay = false;
+    if (iconPlay)  iconPlay.style.display  = '';
+    if (iconPause) iconPause.style.display = 'none';
+  }
+
+  if (autoBtn) {
+    autoBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      autoPlay ? stopAuto() : startAuto();
+    });
+  }
+
+  wrap.addEventListener('mousedown', function(e) {
+    if (e.target === autoBtn || autoBtn.contains(e.target)) return;
+    stopAuto();
+    isDrag = true;
+    dragStartX   = e.clientX;
+    dragStartIdx = curIdx;
+    e.preventDefault();
+  });
+  window.addEventListener('mousemove', function(e) {
+    if (!isDrag) return;
+    var delta = Math.round((dragStartX - e.clientX) / sensitivity);
+    showFrame(dragStartIdx + delta);
+  });
+  window.addEventListener('mouseup', function() {
+    isDrag = false;
+  });
+
+  wrap.addEventListener('touchstart', function(e) {
+    if (e.target === autoBtn || autoBtn.contains(e.target)) return;
+    stopAuto();
+    isDrag = true;
+    dragStartX   = e.touches[0].clientX;
+    dragStartIdx = curIdx;
+  }, { passive: true });
+  wrap.addEventListener('touchmove', function(e) {
+    if (!isDrag) return;
+    var delta = Math.round((dragStartX - e.touches[0].clientX) / sensitivity);
+    showFrame(dragStartIdx + delta);
+  }, { passive: true });
+  wrap.addEventListener('touchend', function() { isDrag = false; });
+
+  wrap.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    stopAuto();
+    showFrame(curIdx + (e.deltaY > 0 ? 1 : -1));
+  }, { passive: false });
+
+  wrap.addEventListener('mouseenter', function() {
+    if (autoPlay) clearInterval(autoTimer);
+  });
+  wrap.addEventListener('mouseleave', function() {
+    if (autoPlay && !isDrag) {
+      clearInterval(autoTimer);
+      autoTimer = null;
+      autoTimer = setInterval(function() { showFrame(curIdx + 1); }, 280);
+    }
+  });
+
+  if (hintEl) {
+    setTimeout(function() {
+      hintEl.style.opacity = '0';
+      setTimeout(function() { hintEl.style.display = 'none'; }, 500);
+    }, 3500);
+  }
+
+  showFrame(0);
+  startAuto();
+
+})();
+
+
+/* ══════════════════════════════════════════════
+   STICKY NAV
+══════════════════════════════════════════════ */
+var wrap2  = document.getElementById('detail-sticky-wrap');
+var nav2   = document.getElementById('detail-nav');
+var links  = Array.from(nav2?.querySelectorAll('a.nav-link') || []);
 
 function getHeaderH() {
-  let h = 0;
-  document.querySelectorAll('header,#header,.site-header,.navbar,.main-header').forEach(el => {
-    if (el === wrap || el.contains(wrap)) return;
-    const r = el.getBoundingClientRect();
+  var h = 0;
+  document.querySelectorAll('header,#header,.site-header,.navbar,.main-header').forEach(function(el) {
+    if (el === wrap2 || el.contains(wrap2)) return;
+    var r = el.getBoundingClientRect();
     if (r.top <= 1 && r.height > 10) h = Math.max(h, Math.round(r.bottom));
   });
   return h;
 }
-function applyTop() { if (wrap) wrap.style.top = (getHeaderH() || 0) + 'px'; }
+function applyTop() { if (wrap2) wrap2.style.top = (getHeaderH() || 0) + 'px'; }
 applyTop();
-[100, 300, 600, 1000, 2000].forEach(t => setTimeout(applyTop, t));
+[100,300,600,1000,2000].forEach(function(t){ setTimeout(applyTop, t); });
 window.addEventListener('resize', applyTop);
 window.addEventListener('load',   applyTop);
 
-/* ── Nav click + ripple ── */
-links.forEach(a => {
+links.forEach(function(a) {
   a.addEventListener('click', function(e) {
     e.preventDefault(); e.stopPropagation();
-    const old = this.querySelector('.ripple'); if (old) old.remove();
-    const rect = this.getBoundingClientRect(),
-          size = Math.max(rect.width, rect.height) * 2,
-          rip  = document.createElement('span');
+    var old = this.querySelector('.ripple'); if (old) old.remove();
+    var rect = this.getBoundingClientRect(),
+        size = Math.max(rect.width, rect.height) * 2,
+        rip  = document.createElement('span');
     rip.className = 'ripple';
-    rip.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px;`;
-    this.appendChild(rip); setTimeout(() => rip.remove(), 700);
+    rip.style.cssText = 'width:'+size+'px;height:'+size+'px;left:'+(e.clientX-rect.left-size/2)+'px;top:'+(e.clientY-rect.top-size/2)+'px;';
+    this.appendChild(rip);
+    setTimeout(function(){ rip.remove(); }, 700);
 
-    links.forEach(l => l.classList.remove('active'));
+    links.forEach(function(l){ l.classList.remove('active'); });
     this.classList.add('active');
 
-    const target = document.getElementById(this.getAttribute('href').slice(1));
+    var target = document.getElementById(this.getAttribute('href').slice(1));
     if (!target) return;
-    const wrapH = wrap ? wrap.offsetHeight : 0;
-    const top   = target.getBoundingClientRect().top + window.scrollY - (parseInt(wrap?.style.top) || 0) - wrapH - 8;
-    window.scrollTo({ top, behavior: 'smooth' });
+    var wrapH = wrap2 ? wrap2.offsetHeight : 0;
+    var top   = target.getBoundingClientRect().top + window.scrollY - (parseInt(wrap2?.style.top)||0) - wrapH - 8;
+    window.scrollTo({ top: top, behavior: 'smooth' });
 
-    const cat = this.dataset.cat;
-    if (cat) setTimeout(() => {
-      const btn = document.querySelector(`.specs-cat-fixed[data-cat="${cat}"]`);
+    var cat = this.dataset.cat;
+    if (cat) setTimeout(function() {
+      var btn = document.querySelector('.specs-cat-fixed[data-cat="'+cat+'"]');
       if (btn && btn.classList.contains('collapsed')) window.toggleSpecsCat(cat);
     }, 550);
   });
 });
 
-/* ── Active nav khi scroll ── */
-const sIds = ['gia-mau-sac','tinh-nang','thong-so','thu-vien','thong-tin','so-sanh'];
+var sIds = ['gia-mau-sac','tinh-nang','thong-so','thu-vien','thong-tin','so-sanh'];
 function updateNav() {
-  const wrapH = wrap ? wrap.offsetHeight : 0;
-  const off   = (parseInt(wrap?.style.top) || 0) + wrapH + 32;
-  let active  = sIds[0];
-  sIds.forEach(id => {
-    const el = document.getElementById(id);
+  var wrapH = wrap2 ? wrap2.offsetHeight : 0;
+  var off   = (parseInt(wrap2?.style.top)||0) + wrapH + 32;
+  var active = sIds[0];
+  sIds.forEach(function(id) {
+    var el = document.getElementById(id);
     if (el && window.scrollY >= el.offsetTop - off) active = id;
   });
-  links.forEach(l => {
-    const h = l.getAttribute('href').slice(1);
+  links.forEach(function(l) {
+    var h = l.getAttribute('href').slice(1);
     l.classList.toggle('active', h === active && !l.dataset.cat);
   });
 }
-let tick = false;
-window.addEventListener('scroll', () => {
-  if (!tick) { tick = true; requestAnimationFrame(() => { updateNav(); tick = false; }); }
+var tick = false;
+window.addEventListener('scroll', function() {
+  if (!tick) { tick = true; requestAnimationFrame(function(){ updateNav(); tick = false; }); }
 }, { passive: true });
 setTimeout(updateNav, 400);
 window.addEventListener('load', updateNav);
 
-/* ── Feature reveal ── */
-const obs = new IntersectionObserver(en => {
-  en.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in-view'); obs.unobserve(e.target); } });
+/* ══════════════════════════════════════════════
+   FEATURE REVEAL
+══════════════════════════════════════════════ */
+var obs = new IntersectionObserver(function(entries) {
+  entries.forEach(function(e) {
+    if (e.isIntersecting) { e.target.classList.add('in-view'); obs.unobserve(e.target); }
+  });
 }, { threshold: .08 });
-document.querySelectorAll('.feature-slide').forEach(s => obs.observe(s));
+document.querySelectorAll('.feature-slide').forEach(function(s){ obs.observe(s); });
 
-/* ── Specs toggle ── */
+/* ══════════════════════════════════════════════
+   SPECS TOGGLE
+══════════════════════════════════════════════ */
 window.toggleSpecsCat = function(slug) {
-  const btn = document.querySelector(`.specs-cat-fixed[data-cat="${slug}"]`);
+  var btn = document.querySelector('.specs-cat-fixed[data-cat="'+slug+'"]');
   if (btn) btn.classList.toggle('collapsed');
-  document.querySelectorAll(`.specs-row-group[data-cat-rows="${slug}"]`).forEach(g => g.classList.toggle('collapsed'));
-  document.querySelectorAll(`.specs-cat-spacer[data-cat="${slug}"]`).forEach(s => {
+  document.querySelectorAll('.specs-row-group[data-cat-rows="'+slug+'"]').forEach(function(g){ g.classList.toggle('collapsed'); });
+  document.querySelectorAll('.specs-cat-spacer[data-cat="'+slug+'"]').forEach(function(s){
     s.style.display = btn?.classList.contains('collapsed') ? 'none' : '';
   });
 };
 
-/* ── Modal + Slider ── */
-let idx = 0, srcs = [];
+/* ══════════════════════════════════════════════
+   FEATURE MODAL + SLIDER
+══════════════════════════════════════════════ */
+var mIdx = 0, mSrcs = [];
 function updateSlider() {
-  const track = document.getElementById('modal-slider-track');
-  const dots  = document.getElementById('modal-slider-dots');
-  const fill  = document.getElementById('progress-fill');
-  const cnt   = document.getElementById('progress-count');
-  if (track) track.style.transform = `translateX(-${idx * 100}%)`;
-  if (dots)  Array.from(dots.querySelectorAll('.dot')).forEach((d,i) => d.classList.toggle('active', i === idx));
-  if (fill)  fill.style.width = srcs.length > 1 ? ((idx+1)/srcs.length*100)+'%' : '100%';
-  if (cnt)   cnt.textContent = `${idx+1} / ${srcs.length}`;
+  var track = document.getElementById('modal-slider-track');
+  var dots  = document.getElementById('modal-slider-dots');
+  var fill  = document.getElementById('progress-fill');
+  var cnt   = document.getElementById('progress-count');
+  if (track) track.style.transform = 'translateX(-'+(mIdx*100)+'%)';
+  if (dots)  Array.from(dots.querySelectorAll('.dot')).forEach(function(d,i){ d.classList.toggle('active', i===mIdx); });
+  if (fill)  fill.style.width = mSrcs.length > 1 ? ((mIdx+1)/mSrcs.length*100)+'%' : '100%';
+  if (cnt)   cnt.textContent  = (mIdx+1)+' / '+mSrcs.length;
 }
 window.sliderMove = function(dir) {
-  if (srcs.length <= 1) return;
-  idx = (idx + dir + srcs.length) % srcs.length;
+  if (mSrcs.length <= 1) return;
+  mIdx = (mIdx + dir + mSrcs.length) % mSrcs.length;
   updateSlider();
 };
 document.getElementById('progress-track')?.addEventListener('click', function(e) {
-  if (srcs.length <= 1) return;
-  idx = Math.min(Math.floor(e.offsetX / this.offsetWidth * srcs.length), srcs.length - 1);
+  if (mSrcs.length <= 1) return;
+  mIdx = Math.min(Math.floor(e.offsetX / this.offsetWidth * mSrcs.length), mSrcs.length-1);
   updateSlider();
 });
-let tx = 0;
-const sliderEl = document.getElementById('modal-slider');
-sliderEl?.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
-sliderEl?.addEventListener('touchend',   e => { if (Math.abs(e.changedTouches[0].clientX - tx) > 40) window.sliderMove(e.changedTouches[0].clientX < tx ? 1 : -1); }, { passive: true });
+var tx = 0;
+var sliderEl = document.getElementById('modal-slider');
+sliderEl?.addEventListener('touchstart', function(e){ tx = e.touches[0].clientX; }, { passive: true });
+sliderEl?.addEventListener('touchend',   function(e){ if (Math.abs(e.changedTouches[0].clientX-tx)>40) window.sliderMove(e.changedTouches[0].clientX < tx ? 1 : -1); }, { passive: true });
 
 window.openFeatureModal = function(slide) {
   document.getElementById('modal-badge').textContent = slide.dataset.badge;
   document.getElementById('modal-title').textContent = slide.dataset.title;
   document.getElementById('modal-desc').textContent  = slide.dataset.desc;
-  srcs = [slide.dataset.img, slide.dataset.img2].filter(Boolean); idx = 0;
-  const track = document.getElementById('modal-slider-track');
+  mSrcs = [slide.dataset.img, slide.dataset.img2].filter(Boolean); mIdx = 0;
+  var track = document.getElementById('modal-slider-track');
   track.innerHTML = ''; track.style.transform = 'translateX(0)';
-  srcs.forEach(src => {
-    const w = document.createElement('div'); w.className = 'modal-slide';
-    const img = document.createElement('img'); img.src = src; img.alt = '';
-    w.appendChild(img); track.appendChild(w);
+  mSrcs.forEach(function(src) {
+    var w = document.createElement('div'); w.className = 'modal-slide';
+    var im = document.createElement('img'); im.src = src; im.alt = '';
+    w.appendChild(im); track.appendChild(w);
   });
-  const dots = document.getElementById('modal-slider-dots'); dots.innerHTML = '';
-  srcs.forEach((_,i) => {
-    const d = document.createElement('span');
-    d.className = 'dot' + (i === 0 ? ' active' : '');
-    d.onclick = () => { idx = i; updateSlider(); };
+  var dots = document.getElementById('modal-slider-dots'); dots.innerHTML = '';
+  mSrcs.forEach(function(_, i) {
+    var d = document.createElement('span');
+    d.className = 'dot' + (i===0 ? ' active' : '');
+    d.onclick = function(){ mIdx = i; updateSlider(); };
     dots.appendChild(d);
   });
-  document.getElementById('modal-slider').classList.toggle('single', srcs.length <= 1);
+  document.getElementById('modal-slider').classList.toggle('single', mSrcs.length <= 1);
   updateSlider();
-  const bd = document.getElementById('feature-modal-backdrop'); if (!bd) return;
+  var bd = document.getElementById('feature-modal-backdrop'); if (!bd) return;
   bd.style.display = 'flex'; document.body.style.overflow = 'hidden';
-  requestAnimationFrame(() => bd.classList.add('visible'));
+  requestAnimationFrame(function(){ bd.classList.add('visible'); });
 };
 window.closeFeatureModal = function() {
-  const bd = document.getElementById('feature-modal-backdrop'); if (!bd) return;
+  var bd = document.getElementById('feature-modal-backdrop'); if (!bd) return;
   bd.classList.remove('visible');
-  setTimeout(() => { bd.style.display = 'none'; document.body.style.overflow = ''; }, 300);
+  setTimeout(function(){ bd.style.display = 'none'; document.body.style.overflow = ''; }, 300);
 };
-document.getElementById('feature-modal-backdrop')?.addEventListener('click', function(e) { if (e.target === this) window.closeFeatureModal(); });
-document.addEventListener('keydown', e => {
+document.getElementById('feature-modal-backdrop')?.addEventListener('click', function(e){
+  if (e.target === this) window.closeFeatureModal();
+});
+document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape')     window.closeFeatureModal();
   if (e.key === 'ArrowLeft')  window.sliderMove(-1);
   if (e.key === 'ArrowRight') window.sliderMove(1);

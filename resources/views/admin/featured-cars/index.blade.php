@@ -79,6 +79,8 @@
 .btn-outline:hover { background: #f3f4f6; }
 .btn-danger { background: #fff; color: #dc2626; border: 1.5px solid #fca5a5; }
 .btn-danger:hover { background: #fef2f2; }
+.btn-danger-solid { background: #dc2626; color: #fff; border: none; }
+.btn-danger-solid:hover { background: #b91c1c; color: #fff; }
 .btn-success { background: #16a34a; color: #fff; }
 .btn-success:hover { background: #15803d; color: #fff; }
 .btn-sm { padding: 5px 11px; font-size: 11px; }
@@ -106,6 +108,47 @@
     padding: 12px 18px; border-radius: 8px; font-size: 13px; margin-bottom: 20px;
 }
 .empty-feat { text-align: center; padding: 40px 20px; color: #9ca3af; font-size: 14px; }
+
+/* ── Custom Confirm Modal ── */
+.modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 9999;
+    background: rgba(0, 0, 0, .5);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    align-items: center; justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+    background: #fff; border-radius: 16px; padding: 36px 32px 28px;
+    max-width: 400px; width: 90%;
+    box-shadow: 0 24px 80px rgba(0,0,0,.18), 0 4px 16px rgba(0,0,0,.08);
+    text-align: center;
+    animation: modalPop .2s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes modalPop {
+    from { transform: scale(.88) translateY(12px); opacity: 0; }
+    to   { transform: scale(1)   translateY(0);    opacity: 1; }
+}
+.modal-icon-wrap {
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+}
+.modal-title {
+    font-size: 18px; font-weight: 800; color: #111;
+    margin-bottom: 8px; letter-spacing: -.3px;
+}
+.modal-desc {
+    font-size: 13px; color: #6b7280; margin-bottom: 28px;
+    line-height: 1.6;
+}
+.modal-desc strong { color: #111; }
+.modal-actions {
+    display: flex; gap: 10px; justify-content: center;
+}
+.modal-actions .btn {
+    min-width: 120px; justify-content: center;
+    padding: 9px 18px; font-size: 13px;
+}
 
 @media (max-width: 700px) {
     .feat-row { grid-template-columns: 1fr; }
@@ -201,11 +244,18 @@
                                class="btn btn-primary btn-sm">
                                 ✏️ Upload ảnh 360°
                             </a>
-                            <form method="POST" action="{{ route('admin.featured-cars.unmark', $car) }}"
-                                  onsubmit="return confirm('Bỏ xe này khỏi danh sách nổi bật?')">
+
+                            {{-- Form ẩn, submit bởi modal --}}
+                            <form method="POST"
+                                  action="{{ route('admin.featured-cars.unmark', $car) }}"
+                                  id="unmark-form-{{ $car->id }}">
                                 @csrf @method('PATCH')
-                                <button class="btn btn-danger btn-sm" type="submit">✕ Bỏ nổi bật</button>
                             </form>
+
+                            <button type="button" class="btn btn-danger btn-sm"
+                                    onclick="openUnmarkModal('{{ $car->id }}', '{{ addslashes($car->name) }}')">
+                                ✕ Bỏ nổi bật
+                            </button>
                         </div>
                         @endif
                     </div>
@@ -268,4 +318,64 @@
     @endif
 
 </div>
+
+{{-- ── Custom Confirm Modal ── --}}
+<div class="modal-overlay" id="unmarkModal">
+    <div class="modal-box">
+        <div class="modal-icon-wrap">
+            <img src="{{ asset('images/logo.png') }}" alt="Logo" style="width:80px;height:auto;object-fit:contain;display:block;">
+        </div>
+        <div class="modal-title">Bỏ xe khỏi nổi bật?</div>
+        <div class="modal-desc">
+            Xe <strong id="unmarkCarName"></strong> sẽ không còn hiển thị
+            trong danh sách <em>Xe Nổi Bật</em> trên website nữa.
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeUnmarkModal()">
+                Huỷ bỏ
+            </button>
+            <button class="btn btn-danger-solid" id="unmarkConfirmBtn">
+                ✕ Xác nhận bỏ
+            </button>
+        </div>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+let _unmarkFormId = null;
+
+function openUnmarkModal(carId, carName) {
+    _unmarkFormId = carId;
+    document.getElementById('unmarkCarName').textContent = carName;
+    document.getElementById('unmarkModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeUnmarkModal() {
+    document.getElementById('unmarkModal').classList.remove('open');
+    document.body.style.overflow = '';
+    _unmarkFormId = null;
+}
+
+document.getElementById('unmarkConfirmBtn').addEventListener('click', function () {
+    if (_unmarkFormId) {
+        this.disabled = true;
+        this.textContent = 'Đang xử lý...';
+        document.getElementById('unmark-form-' + _unmarkFormId).submit();
+    }
+});
+
+// Đóng khi click ra ngoài modal box
+document.getElementById('unmarkModal').addEventListener('click', function (e) {
+    if (e.target === this) closeUnmarkModal();
+});
+
+// Đóng khi nhấn Escape
+document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeUnmarkModal();
+});
+</script>
+@endpush
+
 @endsection

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Car;
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Str;
 
 class FeaturedCarController extends Controller
@@ -106,7 +107,7 @@ class FeaturedCarController extends Controller
     /**
      * Xoá 1 frame cụ thể
      */
-    public function deleteFrame(Car $car, int $frameNum)
+    public function deleteFrame(Car $car, int $frameNum): RedirectResponse
     {
         $folder   = public_path('images/quay360/' . Str::slug($car->name) . '/');
         $filePath = $folder . $frameNum . '.png';
@@ -116,6 +117,36 @@ class FeaturedCarController extends Controller
         }
 
         return back()->with('success', "Đã xoá frame #{$frameNum}.");
+    }
+
+    /**
+     * Xoá nhiều frame cùng lúc
+     * DELETE /admin/featured-cars/{car}/frames
+     * Body: frames[] = [1, 3, 5, ...]
+     */
+    public function deleteFrames(Request $request, Car $car): RedirectResponse
+    {
+        $frames = $request->input('frames', []);
+
+        if (empty($frames)) {
+            return back()->with('error', 'Vui lòng chọn ít nhất 1 frame để xoá.');
+        }
+
+        $folder  = public_path('images/quay360/' . Str::slug($car->name) . '/');
+        $deleted = 0;
+
+        foreach ($frames as $frame) {
+            $frame = (int) $frame;
+            if ($frame < 1 || $frame > 8) continue;
+
+            $path = $folder . $frame . '.png';
+            if (file_exists($path)) {
+                unlink($path);
+                $deleted++;
+            }
+        }
+
+        return back()->with('success', "Đã xoá {$deleted} frame thành công.");
     }
 
     /**

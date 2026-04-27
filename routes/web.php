@@ -186,6 +186,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::patch('featured-cars/{car}/unmark',         [FeaturedCarController::class, 'unmarkFeatured'])->name('featured-cars.unmark');
         Route::put('featured-cars/{car}/update-360',       [FeaturedCarController::class, 'update360'])->name('featured-cars.update360');
         Route::delete('featured-cars/{car}/frame/{frame}', [FeaturedCarController::class, 'deleteFrame'])->name('featured-cars.delete-frame');
+        Route::delete('featured-cars/{car}/frames',        [FeaturedCarController::class, 'deleteFrames'])->name('featured-cars.delete-frames'); // ← MỚI: xoá nhiều frame
 
         // Tin tức, liên hệ, newsletter
         Route::resource('news', App\Http\Controllers\Admin\NewsController::class);

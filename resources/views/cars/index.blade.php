@@ -204,14 +204,17 @@ body:not(.home-page) main { margin-top: 0 !important; padding-top: 0 !important;
 }
 
 .feat-modal-actions { margin-top: auto; display: flex; gap: 10px; padding-top: 20px; }
+
+/* ── [SỬA] Nút chính: chữ trắng, không bị override ── */
 .feat-modal-btn-main {
   flex: 1; font-family: 'Rajdhani', sans-serif; font-size: 11px; font-weight: 700;
   letter-spacing: 2px; text-transform: uppercase;
-  background: #d42b2b; color: #fff; border: none; padding: 13px 20px;
-  cursor: pointer; text-decoration: none; text-align: center;
+  background: #d42b2b; color: #fff !important; border: none; padding: 13px 20px;
+  cursor: pointer; text-decoration: none !important; text-align: center;
   transition: background .2s; display: inline-flex; align-items: center; justify-content: center;
 }
-.feat-modal-btn-main:hover { background: #b52222; color: #fff; }
+.feat-modal-btn-main:hover { background: #b52222; color: #fff !important; }
+
 .feat-modal-btn-sec {
   font-family: 'Rajdhani', sans-serif; font-size: 11px; font-weight: 700;
   letter-spacing: 2px; text-transform: uppercase;
@@ -700,7 +703,7 @@ document.addEventListener('DOMContentLoaded', function () {
       frames.push(f);
     }
 
-    // ── LƯU frames vào card để modal dùng lại ──
+    // Lưu frames vào card để modal dùng lại
     card._frames = frames;
 
     function show(idx) {
@@ -775,6 +778,8 @@ document.addEventListener('DOMContentLoaded', function () {
   var mIsDrag = false, mLastX = 0, mVel = 0, mRaf = null;
   var mSensitivity = 8;
 
+  var mAutoSpin = null; // không dùng auto-spin, chỉ xoay khi kéo
+
   function mShow(idx) {
     idx = ((idx % mTotal) + mTotal) % mTotal;
     mCur = idx;
@@ -787,7 +792,7 @@ document.addEventListener('DOMContentLoaded', function () {
     mTotal  = parseInt(card.dataset.frames) || 8;
     mCur    = startFrame || 0;
 
-    // ── Dùng lại frames đã preload từ card, không load lại ──
+    // Dùng lại frames đã preload từ card, không load lại
     mFrames = (card._frames && card._frames.length) ? card._frames : [];
     if (!mFrames.length) {
       for (var i = 0; i < mTotal; i++) {
@@ -828,7 +833,10 @@ document.addEventListener('DOMContentLoaded', function () {
   backdrop.addEventListener('click', function (e) { if (e.target === backdrop) closeModal(); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
 
-  modalImg.addEventListener('mousedown', function (e) { mIsDrag = true; mLastX = e.clientX; e.preventDefault(); });
+  modalImg.addEventListener('mousedown', function (e) {
+    mIsDrag = true; mLastX = e.clientX;
+    e.preventDefault();
+  });
   document.addEventListener('mousemove', function (e) {
     if (!mIsDrag) return;
     var dx = e.clientX - mLastX; mLastX = e.clientX; mVel = dx;
@@ -845,6 +853,7 @@ document.addEventListener('DOMContentLoaded', function () {
       mVel *= 0.85; mRaf = requestAnimationFrame(inertia);
     })();
   });
+
   modalImg.addEventListener('touchstart', function (e) {
     mIsDrag = true; mLastX = e.touches[0].clientX;
   }, { passive: true });
