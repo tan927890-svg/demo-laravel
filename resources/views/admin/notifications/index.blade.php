@@ -11,20 +11,6 @@
   <div class="alert alert-success">{{ session('success') }}</div>
 @endif
 
-{{-- ===== SOUND TOGGLE BUTTON ===== --}}
-<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-  <button id="soundToggleBtn" onclick="toggleSound()"
-    style="display:inline-flex;align-items:center;gap:7px;
-           padding:7px 16px;border-radius:30px;border:1.5px solid var(--border,#e2e8f0);
-           background:var(--bg-card,#fff);cursor:pointer;font-size:13px;font-weight:600;
-           color:var(--text-1,#1e293b);transition:all .2s;box-shadow:0 1px 4px rgba(0,0,0,.06)">
-    <span id="soundIcon" style="font-size:16px">🔔</span>
-    <span id="soundLabel">Âm thanh: Bật</span>
-  </button>
-  <span style="font-size:12px;color:var(--text-3,#94a3b8)">
-    Phát âm khi có thông báo mới
-  </span>
-</div>
 
 <div class="card">
   <table class="table">
@@ -66,10 +52,11 @@
         <td style="font-size:12px;color:var(--text-3)">{{ $n->created_at->format('d/m/Y H:i') }}</td>
         @if(auth()->user()->isAdmin())
         <td>
-          <form method="POST" action="{{ route('admin.notifications.destroy', $n) }}"
-            onsubmit="return confirm('Xóa thông báo này?')">
+          {{-- Form xóa — submit bằng JS sau khi user xác nhận qua modal --}}
+          <form method="POST" action="{{ route('admin.notifications.destroy', $n) }}" class="ntf-del-form">
             @csrf @method('DELETE')
-            <button class="btn btn-sm btn-danger">Xóa</button>
+            <button type="button" class="btn btn-sm btn-danger"
+              onclick="ntfConfirmDelete(this, '{{ addslashes($n->title) }}')">Xóa</button>
           </form>
         </td>
         @endif
@@ -88,179 +75,91 @@
   @endif
 </div>
 
-{{-- ===== SOUND SYSTEM ===== --}}
-<script>
-(function () {
+{{-- ===== CUSTOM CONFIRM MODAL ===== --}}
+<div id="ntf-modal-overlay" style="
+  display:none;position:fixed;inset:0;z-index:9999;
+  background:rgba(0,0,0,.45);backdrop-filter:blur(3px);
+  align-items:center;justify-content:center;animation:ntfFadeIn .18s ease">
 
-  var soundEnabled = localStorage.getItem('notif_sound') !== 'off';
-  var audioCtx     = null;
-  var pendingPlay  = false; // chờ gesture để phát
+  <div style="
+    background:#fff;border-radius:14px;padding:28px 28px 22px;
+    width:340px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,.18);
+    animation:ntfSlideUp .2s ease;position:relative">
 
-  updateBtn();
+    {{-- Icon --}}
+    <div style="width:44px;height:44px;border-radius:50%;background:#fee2e2;
+      display:flex;align-items:center;justify-content:center;margin-bottom:14px">
+      <svg width="20" height="20" fill="none" stroke="#dc2626" stroke-width="2.5" viewBox="0 0 24 24">
+        <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+        <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+      </svg>
+    </div>
 
-  // ── Tạo / lấy AudioContext ───────────────────────────────────────────────
-  function getCtx() {
-    if (!audioCtx) {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    // Một số trình duyệt suspend context nếu chưa có gesture
-    if (audioCtx.state === 'suspended') {
-      audioCtx.resume();
-    }
-    return audioCtx;
-  }
+    <div style="font-size:15px;font-weight:700;color:#111827;margin-bottom:6px">Xóa thông báo?</div>
+    <div style="font-size:13px;color:#6b7280;margin-bottom:22px;line-height:1.5">
+      Thông báo <strong id="ntf-modal-title" style="color:#111827"></strong> sẽ bị xóa vĩnh viễn và không thể khôi phục.
+    </div>
 
-  // ── Phát âm ─────────────────────────────────────────────────────────────
-  function playNotifSound(type) {
-    if (!soundEnabled) return;
-    var ctx = getCtx();
-
-    if (ctx.state === 'suspended') {
-      // Chưa unlock → đánh dấu chờ, phát khi unlock
-      pendingPlay = type;
-      return;
-    }
-
-    var presets = {
-      info:    { freqs: [660, 880],      gap: 0.30, dur: 0.70, vol: 0.13 },
-      success: { freqs: [740, 988],      gap: 0.30, dur: 0.70, vol: 0.13 },
-      warning: { freqs: [550, 494],      gap: 0.32, dur: 0.75, vol: 0.14 },
-      urgent:  { freqs: [660, 740, 880], gap: 0.28, dur: 0.60, vol: 0.15 }
-    };
-
-    var p   = presets[type] || presets.info;
-    var now = ctx.currentTime;
-
-    p.freqs.forEach(function(freq, i) {
-      var osc  = ctx.createOscillator();
-      var gain = ctx.createGain();
-      var t    = now + i * (p.dur * 0.52 + p.gap);
-
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, t);
-
-      gain.gain.setValueAtTime(0,      t);
-      gain.gain.linearRampToValueAtTime(p.vol, t + 0.08);
-      gain.gain.setValueAtTime(p.vol,          t + 0.13);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + p.dur);
-
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(t);
-      osc.stop(t + p.dur + 0.12);
-    });
-  }
-
-  // ── Unlock AudioContext khi có bất kỳ tương tác nào ─────────────────────
-  // Bắt TẤT CẢ các gesture có thể xảy ra sau khi trang load
-  function onFirstInteraction() {
-    var ctx = getCtx();
-    ctx.resume().then(function() {
-      if (pendingPlay) {
-        // Có âm thanh đang chờ → phát ngay
-        var type = pendingPlay;
-        pendingPlay = false;
-        setTimeout(function() { playNotifSound(type); }, 100);
-      }
-    });
-    // Gỡ tất cả listener sau lần đầu
-    ['click','mousedown','keydown','touchstart','scroll','mousemove'].forEach(function(ev) {
-      document.removeEventListener(ev, onFirstInteraction);
-    });
-  }
-
-  ['click','mousedown','keydown','touchstart','scroll','mousemove'].forEach(function(ev) {
-    document.addEventListener(ev, onFirstInteraction, { once: true, passive: true });
-  });
-
-  // ── Phát khi vào trang — áp dụng tất cả role (staff / manager / admin) ──
-  var hasNotifs  = {{ $notifications->count() > 0 ? 'true' : 'false' }};
-  var latestType = '{{ $notifications->count() > 0 ? $notifications->first()->type : "info" }}';
-  // sessionKey theo ID → tự reset khi có thông báo mới hơn
-  var sessionKey = 'notif_played_{{ $notifications->count() > 0 ? $notifications->first()->id : 0 }}';
-
-  if (hasNotifs && !sessionStorage.getItem(sessionKey)) {
-    sessionStorage.setItem(sessionKey, '1');
-    // Thử phát ngay, nếu context chưa unlock thì pendingPlay sẽ giữ lại
-    playNotifSound(latestType);
-  }
-
-  // ── Toggle bật / tắt ─────────────────────────────────────────────────────
-  window.toggleSound = function() {
-    soundEnabled = !soundEnabled;
-    localStorage.setItem('notif_sound', soundEnabled ? 'on' : 'off');
-    updateBtn();
-    if (soundEnabled) playNotifSound('success');
-  };
-
-  function updateBtn() {
-    var icon  = document.getElementById('soundIcon');
-    var label = document.getElementById('soundLabel');
-    var btn   = document.getElementById('soundToggleBtn');
-    if (!icon || !label || !btn) return;
-    if (soundEnabled) {
-      icon.textContent  = '🔔';
-      label.textContent = 'Âm thanh: Bật';
-      btn.style.borderColor = 'var(--primary, #3b82f6)';
-      btn.style.color       = 'var(--primary, #3b82f6)';
-    } else {
-      icon.textContent  = '🔕';
-      label.textContent = 'Âm thanh: Tắt';
-      btn.style.borderColor = 'var(--border, #e2e8f0)';
-      btn.style.color       = 'var(--text-3, #94a3b8)';
-    }
-  }
-
-  // ── Polling 30 giây: phát khi có thông báo mới trong lúc đang dùng ───────
-  @if($notifications->count())
-  var lastSeenId = {{ $notifications->first()->id }};
-  @else
-  var lastSeenId = 0;
-  @endif
-
-  function pollNewNotifications() {
-    fetch('/admin/notifications/latest?after=' + lastSeenId, {
-      headers: { 'X-Requested-With': 'XMLHttpRequest' }
-    })
-    .then(function(res) { return res.ok ? res.json() : null; })
-    .then(function(data) {
-      if (data && data.id && data.id > lastSeenId) {
-        lastSeenId = data.id;
-        playNotifSound(data.type || 'info');
-        showNewBadge();
-      }
-    })
-    .catch(function() {});
-  }
-
-  function showNewBadge() {
-    var btn = document.getElementById('soundToggleBtn');
-    if (!btn) return;
-    var old = btn.querySelector('.notif-badge');
-    if (old) old.remove();
-    var badge = document.createElement('span');
-    badge.className  = 'notif-badge';
-    badge.textContent = '● Mới';
-    badge.style.cssText = 'position:absolute;top:-6px;right:-6px;background:#ef4444;color:#fff;' +
-      'font-size:10px;font-weight:700;padding:2px 6px;border-radius:20px;animation:fadeInPop .3s ease';
-    btn.style.position = 'relative';
-    btn.appendChild(badge);
-    setTimeout(function() { badge.remove(); }, 8000);
-  }
-
-  setTimeout(function() {
-    pollNewNotifications();
-    setInterval(pollNewNotifications, 30000);
-  }, 5000);
-
-})();
-</script>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button onclick="ntfCloseModal()"
+        style="padding:8px 18px;border:1px solid #e5e7eb;border-radius:8px;
+          font-size:13px;font-weight:600;cursor:pointer;background:#fff;color:#374151;
+          transition:background .12s;font-family:inherit"
+        onmouseover="this.style.background='#f9fafb'"
+        onmouseout="this.style.background='#fff'">
+        Huỷ
+      </button>
+      <button id="ntf-modal-confirm"
+        style="padding:8px 18px;border:none;border-radius:8px;
+          font-size:13px;font-weight:600;cursor:pointer;
+          background:#dc2626;color:#fff;transition:background .12s;font-family:inherit"
+        onmouseover="this.style.background='#b91c1c'"
+        onmouseout="this.style.background='#dc2626'">
+        Xóa
+      </button>
+    </div>
+  </div>
+</div>
 
 <style>
-@keyframes fadeInPop {
-  from { opacity:0; transform:scale(.5); }
-  to   { opacity:1; transform:scale(1); }
-}
+@keyframes ntfFadeIn  { from { opacity:0 } to { opacity:1 } }
+@keyframes ntfSlideUp { from { opacity:0; transform:translateY(12px) } to { opacity:1; transform:translateY(0) } }
 </style>
+
+{{-- ===== MODAL JS ===== --}}
+<script>
+(function () {
+  var _pendingForm = null;
+  var overlay = document.getElementById('ntf-modal-overlay');
+
+  window.ntfConfirmDelete = function(btn, title) {
+    _pendingForm = btn.closest('.ntf-del-form');
+    document.getElementById('ntf-modal-title').textContent = '"' + title + '"';
+    overlay.style.display = 'flex';
+  };
+
+  document.getElementById('ntf-modal-confirm').addEventListener('click', function() {
+    if (_pendingForm) {
+      var form = _pendingForm;
+      _pendingForm = null;
+      overlay.style.display = 'none';
+      form.submit();
+    }
+  });
+
+  window.ntfCloseModal = function() {
+    overlay.style.display = 'none';
+    _pendingForm = null;
+  };
+
+  overlay.addEventListener('click', function(e) {
+    if (e.target === this) ntfCloseModal();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') ntfCloseModal();
+  });
+})();
+</script>
 
 @endsection

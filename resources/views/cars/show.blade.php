@@ -58,11 +58,39 @@
 .car-hero { position: relative; height: 560px; overflow: hidden; background: #0d0d0f; }
 .car-hero-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; transform: scale(1.01); animation: hero-zoom 6s ease-out forwards; }
 @keyframes hero-zoom { to { transform: scale(1); } }
-.car-hero-overlay { position: absolute; inset: 0; background: linear-gradient(90deg,rgba(0,0,0,.75) 0%,rgba(0,0,0,.2) 60%,transparent 100%); }
-.car-hero-content { position: absolute; bottom: 0; left: 0; right: 0; padding: 0 80px 60px; display: flex; align-items: flex-end; justify-content: space-between; }
+.car-hero-overlay { 
+  position: absolute; 
+  inset: 0; 
+  background: linear-gradient(
+    to top,
+    rgba(0,0,0,.85) 0%,
+    rgba(0,0,0,.5) 30%,
+    rgba(0,0,0,.1) 60%,
+    transparent 100%
+  ); 
+}
+.car-hero-content { 
+  position: absolute; 
+  bottom: 0; 
+  left: 0; 
+  right: 0; 
+  padding: 0 80px 60px;  /* giữ nguyên 60px như gốc */
+  display: flex; 
+  align-items: flex-end; 
+  justify-content: space-between; 
+}
 .car-hero-eyebrow { font-family: 'Rajdhani', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: var(--red); margin-bottom: 10px; display: flex; align-items: center; gap: 12px; }
 .car-hero-eyebrow::before { content: ''; width: 28px; height: 1px; background: var(--red); }
-.car-hero-name { font-family: 'Barlow Condensed', sans-serif; font-size: clamp(52px,7vw,90px); font-weight: 900; color: var(--white); text-transform: uppercase; letter-spacing: -2px; line-height: .9; animation: slide-up .7s cubic-bezier(.22,1,.36,1) both; }
+.car-hero-name { 
+  font-family: 'Barlow Condensed', sans-serif !important; 
+  font-size: clamp(52px,7vw,90px) !important; 
+  font-weight: 900 !important; 
+  color: #fff !important; 
+  text-transform: uppercase !important; 
+  letter-spacing: -2px !important; 
+  line-height: .9 !important; 
+  animation: slide-up .7s cubic-bezier(.22,1,.36,1) both; 
+}
 @keyframes slide-up { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:none} }
 .car-hero-tagline { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 500; color: rgba(255,255,255,.55); text-transform: uppercase; letter-spacing: 3px; margin-top: 8px; }
 .car-hero-right { text-align: right; }
@@ -454,6 +482,34 @@
   .tv-video { padding: 20px 16px 0; }
   .car-360-wrap { min-height: 260px; }
 }
+/* ── COLOR PICKER 360 ── */
+.color-picker-360 {
+  display: flex; justify-content: center;
+  gap: 20px; margin-top: 20px; flex-wrap: wrap;
+}
+.color-picker-360-item {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 6px;
+  cursor: pointer; transition: transform .2s;
+}
+.color-picker-360-item:hover { transform: translateY(-3px); }
+.color-picker-360-dot {
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 3px solid transparent;
+  transition: border-color .25s, transform .25s;
+  box-sizing: border-box;
+}
+.color-picker-360-item.active360 .color-picker-360-dot {
+  border-color: #c00; transform: scale(1.18);
+}
+.color-picker-360-label {
+  font-family: 'Rajdhani', sans-serif; font-size: 10px;
+  font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: #999;
+  transition: color .2s;
+}
+.color-picker-360-item.active360 .color-picker-360-label { color: #c00; }
+.color-picker-360-item.active360 .color-picker-360-label { color: #c00; }
 </style>
 @endpush
 
@@ -502,19 +558,135 @@ function carImgPath($val) {
 
 {{-- HERO --}}
 <section class="car-hero">
-  @php
-    $bannerNum = ($car->id % 7) + 1;
-    $base = 'images/car/Banner' . $bannerNum;
-    if (file_exists(public_path($base . '.png'))) {
-        $heroSrc = asset($base . '.png');
-    } elseif (file_exists(public_path($base . '.jpg'))) {
-        $heroSrc = asset($base . '.jpg');
-    } elseif (file_exists(public_path($base . '.jpeg'))) {
-        $heroSrc = asset($base . '.jpeg');
-    } else {
-        $heroSrc = '';
+@php
+  $vinColorMap = [
+    // ── VF3: có 360° ──
+    'vinfast-vf-3' => [
+      'Hồng' => ['has360' => true,  'prefix' => 'images/vinfast/vf3-hong', 'frames' => 8, 'ext' => 'png', 'hex' => '#f4a7b9', 'static' => 'images/vinfast/vf3-hong1.png'],
+      'Xanh' => ['has360' => true,  'prefix' => 'images/vinfast/vf3-xanh', 'frames' => 8, 'ext' => 'png', 'hex' => '#5b9bd5', 'static' => 'images/vinfast/vf3-xanh1.png'],
+      'Xám'  => ['has360' => true,  'prefix' => 'images/vinfast/vf3-xam',  'frames' => 8, 'ext' => 'png', 'hex' => '#9e9e9e', 'static' => 'images/vinfast/vf3-xam1.png'],
+    ],
+    // ── VF5: chỉ tĩnh ──
+    'vinfast-vf-5' => [
+      'Vàng' => ['has360' => false, 'prefix' => '', 'frames' => 0, 'ext' => 'png', 'hex' => '#fdd835', 'static' => 'images/vinfast/vf5-vang.png'],
+      'Xám'  => ['has360' => false, 'prefix' => '', 'frames' => 0, 'ext' => 'png', 'hex' => '#9e9e9e', 'static' => 'images/vinfast/vf5-xam.png'],
+      'Xanh' => ['has360' => false, 'prefix' => '', 'frames' => 0, 'ext' => 'png', 'hex' => '#5b9bd5', 'static' => 'images/vinfast/vf5-xanh.png'],
+    ],
+    // ── VF6: chỉ tĩnh ──
+    'vinfast-vf-6' => [
+      'Xanh'  => ['has360' => false, 'prefix' => '', 'frames' => 0, 'ext' => 'png', 'hex' => '#5b9bd5', 'static' => 'images/vinfast/vf6-xanh.png'],
+      'Xám'   => ['has360' => false, 'prefix' => '', 'frames' => 0, 'ext' => 'png', 'hex' => '#9e9e9e', 'static' => 'images/vinfast/vf6-xam.png'],
+      'Trắng' => ['has360' => false, 'prefix' => '', 'frames' => 0, 'ext' => 'png', 'hex' => '#f5f5f5', 'static' => 'images/vinfast/vf6-trang.png'],
+    ],
+    // ── VF7: có 360° ──
+    'vinfast-vf-7' => [
+      'Đỏ'    => ['has360' => true,  'prefix' => 'images/vinfast/vf7-do',    'frames' => 8, 'ext' => 'png', 'hex' => '#c62828', 'static' => 'images/vinfast/vf7-do1.png'],
+      'Trắng' => ['has360' => true,  'prefix' => 'images/vinfast/vf7-trang', 'frames' => 8, 'ext' => 'png', 'hex' => '#f5f5f5', 'static' => 'images/vinfast/vf7-trang1.png'],
+      'Xám'   => ['has360' => true,  'prefix' => 'images/vinfast/vf7-xam',   'frames' => 8, 'ext' => 'png', 'hex' => '#757575', 'static' => 'images/vinfast/vf7-xam1.png'],
+    ],
+    // ── VF8: chỉ tĩnh ──
+    'vinfast-vf-8' => [
+      'Xanh'   => ['has360' => false, 'prefix' => '', 'frames' => 0, 'ext' => 'png', 'hex' => '#1565c0', 'static' => 'images/vinfast/vf8-xanh.png'],
+      'Đỏ nâu' => ['has360' => false, 'prefix' => '', 'frames' => 0, 'ext' => 'png', 'hex' => '#6d4c41', 'static' => 'images/vinfast/vf8-donau.png'],
+      'Trắng'  => ['has360' => false, 'prefix' => '', 'frames' => 0, 'ext' => 'png', 'hex' => '#f5f5f5', 'static' => 'images/vinfast/vf8-trang.png'],
+    ],
+    // ── VF9: chỉ tĩnh ──
+    'vinfast-vf-9' => [
+      'Đỏ'    => ['has360' => false, 'prefix' => '', 'frames' => 0, 'ext' => 'png', 'hex' => '#c62828', 'static' => 'images/vinfast/vf9-do.png'],
+      'Đen'   => ['has360' => false, 'prefix' => '', 'frames' => 0, 'ext' => 'png', 'hex' => '#212121', 'static' => 'images/vinfast/vf9-den.png'],
+      'Trắng' => ['has360' => false, 'prefix' => '', 'frames' => 0, 'ext' => 'png', 'hex' => '#f5f5f5', 'static' => 'images/vinfast/vf9-trang.png'],
+    ],
+  ];
+
+  $carSlugLower360 = strtolower(Str::slug($car->name));
+  $vinColors       = $vinColorMap[$carSlugLower360] ?? [];
+  $isVinFast       = count($vinColors) > 0;
+
+  // Build allColors360
+  $allColors360 = [];
+  foreach ($vinColors as $colorName => $cfg) {
+    $colorFrames = [];
+    if ($cfg['has360']) {
+      for ($fi = 1; $fi <= $cfg['frames']; $fi++) {
+        $p = $cfg['prefix'] . $fi . '.' . $cfg['ext'];
+        if (file_exists(public_path($p))) $colorFrames[] = asset($p);
+      }
     }
-  @endphp
+    $allColors360[$colorName] = [
+      'frames' => $colorFrames,
+      'static' => file_exists(public_path($cfg['static'])) ? asset($cfg['static']) : null,
+      'hex'    => $cfg['hex'],
+      'has360' => $cfg['has360'] && count($colorFrames) >= 2,
+    ];
+  }
+
+  // Màu đầu tiên mặc định
+  $firstColor = array_values($allColors360)[0] ?? null;
+  $frames360  = $firstColor['frames'] ?? [];
+  $has360     = count($frames360) >= 2;
+  $previewImg = $firstColor['static'] ?? null;
+
+  // Fallback Mercedes
+  if (!$isVinFast) {
+    $previewImg = carImgPath($car->image_url ?? null);
+    if (!$previewImg) {
+      $defaultColor = $car->colors->firstWhere('is_default', true) ?? $car->colors->first();
+      $previewImg   = carImgPath($defaultColor?->image ?? null);
+    }
+    if (!$previewImg) {
+      $fg = $car->galleries->where('type','image')
+              ->filter(fn($g) => str_contains($g->file_path ?? '', 'images/car/'))
+              ->sortBy('sort_order')->first();
+      $previewImg = carImgPath($fg?->file_path ?? null);
+    }
+  }
+
+  // Hero background
+  if ($isVinFast) {
+    $vfNgoaiMap = [
+      'vinfast-vf-3' => 'images/vinfast/vf3-ngoai',
+      'vinfast-vf-5' => 'images/vinfast/vf5-ngoai',
+      'vinfast-vf-6' => 'images/vinfast/vf6-ngoai',
+      'vinfast-vf-7' => 'images/vinfast/vf7-ngoai1',
+      'vinfast-vf-8' => 'images/vinfast/vf8-ngoai1',
+      'vinfast-vf-9' => 'images/vinfast/vf9-ngoai',
+    ];
+    $vfBase  = $vfNgoaiMap[$carSlugLower360] ?? null;
+    $heroSrc = null;
+    if ($vfBase) {
+      foreach (['png', 'jpg', 'jpeg'] as $ext) {
+        if (file_exists(public_path("{$vfBase}.{$ext}"))) {
+          $heroSrc = asset("{$vfBase}.{$ext}"); break;
+        }
+      }
+    }
+    $heroSrc = $heroSrc ?? $frames360[0] ?? $previewImg ?? null;
+
+  } else {
+    $merHeroMap = [
+      'mercedes-benz-e-class'    => 'images/car/benz-class',
+      'mercedes-benz-eqs'        => 'images/car/benz-eqs',
+      'mercedes-benz-g-class'    => 'images/car/benz-g-class',
+      'mercedes-benz-gle'        => 'images/car/benz-gle',
+      'mercedes-benz-gls'        => 'images/car/benz-gls',
+      'mercedes-benz-s-class'    => 'images/car/benz-s-class',
+      'mercedes-benz-sl-class'   => 'images/car/benz-sl-class',
+      'mercedes-maybach-s-class' => 'images/car/mabach-class',
+      'mercedes-maybach-gls'     => 'images/car/maybach-gls',
+      'mercedes-amg-gle'         => 'images/car/amg-gle',
+    ];
+    $merBase = $merHeroMap[Str::slug($car->name)] ?? null;
+    $heroSrc = null;
+    if ($merBase) {
+      foreach (['png', 'jpg', 'jpeg'] as $ext) {
+        if (file_exists(public_path("{$merBase}.{$ext}"))) {
+          $heroSrc = asset("{$merBase}.{$ext}"); break;
+        }
+      }
+    }
+    $heroSrc = $heroSrc ?? $previewImg ?? null;
+  }
+@endphp
   <img class="car-hero-img" src="{{ $heroSrc }}" alt="{{ $car->name }}"
        onerror="this.style.display='none';this.closest('.car-hero').querySelector('.car-hero-placeholder').style.display='block';">
   <div class="car-hero-overlay"></div>
@@ -566,90 +738,94 @@ function carImgPath($val) {
         </div>
       </div>
 
-      {{-- RIGHT: 360° Viewer hoặc ảnh tĩnh --}}
-      @php
-        /* Tìm ảnh 360° từ public/images/quay360/{slug}/ */
-        $carSlug360 = Str::slug($car->name);
-        $frames360  = [];
-        $ext360     = ['png', 'jpg', 'jpeg', 'webp'];
-        for ($fi = 1; $fi <= 36; $fi++) {
-            foreach ($ext360 as $ext) {
-                $p = "images/quay360/{$carSlug360}/{$fi}.{$ext}";
-                if (file_exists(public_path($p))) {
-                    $frames360[] = asset($p);
-                    break;
-                }
-            }
-        }
-        $has360 = count($frames360) >= 2;
-
-        /* Fallback: ảnh tĩnh */
-        $previewImg = carImgPath($car->image_url ?? null);
-        if (!$previewImg) {
-            $defaultColor = $car->colors->firstWhere('is_default', true) ?? $car->colors->first();
-            $previewImg = carImgPath($defaultColor?->image ?? null);
-        }
-        if (!$previewImg) {
-            $fg = $car->galleries->where('type','image')
-                    ->filter(fn($g) => str_contains($g->file_path ?? '', 'images/car/'))
-                    ->sortBy('sort_order')->first();
-            $previewImg = carImgPath($fg?->file_path ?? null);
-        }
-      @endphp
-
       @if($has360)
       {{-- ===== 360° VIEWER ===== --}}
-      <div class="car-360-wrap" id="car360wrap"
-           data-frames='@json($frames360)'
-           data-total="{{ count($frames360) }}">
+      {{-- VF3 / VF7: 360° + color picker --}}
+      <div>
+        <div class="car-360-wrap" id="car360wrap"
+             data-frames='@json($frames360)'
+             data-total="{{ count($frames360) }}">
 
-        {{-- Watermark tên xe --}}
-        <div class="color-preview-watermark">{{ $car->name }}</div>
+          {{-- Watermark tên xe --}}
+          <div class="color-preview-watermark">{{ $car->name }}</div>
 
-        {{-- Badge 360 --}}
-        <div class="car-360-badge">360°</div>
+          {{-- Badge 360 --}}
+          <div class="car-360-badge">360°</div>
 
-        {{-- Ảnh hiển thị --}}
-        <img class="car-360-img" id="car360img"
-             src="{{ $frames360[0] }}" alt="{{ $car->name }}">
+          {{-- Ảnh hiển thị --}}
+          <img class="car-360-img" id="car360img"
+               src="{{ $frames360[0] }}" alt="{{ $car->name }}">
 
-        {{-- Nút play/pause --}}
-        <button class="car-360-auto-btn" id="car360autoBtn" title="Bật/tắt tự xoay" type="button">
-          {{-- Icon Pause (đang chạy) --}}
-          <svg id="car360iconPause" viewBox="0 0 24 24" fill="none" width="16" height="16">
-            <rect x="5"  y="4" width="4" height="16" rx="1" fill="#555" class="btn-icon-fill"/>
-            <rect x="15" y="4" width="4" height="16" rx="1" fill="#555" class="btn-icon-fill"/>
-          </svg>
-          {{-- Icon Play (đang dừng) --}}
-          <svg id="car360iconPlay" viewBox="0 0 24 24" fill="none" width="16" height="16" style="display:none;">
-            <path d="M6 4l13 8-13 8V4z" fill="#555" class="btn-icon-fill"/>
-          </svg>
-        </button>
+          {{-- Nút play/pause --}}
+          <button class="car-360-auto-btn" id="car360autoBtn" title="Bật/tắt tự xoay" type="button">
+            {{-- Icon Pause (đang chạy) --}}
+            <svg id="car360iconPause" viewBox="0 0 24 24" fill="none" width="16" height="16">
+              <rect x="5"  y="4" width="4" height="16" rx="1" fill="#555" class="btn-icon-fill"/>
+              <rect x="15" y="4" width="4" height="16" rx="1" fill="#555" class="btn-icon-fill"/>
+            </svg>
+            {{-- Icon Play (đang dừng) --}}
+            <svg id="car360iconPlay" viewBox="0 0 24 24" fill="none" width="16" height="16" style="display:none;">
+              <path d="M6 4l13 8-13 8V4z" fill="#555" class="btn-icon-fill"/>
+            </svg>
+          </button>
 
-        {{-- Dots chỉ frame --}}
-        <div class="car-360-dots" id="car360dots">
-          @foreach($frames360 as $fi => $_)
-            <span class="{{ $fi === 0 ? 'active' : '' }}"></span>
+          {{-- Dots chỉ frame --}}
+          <div class="car-360-dots" id="car360dots">
+            @foreach($frames360 as $fi => $_)
+              <span class="{{ $fi === 0 ? 'active' : '' }}"></span>
+            @endforeach
+          </div>
+
+          {{-- Gợi ý kéo --}}
+          <div class="car-360-hint" id="car360hint">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+              <path d="M5 12h14M14 7l5 5-5 5"/>
+            </svg>
+            KÉO ĐỂ XOAY 360°
+          </div>
+
+          {{-- Thanh tiến trình --}}
+          <div class="car-360-bar">
+            <div class="car-360-bar-fill" id="car360fill" style="width:0%"></div>
+          </div>
+
+        </div>
+
+        {{-- Color picker --}}
+        <div class="color-picker-360" id="colorPicker360">
+          @foreach($allColors360 as $colorName => $colorData)
+          <div class="color-picker-360-item {{ $loop->first ? 'active360' : '' }}"
+               onclick="change360Color({{ json_encode($colorData['frames']) }},{{ json_encode($colorData['static']) }},{{ $colorData['has360'] ? 'true' : 'false' }},this)">
+            <div class="color-picker-360-dot"
+                 style="background:{{ $colorData['hex'] }};{{ $colorName==='Trắng'?'box-shadow:inset 0 0 0 1px #ccc;':'' }}"></div>
+            <span class="color-picker-360-label">{{ $colorName }}</span>
+          </div>
           @endforeach
         </div>
-
-        {{-- Gợi ý kéo --}}
-        <div class="car-360-hint" id="car360hint">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
-            <path d="M5 12h14M14 7l5 5-5 5"/>
-          </svg>
-          KÉO ĐỂ XOAY 360°
-        </div>
-
-        {{-- Thanh tiến trình --}}
-        <div class="car-360-bar">
-          <div class="car-360-bar-fill" id="car360fill" style="width:0%"></div>
-        </div>
-
       </div>
       {{-- END 360° VIEWER --}}
 
+      @elseif($isVinFast && $previewImg)
+      {{-- VF5/6/8/9: ảnh tĩnh + color picker --}}
+      <div>
+        <div class="color-preview">
+          <div class="color-preview-watermark">{{ $car->name }}</div>
+          <img class="color-preview-img" id="vinStaticImg" src="{{ $previewImg }}" alt="{{ $car->name }}">
+        </div>
+        <div class="color-picker-360" id="colorPicker360">
+          @foreach($allColors360 as $colorName => $colorData)
+          <div class="color-picker-360-item {{ $loop->first ? 'active360' : '' }}"
+               onclick="change360Color([],{{ json_encode($colorData['static']) }},false,this)">
+            <div class="color-picker-360-dot"
+                 style="background:{{ $colorData['hex'] }};{{ $colorName==='Trắng'?'box-shadow:inset 0 0 0 1px #ccc;':'' }}"></div>
+            <span class="color-picker-360-label">{{ $colorName }}</span>
+          </div>
+          @endforeach
+        </div>
+      </div>
+
       @elseif($previewImg)
+      {{-- Mercedes: ảnh tĩnh, không có color picker --}}
       <div class="color-preview">
         <div class="color-preview-watermark">{{ $car->name }}</div>
         <img class="color-preview-img" src="{{ $previewImg }}" alt="{{ $car->name }}">
@@ -658,7 +834,6 @@ function carImgPath($val) {
       @else
       <div class="color-preview">
         <div class="color-preview-watermark">{{ $car->name }}</div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(24px,3vw,40px);font-weight:900;letter-spacing:2px;text-transform:uppercase;color:rgba(0,0,0,.15);text-align:center;padding:60px 0;">{{ $car->name }}</div>
       </div>
       @endif
 
@@ -668,61 +843,72 @@ function carImgPath($val) {
 
 {{-- TINH NANG NOI BAT --}}
 @if($car->features->count())
+@php
+  $featurePairs = $car->features->unique('id')->sortBy('sort_order')->values();
+  $ngoai = $featurePairs->first(fn($f) => str_contains(strtolower($f->title), 'ngoại') || str_contains(strtolower($f->title), 'ngoai'));
+  $noi   = $featurePairs->first(fn($f) => str_contains(strtolower($f->title), 'nội')   || str_contains(strtolower($f->title), 'noi'));
+  if (!$ngoai) $ngoai = $featurePairs->get(0);
+  if (!$noi)   $noi   = $featurePairs->get(1);
+  $twoFeatures = collect([$ngoai, $noi])->filter();
+@endphp
 <section class="features-section" id="tinh-nang">
   <div class="features-snap-wrap">
-    @php
-      $uniqueFeatures = $car->features->unique('id')->sortBy('sort_order')->values();
-      /* Lấy path của frame đầu tiên từ 360° để dùng làm fallback cho feature */
-      $frame0path = isset($frames360[0]) ? ltrim(parse_url($frames360[0], PHP_URL_PATH), '/') : null;
-    @endphp
-    @foreach($uniqueFeatures as $feature)
+    @foreach($twoFeatures as $idx => $feature)
       @php
-        $rawImg1   = !empty(trim($feature->image ?? '')) ? $feature->image : ($frame0path ?? 'images/CTN/TN.png');
+        $featImg   = carImgPath(!empty(trim($feature->image ?? '')) ? $feature->image : null);
+        $isReverse = $idx % 2 === 1;
+        $badgeText = $idx === 0 ? 'NGOẠI THẤT' : 'NỘI THẤT';
+        $num       = str_pad($idx + 1, 2, '0', STR_PAD_LEFT);
         $modalImg1 = carImgPath(!empty(trim($feature->image ?? ''))  ? $feature->image  : null);
         $modalImg2 = carImgPath(!empty(trim($feature->image2 ?? '')) ? $feature->image2 : null);
-        if (!$modalImg2) {
-            $nextF = $uniqueFeatures->get($loop->index + 1);
-            if ($nextF && !empty(trim($nextF->image ?? '')) && str_contains($nextF->image, 'NT '))
-                $modalImg2 = carImgPath($nextF->image);
-        }
-        $featImg1    = carImgPath($rawImg1);
-        $isReverse   = $loop->index % 2 === 1;
-        $badgeText   = 'TÍNH NĂNG NỔI BẬT';
-        $variantText = $feature->variant?->name ? 'Phiên bản ' . $feature->variant->name : '';
-        $num         = str_pad($loop->iteration, 2, '0', STR_PAD_LEFT);
-        $showNum     = $loop->iteration <= 3;
       @endphp
       <div class="feature-slide {{ $isReverse ? 'reverse' : '' }}"
-           data-title="{{ $feature->title }}" data-desc="{{ $feature->description }}"
-           data-badge="{{ $badgeText }}" data-variant="{{ $variantText }}"
-           data-img="{{ $modalImg1 ?? '' }}" data-img2="{{ $modalImg2 ?? '' }}">
+           style="min-height:520px;"
+           data-title="{{ $feature->title }}"
+           data-desc="{{ $feature->description }}"
+           data-badge="{{ $badgeText }}"
+           data-variant=""
+           data-img="{{ $modalImg1 ?? '' }}"
+           data-img2="{{ $modalImg2 ?? '' }}">
+
+        {{-- TEXT SIDE --}}
         <div class="feature-slide-body">
-          <div class="feature-slide-number {{ !$showNum ? 'hide-num' : '' }}">{{ $num }}</div>
+          <div class="feature-slide-number">{{ $num }}</div>
           <div class="feature-slide-badge">{{ $badgeText }}</div>
-          @if($variantText)<div class="feature-slide-variant">{{ $variantText }}</div>@endif
           <div class="feature-slide-title">{{ $feature->title }}</div>
           <div class="feature-slide-desc">{{ $feature->description }}</div>
           <button class="btn-feature-detail" onclick="openFeatureModal(this.closest('.feature-slide'))">
             <span>XEM CHI TIẾT →</span>
           </button>
         </div>
+
+        {{-- IMAGE SIDE --}}
         <div class="feature-slide-imgs">
           <div class="img-slot">
-            @if($featImg1)
-              <img src="{{ $featImg1 }}" alt="{{ $feature->title }}" loading="lazy"
+            @if($featImg)
+              <img src="{{ $featImg }}" alt="{{ $feature->title }}" loading="lazy"
                    onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
               <div class="img-slot-no-img" style="display:none;">
-                <svg class="img-slot-no-img-icon" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                <svg class="img-slot-no-img-icon" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1">
+                  <rect x="3" y="3" width="18" height="18" rx="2"/>
+                  <circle cx="8.5" cy="8.5" r="1.5"/>
+                  <polyline points="21 15 16 10 5 21"/>
+                </svg>
                 <span class="img-slot-no-img-text">{{ $car->name }}</span>
               </div>
             @else
               <div class="img-slot-no-img">
-                <svg class="img-slot-no-img-icon" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                <svg class="img-slot-no-img-icon" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1">
+                  <rect x="3" y="3" width="18" height="18" rx="2"/>
+                  <circle cx="8.5" cy="8.5" r="1.5"/>
+                  <polyline points="21 15 16 10 5 21"/>
+                </svg>
                 <span class="img-slot-no-img-text">{{ $car->name }}</span>
               </div>
             @endif
           </div>
         </div>
+
       </div>
     @endforeach
   </div>
@@ -802,7 +988,12 @@ function carImgPath($val) {
 {{-- THU VIEN ANH & VIDEO --}}
 @if($car->galleries->count())
 @php
-  $imageGalleries = $car->galleries->where('type','image')->sortBy('sort_order')->values();
+  $colorImages    = $car->colors->pluck('image')->filter()->values();
+$imageGalleries = $car->galleries
+    ->where('type', 'image')
+    ->filter(fn($g) => !$colorImages->contains($g->file_path))
+    ->sortBy('sort_order')
+    ->values();
   $videoGalleries = $car->galleries->where('type','video')->sortBy('sort_order')->values();
   $tvImgUrls = $imageGalleries->map(fn($g) => carImgPath($g->file_path ?? null))->filter()->values();
   $tvVideos = $videoGalleries->map(function($g) {
@@ -986,11 +1177,12 @@ window.tvSwitch = function(tab, btn) {
           if (file_exists(public_path($path))) { $image = $path; break; }
       }
     @endphp
-    <div style="position:absolute;inset:0;background:url('{{ asset($image) }}') center/cover no-repeat;opacity:0.80;"></div>
+   <div style="position:absolute;inset:0;background:url('{{ asset($image) }}') center/cover no-repeat;opacity:1;"></div>
+<div style="position:absolute;inset:0;background:linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.5) 100%);"></div>
     <div style="position:relative;z-index:1;">
       <div class="info-cta-title">Thông Tin Chi Tiết</div>
       <div class="info-cta-btns">
-        <a href="{{ route('orders.create', $car) }}" class="info-cta-btn">Đặt xe ngay →</a>
+        <a href="{{ route('services.booking') }}" class="info-cta-btn">Đặt xe ngay →</a>
         <a href="{{ route('cars.compare') }}" class="info-cta-btn">So sánh sản phẩm →</a>
       </div>
     </div>
@@ -1058,119 +1250,125 @@ window.tvSwitch = function(tab, btn) {
   try { frames = JSON.parse(wrap.dataset.frames || '[]'); } catch(e) { return; }
   if (frames.length < 2) return;
 
-  var img        = document.getElementById('car360img');
-  var dotsWrap   = document.getElementById('car360dots');
-  var fillEl     = document.getElementById('car360fill');
-  var autoBtn    = document.getElementById('car360autoBtn');
-  var iconPlay   = document.getElementById('car360iconPlay');
-  var iconPause  = document.getElementById('car360iconPause');
-  var hintEl     = document.getElementById('car360hint');
+  var img      = document.getElementById('car360img');
+  var dotsWrap = document.getElementById('car360dots');
+  var fillEl   = document.getElementById('car360fill');
+  var autoBtn  = document.getElementById('car360autoBtn');
+  var iconPlay = document.getElementById('car360iconPlay');
+  var iconPause= document.getElementById('car360iconPause');
+  var hintEl   = document.getElementById('car360hint');
 
-  var total      = frames.length;
-  var curIdx     = 0;
-  var autoPlay   = true;
-  var autoTimer  = null;
-  var isDrag     = false;
-  var dragStartX = 0;
+  var total        = frames.length;
+  var curIdx       = 0;
+  var autoPlay     = true;
+  var autoTimer    = null;
+  var isDrag       = false;
+  var dragStartX   = 0;
   var dragStartIdx = 0;
-  var sensitivity = Math.max(1, Math.round(280 / total));
+  var sensitivity  = Math.max(1, Math.round(280 / total));
 
-  frames.forEach(function(src) {
-    var im = new Image();
-    im.src = src;
-  });
+  // Preload
+  frames.forEach(function(src){ new Image().src = src; });
 
   function showFrame(idx) {
     curIdx = ((idx % total) + total) % total;
     if (img) img.src = frames[curIdx];
     if (dotsWrap) {
-      var allDots = dotsWrap.querySelectorAll('span');
-      allDots.forEach(function(d, i) {
+      dotsWrap.querySelectorAll('span').forEach(function(d, i){
         d.classList.toggle('active', i === curIdx);
       });
     }
-    if (fillEl) {
-      fillEl.style.width = (total > 1 ? (curIdx / (total - 1)) * 100 : 100) + '%';
-    }
+    if (fillEl) fillEl.style.width = (total > 1 ? (curIdx / (total-1)) * 100 : 100) + '%';
   }
 
   function startAuto() {
     clearInterval(autoTimer);
-    autoTimer = null;
     autoPlay = true;
     if (iconPlay)  iconPlay.style.display  = 'none';
     if (iconPause) iconPause.style.display = '';
-    autoTimer = setInterval(function() { showFrame(curIdx + 1); }, 280);
+    autoTimer = setInterval(function(){ showFrame(curIdx + 1); }, 120);
   }
 
   function stopAuto() {
     clearInterval(autoTimer);
     autoTimer = null;
-    autoPlay = false;
+    autoPlay  = false;
     if (iconPlay)  iconPlay.style.display  = '';
     if (iconPause) iconPause.style.display = 'none';
   }
 
+  // ── Listener colorchange (từ change360Color) ──
+  wrap.addEventListener('colorchange', function(e) {
+    var newFrames = e.detail && e.detail.frames;
+    if (!newFrames || newFrames.length < 2) return;
+
+    newFrames.forEach(function(src){ new Image().src = src; });
+
+    frames      = newFrames;
+    total       = newFrames.length;
+    curIdx      = 0;
+    sensitivity = Math.max(1, Math.round(280 / total));
+
+    if (dotsWrap) {
+      dotsWrap.innerHTML = '';
+      newFrames.forEach(function(_, i){
+        var s = document.createElement('span');
+        if (i === 0) s.classList.add('active');
+        dotsWrap.appendChild(s);
+      });
+    }
+
+    showFrame(0);
+    if (autoPlay) startAuto();
+  });
+
+  // ── Events ──
   if (autoBtn) {
-    autoBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
+    autoBtn.addEventListener('click', function(e){
+      e.preventDefault(); e.stopPropagation();
       autoPlay ? stopAuto() : startAuto();
     });
   }
 
-  wrap.addEventListener('mousedown', function(e) {
-    if (e.target === autoBtn || autoBtn.contains(e.target)) return;
+  wrap.addEventListener('mousedown', function(e){
+    if (e.target === autoBtn || autoBtn?.contains(e.target)) return;
     stopAuto();
-    isDrag = true;
-    dragStartX   = e.clientX;
-    dragStartIdx = curIdx;
+    isDrag = true; dragStartX = e.clientX; dragStartIdx = curIdx;
     e.preventDefault();
   });
-  window.addEventListener('mousemove', function(e) {
+  window.addEventListener('mousemove', function(e){
     if (!isDrag) return;
-    var delta = Math.round((dragStartX - e.clientX) / sensitivity);
-    showFrame(dragStartIdx + delta);
+    showFrame(dragStartIdx + Math.round((dragStartX - e.clientX) / sensitivity));
   });
-  window.addEventListener('mouseup', function() {
-    isDrag = false;
-  });
+  window.addEventListener('mouseup', function(){ isDrag = false; });
 
-  wrap.addEventListener('touchstart', function(e) {
-    if (e.target === autoBtn || autoBtn.contains(e.target)) return;
+  wrap.addEventListener('touchstart', function(e){
+    if (e.target === autoBtn || autoBtn?.contains(e.target)) return;
     stopAuto();
-    isDrag = true;
-    dragStartX   = e.touches[0].clientX;
-    dragStartIdx = curIdx;
+    isDrag = true; dragStartX = e.touches[0].clientX; dragStartIdx = curIdx;
   }, { passive: true });
-  wrap.addEventListener('touchmove', function(e) {
+  wrap.addEventListener('touchmove', function(e){
     if (!isDrag) return;
-    var delta = Math.round((dragStartX - e.touches[0].clientX) / sensitivity);
-    showFrame(dragStartIdx + delta);
+    showFrame(dragStartIdx + Math.round((dragStartX - e.touches[0].clientX) / sensitivity));
   }, { passive: true });
-  wrap.addEventListener('touchend', function() { isDrag = false; });
+  wrap.addEventListener('touchend', function(){ isDrag = false; });
 
-  wrap.addEventListener('wheel', function(e) {
-    e.preventDefault();
-    stopAuto();
+  wrap.addEventListener('wheel', function(e){
+    e.preventDefault(); stopAuto();
     showFrame(curIdx + (e.deltaY > 0 ? 1 : -1));
   }, { passive: false });
 
-  wrap.addEventListener('mouseenter', function() {
+  wrap.addEventListener('mouseenter', function(){
     if (autoPlay) clearInterval(autoTimer);
   });
-  wrap.addEventListener('mouseleave', function() {
-    if (autoPlay && !isDrag) {
-      clearInterval(autoTimer);
-      autoTimer = null;
-      autoTimer = setInterval(function() { showFrame(curIdx + 1); }, 280);
-    }
+  wrap.addEventListener('mouseleave', function(){
+    if (autoPlay && !isDrag) startAuto();
   });
 
   if (hintEl) {
-    setTimeout(function() {
+    setTimeout(function(){
       hintEl.style.opacity = '0';
-      setTimeout(function() { hintEl.style.display = 'none'; }, 500);
+      setTimeout(function(){ hintEl.style.display = 'none'; }, 500);
     }, 3500);
   }
 
@@ -1179,6 +1377,21 @@ window.tvSwitch = function(tab, btn) {
 
 })();
 
+// ── change360Color: gọi từ color picker ──
+window.change360Color = function(newFrames, staticImg, has360, el) {
+  if (has360 && newFrames.length >= 2) {
+    // VF3/VF7: đổi frames 360°
+    newFrames.forEach(function(src){ new Image().src = src; });
+    var wrap = document.getElementById('car360wrap');
+    if (wrap) wrap.dispatchEvent(new CustomEvent('colorchange', { detail: { frames: newFrames } }));
+  } else {
+    // VF5/6/8/9: đổi ảnh tĩnh
+    var staticEl = document.getElementById('vinStaticImg');
+    if (staticEl && staticImg) staticEl.src = staticImg;
+  }
+  document.querySelectorAll('.color-picker-360-item').forEach(function(b){ b.classList.remove('active360'); });
+  if (el) el.classList.add('active360');
+};
 
 /* ══════════════════════════════════════════════
    STICKY NAV

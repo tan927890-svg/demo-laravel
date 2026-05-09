@@ -676,7 +676,6 @@ body {
     .car-ad-img-wrap-new img { height: 210px; }
     .car-ad-qr-wrap { display: none; }
 }
-
 /* ══════════════════════════════════════
    TESTIMONIALS
 ══════════════════════════════════════ */
@@ -704,12 +703,17 @@ body {
 .testimonial-card:last-child { border-right: none; }
 .testimonial-card:hover { background: #fff; }
 .testimonial-card-img-wrap {
-    width: 100%; height: 160px;
+    width: 100%; height: 220px;
     overflow: hidden; margin-bottom: 20px;
     background: #f0ebe1;
     display: flex; align-items: center; justify-content: center;
 }
-.testimonial-card-img { width: 100%; height: 100%; object-fit: cover; }
+.testimonial-card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+}
 .testimonial-card-quote {
     font-family: 'Cormorant Garamond', serif;
     font-size: 19px; font-weight: 600;
@@ -743,6 +747,9 @@ body {
 }
 .testimonial-dots { display: flex; justify-content: center; gap: 8px; margin-top: 24px; }
 
+@media (max-width: 768px) {
+    .testimonial-card-img-wrap { height: 180px; }
+}
 /* ══════════════════════════════════════
    PRICE UPDATE BANNER
 ══════════════════════════════════════ */
@@ -792,46 +799,229 @@ body {
     .price-banner-box { padding: 24px 20px; }
     .price-banner-hotline { width: 100%; text-align: center; }
 }
-
 /* ══════════════════════════════════════
-   FLOAT BUTTONS
+   FAB WRAP — RADIAL MENU
 ══════════════════════════════════════ */
-.float-group {
-    position: fixed; bottom: 28px; right: 28px;
-    z-index: 9999; display: flex; flex-direction: column;
-    align-items: center; gap: 12px;
+.fab-wrap {
+    position: fixed;
+    bottom: 32px;
+    right: 28px;
+    z-index: 9999;
+    width: 58px;
+    height: 58px;
 }
-.float-btn {
-    width: 52px; height: 52px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    text-decoration: none !important;
-    position: relative; cursor: pointer; flex-shrink: 0;
-}
-.float-btn::before, .float-btn::after {
-    content: ''; position: absolute; inset: -3px;
-    border-radius: 50%; background: transparent;
-    animation: floatRing 2s ease-out infinite;
-}
-.float-btn::after { inset: -7px; animation-delay: 0.45s; }
-.float-btn-zalo {
-    background: #0068FF;
-    animation: shakeLoop 2.5s ease-in-out 1.2s infinite, glowBlue 2s ease-in-out 0.5s infinite;
-}
-.float-btn-zalo::before { border: 2px solid rgba(0,104,255,0.55); }
-.float-btn-zalo::after  { border: 2px solid rgba(0,104,255,0.25); animation-delay: 1.15s; }
-.float-btn-zalo img { width: 36px; height: 36px; object-fit: contain; border-radius: 50%; }
-@keyframes floatRing { 0%{transform:scale(1);opacity:1} 100%{transform:scale(1.55);opacity:0} }
-@keyframes shakeLoop {
-    0%{transform:rotate(0deg)} 5%{transform:rotate(-20deg)} 10%{transform:rotate(20deg)}
-    15%{transform:rotate(-16deg)} 20%{transform:rotate(16deg)} 25%{transform:rotate(-10deg)}
-    30%{transform:rotate(10deg)} 35%,100%{transform:rotate(0deg)}
-}
-@keyframes glowBlue {
-    0%,100%{box-shadow:0 4px 16px rgba(0,104,255,0.45),0 0 6px rgba(0,104,255,0.3)}
-    50%{box-shadow:0 4px 28px rgba(0,104,255,0.85),0 0 20px rgba(0,104,255,0.55)}
-}
-@media (max-width:768px) { .float-group{bottom:18px;right:14px;} .float-btn{width:46px;height:46px;} }
 
+.fab-sub-list {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.fab-item {
+    position: absolute;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none !important;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.22);
+    color: #fff;
+    font-size: 20px;
+    top: 5px; left: 5px;
+    opacity: 0;
+    transform: scale(0.4);
+    transition:
+        opacity 0.35s cubic-bezier(0.34,1.56,0.64,1),
+        transform 0.4s cubic-bezier(0.34,1.56,0.64,1),
+        top 0.4s cubic-bezier(0.34,1.56,0.64,1),
+        left 0.4s cubic-bezier(0.34,1.56,0.64,1),
+        box-shadow 0.2s;
+    pointer-events: none;
+}
+
+.fab-wrap.open .fab-item {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+}
+
+/* Zalo — thẳng lên */
+.fab-wrap.open .fab-item:nth-child(1) {
+    top: -65px; left: 5px;
+    transition-delay: 0.05s;
+}
+/* Phone — chéo trái-lên */
+.fab-wrap.open .fab-item:nth-child(2) {
+    top: -48px; left: -48px;
+    transition-delay: 0.1s;
+}
+/* Chat — sang trái */
+.fab-wrap.open .fab-item:nth-child(3) {
+    top: 5px; left: -65px;
+    transition-delay: 0.15s;
+}
+
+/* Tooltip */
+.fab-item::before {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    background: rgba(10,10,10,0.82);
+    color: #fff;
+    font-family: 'Didact Gothic', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+    padding: 4px 10px;
+    border-radius: 6px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s, transform 0.2s;
+}
+.fab-item:hover::before {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.fab-item:hover {
+    transform: scale(1.12) !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+.fab-item:active { transform: scale(0.96) !important; }
+
+.fab-item.fab-zalo  { background: #0068FF; }
+.fab-item.fab-phone { background: #25D366; }
+.fab-item.fab-chat  { background: #7C4DFF; }
+
+.fab-item svg {
+    width: 24px; height: 24px; fill: none;
+    stroke: #fff; stroke-width: 2;
+    stroke-linecap: round; stroke-linejoin: round;
+}
+.fab-item img {
+    width: 30px; height: 30px;
+    object-fit: contain; border-radius: 50%;
+}
+
+/* Pulse ring lần lượt Zalo → Phone → Chat */
+.fab-item.fab-zalo::after,
+.fab-item.fab-phone::after,
+.fab-item.fab-chat::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 2px solid;
+    opacity: 0;
+    animation: fabPulse 3s ease-out infinite;
+}
+.fab-item.fab-zalo::after  { border-color: #0068FF; animation-delay: 0s;  }
+.fab-item.fab-phone::after { border-color: #25D366; animation-delay: 1s;  }
+.fab-item.fab-chat::after  { border-color: #7C4DFF; animation-delay: 2s;  }
+
+@keyframes fabPulse {
+    0%   { transform: scale(1);    opacity: 0.8; }
+    60%  { transform: scale(1.65); opacity: 0;   }
+    100% { transform: scale(1.65); opacity: 0;   }
+}
+
+/* Ripple 2 vòng khi open */
+.fab-wrap::before,
+.fab-wrap::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid rgba(21,101,192,0.5);
+    opacity: 0;
+    pointer-events: none;
+}
+.fab-wrap.open::before {
+    animation: fabRipple1 0.65s cubic-bezier(0.25,0.46,0.45,0.94) forwards;
+}
+.fab-wrap.open::after {
+    animation: fabRipple2 0.85s cubic-bezier(0.25,0.46,0.45,0.94) 0.12s forwards;
+}
+@keyframes fabRipple1 {
+    0%   { transform: scale(1);   opacity: 0.75; }
+    100% { transform: scale(3.2); opacity: 0; }
+}
+@keyframes fabRipple2 {
+    0%   { transform: scale(1);   opacity: 0.5; }
+    100% { transform: scale(4.2); opacity: 0; }
+}
+
+/* NÚT CHÍNH */
+.fab-main {
+    position: absolute;
+    inset: 0;
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: #1565C0;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow:
+        0 6px 24px rgba(21,101,192,0.55),
+        0 2px 8px rgba(0,0,0,0.18);
+    transition: background 0.25s, transform 0.4s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s;
+    z-index: 2;
+}
+.fab-main:hover {
+    background: #1976D2;
+    box-shadow: 0 8px 28px rgba(21,101,192,0.65);
+}
+.fab-wrap.open .fab-main {
+    background: #455a64;
+    transform: rotate(135deg);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+}
+
+.fab-main-icon {
+    width: 46px;
+    height: 46px;
+    transition: opacity 0.2s, transform 0.3s;
+    display: block;
+}
+.fab-main-close {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 0.2s;
+    color: #fff; font-size: 22px; font-weight: 300; line-height: 1;
+}
+.fab-wrap.open .fab-main-icon { opacity: 0; }
+.fab-wrap.open .fab-main-close { opacity: 1; }
+
+@keyframes fabShake {
+    0%,35%,100% { transform: rotate(0deg); }
+    5%  { transform: rotate(-16deg); }
+    10% { transform: rotate(16deg); }
+    15% { transform: rotate(-10deg); }
+    20% { transform: rotate(10deg); }
+    25% { transform: rotate(-5deg); }
+    30% { transform: rotate(5deg); }
+}
+.fab-main { animation: fabShake 3.5s ease-in-out 2s infinite; }
+.fab-wrap.open .fab-main { animation: none; }
+
+@media (max-width: 768px) {
+    .fab-wrap { bottom: 18px; right: 16px; width: 52px; height: 52px; }
+    .fab-main { width: 52px; height: 52px; }
+    .fab-item { width: 44px; height: 44px; font-size: 18px; }
+    .fab-item::before { display: none; }
+    .fab-wrap.open .fab-item:nth-child(1) { top: -60px; left: 4px; }
+    .fab-wrap.open .fab-item:nth-child(2) { top: -44px; left: -44px; }
+    .fab-wrap.open .fab-item:nth-child(3) { top: 4px;   left: -60px; }
+}
 /* ══════════════════════════════════════
    RESPONSIVE
 ══════════════════════════════════════ */
@@ -865,15 +1055,15 @@ body {
 <section class="banner-wrap">
     <div class="banner-track" id="bannerTrack">
         <div class="banner-slide" id="slide-0">
-            <img src="{{ asset('images/car/Banner8.jpeg') }}" alt="MEC - Mua bán xe đã qua sử dụng">
+            <img src="{{ asset('images/car/Banner1.png') }}" alt="MEC - Mua bán xe đã qua sử dụng">
             <div class="banner-overlay"></div>
         </div>
         <div class="banner-slide" id="slide-1">
-            <img src="{{ asset('images/car/Banner3.png') }}" alt="MEC - Sang trọng đẳng cấp">
+            <img src="{{ asset('images/car/Banner2.jpg') }}" alt="MEC - Sang trọng đẳng cấp">
             <div class="banner-overlay"></div>
         </div>
         <div class="banner-slide" id="slide-2">
-            <img src="{{ asset('images/car/Banner7.png') }}" alt="MEC - Lái thử miễn phí">
+            <img src="{{ asset('images/car/Banner3.png') }}" alt="MEC - Lái thử miễn phí">
             <div class="banner-overlay"></div>
         </div>
         <div class="banner-slide" id="slide-3">
@@ -962,13 +1152,13 @@ body {
                         @if($car->image_url)
                             @if(str_starts_with($car->image_url, 'images/'))
                                 <img src="{{ asset($car->image_url) }}" alt="{{ $car->name }}"
-                                     onerror="this.src='{{ asset('images/car/placeholder.jpg') }}'">
+                                     onerror="this.src='https://placehold.co/400x300/1a1a1a/ffffff?text=No+Image'">
                             @else
                                 <img src="{{ asset('images/car/' . $car->image_url) }}" alt="{{ $car->name }}"
-                                     onerror="this.src='{{ asset('images/car/placeholder.jpg') }}'">
+                                     onerror="this.src='https://placehold.co/400x300/1a1a1a/ffffff?text=No+Image'">
                             @endif
                         @else
-                            <img src="{{ asset('images/car/placeholder.jpg') }}" alt="No image">
+                            <img src="https://placehold.co/400x300/1a1a1a/ffffff?text=No+Image" alt="No image">
                         @endif
                         <div class="fleet-card-overlay">
                             <span class="fleet-card-overlay-btn">Xem Chi Tiết</span>
@@ -1081,7 +1271,7 @@ body {
             <div class="testimonial-card">
                 <span class="testimonial-card-ornament">"</span>
                 <div class="testimonial-card-img-wrap">
-                    <img class="testimonial-card-img" src="{{ asset('images/testimonial/01.jpg') }}" alt="">
+                    <img class="testimonial-card-img" src="{{ asset('images/vinfast/vf8-ngoai1.png') }}" alt="">
                 </div>
                 <blockquote class="testimonial-card-quote">
                     "Tôi rất ấn tượng với không gian hiện đại và sự đón tiếp nồng hậu tại showroom.
@@ -1098,7 +1288,7 @@ body {
             <div class="testimonial-card">
                 <span class="testimonial-card-ornament">"</span>
                 <div class="testimonial-card-img-wrap">
-                    <img class="testimonial-card-img" src="{{ asset('images/testimonial/02.jpg') }}" alt="">
+                    <img class="testimonial-card-img" src="{{ asset('images/CTN/Mercedes-Benz-E-Class-CTN.png') }}" alt="">
                 </div>
                 <blockquote class="testimonial-card-quote">
                     "Sau 6 tháng cầm lái, tôi hoàn toàn hài lòng với khả năng vận hành của xe.
@@ -1115,7 +1305,7 @@ body {
             <div class="testimonial-card">
                 <span class="testimonial-card-ornament">"</span>
                 <div class="testimonial-card-img-wrap">
-                    <img class="testimonial-card-img" src="{{ asset('images/testimonial/03.jpg') }}" alt="">
+                    <img class="testimonial-card-img" src="{{ asset('images/vinfast/vf6-ngoai.png') }}" alt="">
                 </div>
                 <blockquote class="testimonial-card-quote">
                     "Điểm tôi thích nhất ở AutoX là hệ thống chi nhánh có mặt ở nhiều tỉnh thành.
@@ -1169,12 +1359,44 @@ body {
     </div>
     <div class="price-banner-hotline">Hotline: 0909 123 456</div>
 </section>
+<div class="fab-wrap" id="fabWrap">
+    <div class="fab-sub-list" id="fabSubList">
+        {{-- Zalo (lên thẳng) --}}
+        <a href="https://zalo.me/0372254313" target="_blank"
+           class="fab-item fab-zalo" data-tip="Zalo" onclick="closeFab()">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/d/d6/Logo_Zalo.png" alt="Zalo">
+        </a>
 
-<div class="float-group">
-    <a href="https://zalo.me/0372254313" target="_blank" class="float-btn float-btn-zalo">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/d/d6/Logo_Zalo.png" alt="Zalo">
-    </a>
+        {{-- Gọi điện (chéo) --}}
+        <a href="tel:0909123456" class="fab-item fab-phone" data-tip="Gọi ngay" onclick="closeFab()">
+            📞
+        </a>
+
+        {{-- Chat AI (sang trái) --}}
+        <button class="fab-item fab-chat" data-tip="Chat AI"
+                onclick="openChatWidget(); closeFab()">
+            🤖
+        </button>
+    </div>
+
+    <div class="fab-main" id="fabMain" onclick="toggleFab()">
+        <svg class="fab-main-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="28" cy="12" r="9" fill="rgba(255,255,255,0.15)"/>
+            <path d="M25.3 9.5c.1-.2.3-.3.5-.3h1.6c.3 0 .5.2.5.4.1.5.3 1 .5 1.4.1.2 0 .4-.2.6l-.7.5c.4.9 1 1.6 1.9 2l.6-.7c.2-.2.4-.2.6-.1.4.2.9.3 1.4.4.2 0 .4.2.4.5v1.6c0 .2-.1.4-.3.4-.1 0-.3.1-.4 0-2.9-.4-5.2-2.7-5.7-5.7 0-.2 0-.4.1-.5z" fill="white"/>
+            <circle cx="12" cy="28" r="9" fill="rgba(255,255,255,0.15)"/>
+            <rect x="8" y="24.5" width="8" height="6" rx="1.5" fill="white" opacity="0.9"/>
+            <path d="M10 31.5 L9 33.5 L12 31.5" fill="white" opacity="0.9"/>
+            <rect x="9.5" y="26.2" width="5" height="1" rx="0.5" fill="#1565C0"/>
+            <rect x="9.5" y="28" width="3.5" height="1" rx="0.5" fill="#1565C0"/>
+            <circle cx="20" cy="17" r="3.5" fill="white"/>
+            <circle cx="20" cy="16.5" r="1.4" fill="#1565C0"/>
+            <path d="M20 19.5 C20 19.5 17 23.5 17 25.5 C17 27.2 18.3 28.5 20 28.5 C21.7 28.5 23 27.2 23 25.5 C23 23.5 20 19.5 20 19.5Z" fill="white"/>
+            <circle cx="20" cy="25.5" r="1.2" fill="#1565C0"/>
+        </svg>
+        <span class="fab-main-close">✕</span>
+    </div>
 </div>
+
 
 {{-- POPUP BÁO GIÁ NHANH --}}
 <style>
@@ -1277,6 +1499,12 @@ body {
                 <option value="Mercedes-Benz SL-Class">Mercedes-Benz SL-Class</option>
                 <option value="Mercedes-Maybach GLS">Mercedes-Maybach GLS</option>
                 <option value="Mercedes-Maybach S-Class">Mercedes-Maybach S-Class</option>
+                <option value="Vinfast-VF3">Vinfast VF3</option>
+                <option value="Vinfast-VF5">Vinfast VF5</option>
+                <option value="Vinfast-VF6">Vinfast VF6</option>
+                <option value="Vinfast-VF7">Vinfast VF7</option>
+                <option value="Vinfast-VF8">Vinfast VF8</option>
+                <option value="Vinfast-VF9">Vinfast VF9</option>
             </select>
             <button id="popup-submit" class="popup-submit-btn">Gửi yêu cầu</button>
         </div>
@@ -1614,5 +1842,26 @@ document.getElementById('popup-submit').addEventListener('click', function () {
 
     sizeCards(); buildDots(); goTo(0); startAuto();
 })();
+
+/* ══════════════════════════════════════
+   FAB TOGGLE
+══════════════════════════════════════ */
+function toggleFab() {
+    document.getElementById('fabWrap').classList.toggle('open');
+}
+function closeFab() {
+    document.getElementById('fabWrap').classList.remove('open');
+}
+function openChatWidget() {
+    var overlay  = document.getElementById('ax-chat-overlay');
+    var closeBtn = document.getElementById('ax-chat-close-btn');
+    if (!overlay) return;
+    overlay.classList.add('open');
+    if (closeBtn) closeBtn.classList.add('visible');
+}
+document.addEventListener('click', function(e) {
+    var wrap = document.getElementById('fabWrap');
+    if (wrap && !wrap.contains(e.target)) closeFab();
+});
 </script>
 @endpush

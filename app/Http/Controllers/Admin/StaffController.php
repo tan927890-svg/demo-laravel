@@ -12,9 +12,6 @@ use Illuminate\Support\Facades\Auth;
 
 class StaffController extends Controller
 {
-    /**
-     * Tính khoảng cách Haversine (mét)
-     */
     private function getDistance(float $lat1, float $lng1, float $lat2, float $lng2): float
     {
         $R    = 6371000;
@@ -26,9 +23,6 @@ class StaffController extends Controller
         return $R * 2 * atan2(sqrt($a), sqrt(1 - $a));
     }
 
-    /**
-     * Trang khách hàng — phân quyền theo role
-     */
     public function customers(Request $request)
     {
         $user  = Auth::user();
@@ -71,12 +65,15 @@ class StaffController extends Controller
 
         $orders = $query->paginate(20)->withQueryString();
 
-        return view('admin.staff.customers', compact('orders', 'staffList'));
-    }
+        $allOrders = Order::selectRaw('customer_phone, customer_name, COUNT(*) as total')
+            ->groupBy('customer_phone', 'customer_name')
+            ->get()
+            ->mapWithKeys(fn($row) => [
+                $row->customer_phone . '|' . $row->customer_name => $row->total
+            ]);
 
-    // ────────────────────────────────────────────────────────
-    //  QUẢN LÝ ĐƠN HÀNG CÁ NHÂN
-    // ────────────────────────────────────────────────────────
+        return view('admin.staff.customers', compact('orders', 'staffList', 'allOrders'));
+    }
 
     public function ordersIndex(Request $request)
     {
@@ -100,7 +97,14 @@ class StaffController extends Controller
             'commission' => Order::where('assigned_to', $user->id)->where('consultation_status', 'da_chot_don')->sum('commission_amount'),
         ];
 
-        return view('admin.staff.orders.index', compact('orders', 'stats'));
+        $allOrders = Order::selectRaw('customer_phone, customer_name, COUNT(*) as total')
+            ->groupBy('customer_phone', 'customer_name')
+            ->get()
+            ->mapWithKeys(fn($row) => [
+                $row->customer_phone . '|' . $row->customer_name => $row->total
+            ]);
+
+        return view('admin.staff.orders.index', compact('orders', 'stats', 'allOrders'));
     }
 
     public function ordersCreate(Request $request)
@@ -216,7 +220,7 @@ class StaffController extends Controller
     }
 
     // ────────────────────────────────────────────────────────
-    //  CHẤM CÔNG GPS
+    //  CHẤM CÔNG GPS + FACE
     // ────────────────────────────────────────────────────────
 
     public function attendance()
@@ -236,13 +240,46 @@ class StaffController extends Controller
         return view('admin.staff.attendance', compact('record', 'history'));
     }
 
+    public function getFaceDescriptor()
+    {
+        $descriptor = Auth::user()->face_descriptor;
+
+        if (!$descriptor) {
+            return response()->json(['registered' => false]);
+        }
+
+        return response()->json([
+            'registered' => true,
+            'descriptor' => $descriptor,
+        ]);
+    }
+
+    public function saveFaceDescriptor(Request $request)
+    {
+        $request->validate([
+            'descriptor'   => 'required|array|size:128',
+            'descriptor.*' => 'required|numeric',
+        ]);
+
+        Auth::user()->update([
+            'face_descriptor' => $request->descriptor,
+        ]);
+
+        return response()->json(['success' => true]);
+    }
+
     public function checkIn(Request $request)
     {
         $request->validate([
-            'lat'     => 'required|numeric',
-            'lng'     => 'required|numeric',
-            'address' => 'nullable|string|max:500',
+            'lat'           => 'required|numeric',
+            'lng'           => 'required|numeric',
+            'address'       => 'nullable|string|max:500',
+            'face_verified' => 'required|boolean',
         ]);
+
+        if (!$request->boolean('face_verified')) {
+            return back()->with('error', 'Xác minh khuôn mặt thất bại. Vui lòng thử lại.');
+        }
 
         $officeLat    = (float) env('OFFICE_LAT', 10.7769);
         $officeLng    = (float) env('OFFICE_LNG', 106.7009);
@@ -254,9 +291,8 @@ class StaffController extends Controller
         );
 
         if ($dist > $officeRadius) {
-            $distRound = round($dist);
             return back()->with('error',
-                "Bạn đang cách văn phòng {$distRound}m — cần ở trong vòng {$officeRadius}m để check-in!"
+                'Bạn đang cách văn phòng ' . round($dist) . 'm — cần ở trong vòng ' . $officeRadius . 'm để check-in!'
             );
         }
 
@@ -287,10 +323,15 @@ class StaffController extends Controller
     public function checkOut(Request $request)
     {
         $request->validate([
-            'lat'     => 'required|numeric',
-            'lng'     => 'required|numeric',
-            'address' => 'nullable|string|max:500',
+            'lat'           => 'required|numeric',
+            'lng'           => 'required|numeric',
+            'address'       => 'nullable|string|max:500',
+            'face_verified' => 'required|boolean',
         ]);
+
+        if (!$request->boolean('face_verified')) {
+            return back()->with('error', 'Xác minh khuôn mặt thất bại. Vui lòng thử lại.');
+        }
 
         $officeLat    = (float) env('OFFICE_LAT', 10.7769);
         $officeLng    = (float) env('OFFICE_LNG', 106.7009);
@@ -302,9 +343,8 @@ class StaffController extends Controller
         );
 
         if ($dist > $officeRadius) {
-            $distRound = round($dist);
             return back()->with('error',
-                "Bạn đang cách văn phòng {$distRound}m — cần ở trong vòng {$officeRadius}m để check-out!"
+                'Bạn đang cách văn phòng ' . round($dist) . 'm — cần ở trong vòng ' . $officeRadius . 'm để check-out!'
             );
         }
 

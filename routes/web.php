@@ -22,6 +22,7 @@ use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\Admin\ProfitController;
 use App\Http\Controllers\Admin\PriceListController;
 use App\Http\Controllers\Admin\AttendanceViewController;
+use App\Http\Controllers\Admin\PayrollController;
 
 // ── Auth routes ──────────────────────────────────────────────────────────────
 Route::get('/login',     [AuthController::class, 'showLogin'])->name('login');
@@ -30,7 +31,16 @@ Route::post('/register', [AuthController::class, 'register'])->name('register');
 Route::post('/logout',   [AuthController::class, 'logout'])->name('logout');
 
 // ── Trang chủ ────────────────────────────────────────────────────────────────
-Route::get('/', [CarController::class, 'home'])->name('home');
+Route::get('/', function () {
+    $userAgent = request()->header('User-Agent');
+    $isMobile = preg_match('/Android|iPhone|iPad|Mobile/i', $userAgent);
+
+    if ($isMobile && Auth::check()) {
+        return app(AuthController::class)->redirectByRole(Auth::user());
+    }
+
+    return app(CarController::class)->home(request());
+})->name('home');
 
 // ── Về chúng tôi ─────────────────────────────────────────────────────────────
 Route::get('/about', fn() => view('about'))->name('about');
@@ -64,7 +74,7 @@ Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])
 Route::get('/cars',               [CarController::class, 'index'])->name('cars.index');
 Route::get('/cars/compare',       [CarController::class, 'compare'])->name('cars.compare');
 
-// ── BẢNG GIÁ: truyền $cars từ DB thay vì hardcode ── THAY ĐỔI
+// ── BẢNG GIÁ ─────────────────────────────────────────────────────────────────
 Route::get('/cars/bang-gia', function () {
     $cars = \App\Models\Car::with('brand')
         ->orderBy('brand_id')
@@ -87,7 +97,10 @@ Route::post('/maintenance/reminder/send',   [MaintenanceReminderController::clas
 Route::post('/services/nhan-giao-xe/send',  [PickupDeliveryController::class, 'send'])->name('pickup-delivery.send');
 
 // ── Chat bot ─────────────────────────────────────────────────────────────────
-Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
+Route::get('/chat',        [ChatController::class, 'index'])->name('chat.index');
+Route::post('/chat',       [ChatController::class, 'send'])->name('chat.send');
+Route::post('/chat/image', [ChatController::class, 'sendImage'])->name('chat.image');
+Route::post('/chat/clear', [ChatController::class, 'clearSession'])->name('chat.clear');
 
 // ── Search API ────────────────────────────────────────────────────────────────
 Route::get('/api/cars/search', function (\Illuminate\Http\Request $request) {
@@ -117,6 +130,64 @@ Route::get('/api/cars/search', function (\Illuminate\Http\Request $request) {
         });
 
     return response()->json($cars);
+});
+
+// ── Cars data proxy cho chatbot ───────────────────────────────────────────────
+Route::get('/api/cars-data', function () {
+    $cars = \App\Models\Car::with(['variants', 'colors', 'specs', 'features', 'galleries'])
+        ->get()
+        ->map(function ($car) {
+            $image = null;
+            $color = $car->colors->firstWhere('is_default', true) ?? $car->colors->first();
+            if ($color?->image) $image = asset(ltrim($color->image, '/'));
+            if (!$image) {
+                $gallery = $car->galleries
+                    ->where('type', 'image')
+                    ->filter(fn($g) => str_contains($g->file_path ?? '', '-TN'))
+                    ->sortBy('sort_order')->first();
+                if ($gallery?->file_path) $image = asset(ltrim($gallery->file_path, '/'));
+            }
+            if (!$image) {
+                $gallery = $car->galleries->where('type', 'image')->sortBy('sort_order')->first();
+                if ($gallery?->file_path) $image = asset(ltrim($gallery->file_path, '/'));
+            }
+
+            $variants = $car->variants->sortBy('sort_order')->map(fn($v) => [
+                'name'  => $v->name,
+                'price' => $v->price,
+            ])->values();
+
+            $prices    = $variants->pluck('price')->filter();
+            $minPrice  = $prices->min() ?? 0;
+            $maxPrice  = $prices->max() ?? 0;
+
+            $specsGrouped = [];
+            foreach ($car->specs->sortBy(['category_order','sort_order']) as $s) {
+                $specsGrouped[$s->category][] = ['key' => $s->spec_key, 'value' => $s->spec_value];
+            }
+
+            $featuresGrouped = [];
+            foreach ($car->features as $f) {
+                $cat = $f->category ?? 'Tính năng';
+                $featuresGrouped[$cat][] = $f->description ?? $f->name ?? '';
+            }
+
+            return [
+                'id'          => $car->id,
+                'name'        => $car->name,
+                'slug'        => $car->slug ?? '',
+                'image'       => $image,
+                'description' => $car->description ?? $car->short_description ?? null,
+                'variants'    => $variants,
+                'min_price'   => $minPrice,
+                'max_price'   => $maxPrice,
+                'colors'      => $car->colors->pluck('name')->filter()->values(),
+                'specs'       => $specsGrouped,
+                'features'    => $featuresGrouped,
+            ];
+        });
+
+    return response()->json(['status' => 'ok', 'count' => $cars->count(), 'cars' => $cars]);
 });
 
 // ── Routes cần đăng nhập (khách hàng) ───────────────────────────────────────
@@ -156,7 +227,6 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
             [App\Http\Controllers\Admin\DashboardController::class, 'revenue'])
             ->name('dashboard.revenue');
 
-        // Đơn hàng — thứ tự quan trọng: static trước dynamic
         Route::get('orders/create',          [AdminOrderController::class, 'create'])->name('orders.create');
         Route::post('orders',                [AdminOrderController::class, 'store'])->name('orders.store');
         Route::get('orders',                 [AdminOrderController::class, 'index'])->name('orders.index');
@@ -166,29 +236,27 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::post('orders/{order}/assign', [AdminOrderController::class, 'assignStaff'])->name('orders.assign');
         Route::delete('orders/{order}',      [AdminOrderController::class, 'destroy'])->name('orders.destroy');
 
-        // KPI
         Route::get('kpi',                                    [App\Http\Controllers\Admin\KpiController::class, 'index'])->name('kpi.index');
         Route::get('kpi/{user}',                             [App\Http\Controllers\Admin\KpiController::class, 'show'])->name('kpi.show')->whereNumber('user');
+        Route::post('kpi/{user}/set-target',                 [App\Http\Controllers\Admin\KpiController::class, 'setKpiTarget'])->name('kpi.setTarget')->whereNumber('user');
         Route::post('kpi/{user}/orders',                     [App\Http\Controllers\Admin\KpiController::class, 'storeOrder'])->name('kpi.storeOrder')->whereNumber('user');
         Route::delete('kpi/{user}/orders/{order}',           [App\Http\Controllers\Admin\KpiController::class, 'destroyOrder'])->name('kpi.destroyOrder')->whereNumber('user');
         Route::post('kpi/orders/{order}/consulted',          [App\Http\Controllers\Admin\KpiController::class, 'markConsulted'])->name('kpi.markConsulted');
         Route::post('kpi/orders/{order}/close',              [App\Http\Controllers\Admin\KpiController::class, 'closeOrder'])->name('kpi.closeOrder');
 
-        // Xe
+        Route::get('cars/image-browser', [AdminCarController::class, 'imageBrowser'])->name('cars.imageBrowser');
         Route::get('cars/create',     [AdminCarController::class, 'create'])->name('cars.create');
         Route::post('cars',           [AdminCarController::class, 'store'])->name('cars.store');
         Route::get('cars/{car}/edit', [AdminCarController::class, 'edit'])->name('cars.edit');
         Route::put('cars/{car}',      [AdminCarController::class, 'update'])->name('cars.update');
 
-        // Xe nổi bật
         Route::get('featured-cars/{car}/edit',             [FeaturedCarController::class, 'edit'])->name('featured-cars.edit');
         Route::patch('featured-cars/{car}/mark',           [FeaturedCarController::class, 'markFeatured'])->name('featured-cars.mark');
         Route::patch('featured-cars/{car}/unmark',         [FeaturedCarController::class, 'unmarkFeatured'])->name('featured-cars.unmark');
         Route::put('featured-cars/{car}/update-360',       [FeaturedCarController::class, 'update360'])->name('featured-cars.update360');
         Route::delete('featured-cars/{car}/frame/{frame}', [FeaturedCarController::class, 'deleteFrame'])->name('featured-cars.delete-frame');
-        Route::delete('featured-cars/{car}/frames',        [FeaturedCarController::class, 'deleteFrames'])->name('featured-cars.delete-frames'); // ← MỚI: xoá nhiều frame
+        Route::delete('featured-cars/{car}/frames',        [FeaturedCarController::class, 'deleteFrames'])->name('featured-cars.delete-frames');
 
-        // Tin tức, liên hệ, newsletter
         Route::resource('news', App\Http\Controllers\Admin\NewsController::class);
         Route::post('contacts/mark-all-read',
             [App\Http\Controllers\Admin\ContactController::class, 'markAllRead'])
@@ -199,29 +267,39 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::resource('contacts',   App\Http\Controllers\Admin\ContactController::class);
         Route::resource('newsletter', App\Http\Controllers\Admin\NewsletterController::class);
 
-        // Media
         Route::post('media/upload', [App\Http\Controllers\Admin\MediaController::class, 'upload'])->name('media.upload');
         Route::get('media/images',  [App\Http\Controllers\Admin\MediaController::class, 'images'])->name('media.images');
 
-        // Chấm công nhân viên — static routes TRƯỚC dynamic
         Route::get('attendance/export',        [AttendanceViewController::class, 'export'])->name('attendance.export');
         Route::get('attendance',               [AttendanceViewController::class, 'index'])->name('attendance.index');
         Route::get('attendance/{user}/export', [AttendanceViewController::class, 'exportUser'])->name('attendance.export.user')->whereNumber('user');
         Route::get('attendance/{user}',        [AttendanceViewController::class, 'show'])->name('attendance.show')->whereNumber('user');
 
-        // Thông báo — tạo / xóa (admin + manager)
         Route::get('notifications/create',            [App\Http\Controllers\Admin\NotificationController::class, 'create'])->name('notifications.create');
         Route::post('notifications',                  [App\Http\Controllers\Admin\NotificationController::class, 'store'])->name('notifications.store');
         Route::delete('notifications/{notification}', [App\Http\Controllers\Admin\NotificationController::class, 'destroy'])->name('notifications.destroy');
 
-        // Lợi nhuận xe
         Route::get('profit',       [ProfitController::class, 'index'])->name('profit.index');
         Route::get('profit/{car}', [ProfitController::class, 'show'])->name('profit.show');
         Route::put('profit/{car}', [ProfitController::class, 'update'])->name('profit.update');
 
-        // Bảng giá xe
         Route::get('price-list',  [PriceListController::class, 'index'])->name('price-list.index');
         Route::post('price-list', [PriceListController::class, 'update'])->name('price-list.update');
+
+        Route::get('payroll',                          [PayrollController::class, 'index'])->name('payroll.index');
+        Route::post('payroll/calculate',               [PayrollController::class, 'calculate'])->name('payroll.calculate');
+        Route::get('payroll/export',                   [PayrollController::class, 'export'])->name('payroll.export');
+        Route::get('payroll/salary/manage',            [PayrollController::class, 'salaryIndex'])->name('payroll.salary.index');
+        Route::post('payroll/salary/store',            [PayrollController::class, 'storeSalary'])->name('payroll.salary.store');
+        Route::get('payroll/{payroll}',                [PayrollController::class, 'show'])->name('payroll.show');
+        Route::post('payroll/{payroll}/approve',       [PayrollController::class, 'approve'])->name('payroll.approve');
+        Route::post('payroll/{payroll}/reopen',        [PayrollController::class, 'reopen'])->name('payroll.reopen');
+        Route::patch('payroll/{payroll}/base-salary',  [PayrollController::class, 'updateBaseSalary'])->name('payroll.updateBaseSalary');
+       Route::patch(
+    'payroll/{payroll}/overtime-rate',
+    [PayrollController::class, 'updateOvertimeRate']
+)->name('payroll.updateOvertimeRate');
+        Route::delete('payroll/{payroll}',             [PayrollController::class, 'destroy'])->name('payroll.destroy');
     });
 
     // ── TẤT CẢ (admin, manager, staff) ──────────────────────────────────────
@@ -237,7 +315,6 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::get('cars',       [AdminCarController::class, 'index'])->name('cars.index');
         Route::get('cars/{car}', [AdminCarController::class, 'show'])->name('cars.show');
 
-        // Thông báo — xem + API (tất cả role)
         Route::get('notifications',                      [App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('notifications.index');
         Route::get('notifications/unread',               [App\Http\Controllers\Admin\NotificationController::class, 'unread'])->name('notifications.unread');
         Route::get('notifications/latest',               [App\Http\Controllers\Admin\NotificationController::class, 'latest'])->name('notifications.latest');
@@ -246,7 +323,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     });
 
     // ── STAFF + MANAGER (chấm công cá nhân) ─────────────────────────────────
-    Route::middleware('role:admin,manager,staff')->prefix('staff')->name('staff.')->group(function () {
+    Route::middleware(['role:admin,manager,staff', 'office.network'])->prefix('staff')->name('staff.')->group(function () {
 
         Route::get('customers', [StaffController::class, 'customers'])->name('customers');
 
@@ -259,10 +336,11 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::delete('orders/{order}',
             [StaffController::class, 'ordersDestroy'])->name('orders.destroy');
 
-        // Manager cũng vào được trang tự chấm công
-        Route::get('attendance',           [StaffController::class, 'attendance'])->name('attendance');
-        Route::post('attendance/checkin',  [StaffController::class, 'checkIn'])->name('attendance.checkin');
-        Route::post('attendance/checkout', [StaffController::class, 'checkOut'])->name('attendance.checkout');
+        Route::get('attendance',                  [StaffController::class, 'attendance'])->name('attendance');
+        Route::post('attendance/checkin',         [StaffController::class, 'checkIn'])->name('attendance.checkin');
+        Route::post('attendance/checkout',        [StaffController::class, 'checkOut'])->name('attendance.checkout');
+        Route::get('attendance/face-descriptor',  [StaffController::class, 'getFaceDescriptor'])->name('attendance.face.get');
+        Route::post('attendance/face-descriptor', [StaffController::class, 'saveFaceDescriptor'])->name('attendance.face.save');
 
         Route::get('performance', [StaffController::class, 'performance'])->name('performance');
     });

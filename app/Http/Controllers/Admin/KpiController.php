@@ -94,7 +94,38 @@ class KpiController extends Controller
     }
 
     /**
-     * Manager tạo đơn hàng mới, gán cho một nhân viên cụ thể
+     * Manager/Admin đặt KPI target cho nhân viên theo tháng
+     */
+    public function setKpiTarget(Request $request, User $user)
+    {
+        abort_unless(Auth::user()->isManager() || Auth::user()->isAdmin(), 403);
+
+        $request->validate([
+            'month'          => 'required|integer|min:1|max:12',
+            'year'           => 'required|integer|min:2020|max:2100',
+            'target_revenue' => 'required|integer|min:1',
+            'target_orders'  => 'nullable|integer|min:0',
+        ]);
+
+        \App\Models\Kpi::updateOrCreate(
+            [
+                'user_id' => $user->id,
+                'month'   => $request->month,
+                'year'    => $request->year,
+            ],
+            [
+                'target_revenue' => $request->target_revenue,
+                'target_orders'  => $request->target_orders ?? 0,
+                'actual_revenue' => 0,
+                'actual_orders'  => 0,
+            ]
+        );
+
+        return back()->with('success', "Đã đặt KPI tháng {$request->month}/{$request->year} cho {$user->name}.");
+    }
+
+    /**
+     * Manager tạo đơn hàng mới cho nhân viên
      */
     public function storeOrder(Request $request, User $user)
     {
@@ -148,6 +179,10 @@ class KpiController extends Controller
 
     /**
      * Manager/Admin chốt đơn từ trang KPI
+     *
+     * FIX: commission_rate lưu đúng là 0.05% / 0.1% (không phải 5% / 10%)
+     * Công thức: commission = sale_price * rate / 100
+     * Ví dụ: 5 tỷ * 0.05 / 100 = 2.500.000đ
      */
     public function closeOrder(Request $request, Order $order)
     {
@@ -162,7 +197,9 @@ class KpiController extends Controller
             'manager_note' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        $sale       = (int) $request->sale_price;
+        $sale = (int) $request->sale_price;
+
+        // ✅ FIX: rate đúng là 0.05% hoặc 0.1% (không phải 5% hay 10%)
         $rate       = $sale >= 10_000_000_000 ? 0.1 : 0.05;
         $commission = (int) round($sale * $rate / 100);
 

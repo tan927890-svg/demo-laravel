@@ -2,7 +2,7 @@
   "name": "Chấm Công GPS",
   "short_name": "Chấm Công",
   "description": "Hệ thống chấm công GPS",
-  "start_url": "/admin/attendance",
+  "start_url": "/login",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#ffffff",

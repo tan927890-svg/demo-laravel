@@ -1,6 +1,6 @@
-# 🚗 AutoViet — Website Showroom Mercedes-Benz
+# 🚗 Auto X — Website Showroom Mercedes-Benz
 
-Website giới thiệu, tư vấn và đặt lịch dịch vụ xe Mercedes-Benz, xây dựng bằng Laravel.
+Website giới thiệu, tư vấn và đặt lịch dịch vụ xe Mercedes-Benz, xây dựng bằng Laravel + FastAPI AI Chat + PWA + Chấm công GPS.
 
 ---
 
@@ -13,6 +13,7 @@ Website giới thiệu, tư vấn và đặt lịch dịch vụ xe Mercedes-Benz
 | MySQL | >= 8.0 |
 | Node.js | >= 18.x |
 | NPM | >= 9.x |
+| Python | 3.10 |
 
 ---
 
@@ -52,7 +53,7 @@ php artisan key:generate
 ### 6. Cấu hình file `.env`
 
 ```env
-APP_NAME=Laravel
+APP_NAME=Auto X
 APP_URL=http://demo-laravel.test
 
 DB_CONNECTION=mysql
@@ -62,16 +63,24 @@ DB_DATABASE=demo_laravel
 DB_USERNAME=root
 DB_PASSWORD=
 
+# Tọa độ văn phòng (chấm công GPS)
+OFFICE_LAT=10.855313
+OFFICE_LNG=106.629887
+OFFICE_RADIUS=150
+OFFICE_WIFI_SSID="Tên Wifi Văn Phòng"
+
+# Email (dùng Mailtrap khi dev, Gmail khi production)
 MAIL_MAILER=smtp
-MAIL_HOST=smtp.gmail.com
-MAIL_PORT=587
-MAIL_USERNAME=tan927890@gmail.com
-MAIL_PASSWORD=ulydvzgnecxzjqpc
-MAIL_ENCRYPTION=tls
-MAIL_FROM_ADDRESS=tan927890@gmail.com
-MAIL_FROM_NAME="Mazda Bình Tân"
-MAIL_GARAGE_EMAIL=tan927890@gmail.com
+MAIL_HOST=sandbox.smtp.mailtrap.io
+MAIL_PORT=2525
+MAIL_USERNAME=your_mailtrap_username
+MAIL_PASSWORD=your_mailtrap_password
+MAIL_FROM_ADDRESS=no-reply@autox.vn
+MAIL_FROM_NAME="Auto X"
+MAIL_GARAGE_EMAIL=your_email@gmail.com
 ```
+
+> **Lấy Gmail App Password (dùng khi production):** https://myaccount.google.com/apppasswords
 
 ### 7. Tạo database
 
@@ -91,7 +100,76 @@ php artisan migrate --seed
 php artisan storage:link
 ```
 
-### 10. Build assets frontend
+### 10. Tải model nhận diện khuôn mặt (face-api.js)
+
+> ⚠️ Phải `cd` vào thư mục gốc project (nơi có folder `public/`) trước khi chạy.
+
+```powershell
+mkdir -Force public\face-models; cd public\face-models; @(
+  "tiny_face_detector_model-weights_manifest.json",
+  "tiny_face_detector_model-shard1",
+  "face_landmark_68_tiny_model-weights_manifest.json",
+  "face_landmark_68_tiny_model-shard1",
+  "face_recognition_model-weights_manifest.json",
+  "face_recognition_model-shard1",
+  "face_recognition_model-shard2"
+) | ForEach-Object { Invoke-WebRequest -Uri "https://github.com/justadudewhohacks/face-api.js/raw/master/weights/$_" -OutFile $_ }
+```
+
+Kiểm tra sau khi tải — phải thấy đủ **7 file**:
+
+```powershell
+ls public\face-models | Select-Object Name, Length
+```
+
+| File | Kích thước |
+|------|-----------|
+| `face_recognition_model-shard1` | ~6.2 MB |
+| `face_recognition_model-shard2` | ~2.0 MB |
+| `tiny_face_detector_model-shard1` | ~190 KB |
+
+> ❌ Nếu file nào = 0 bytes → tải lại file đó riêng:
+> ```powershell
+> Invoke-WebRequest -Uri "https://github.com/justadudewhohacks/face-api.js/raw/master/weights/face_recognition_model-shard1" -OutFile "public\face-models\face_recognition_model-shard1"
+> ```
+
+### 11. Cài đặt AI Chat (FastAPI + Groq)
+
+```bash
+# Di chuyển vào thư mục AI chat
+cd dealership-ai-chat-main
+
+# Cài thư viện Python
+pip install -r requirements.txt
+
+# Tạo file .env cho AI
+cp .env.example .env
+```
+
+Mở file `.env` vừa tạo, điền vào:
+
+```env
+GROQ_API_KEY=your_groq_api_key_here
+MYSQL_PASSWORD=your_mysql_password
+```
+
+> **Lấy Groq API key miễn phí:** https://console.groq.com/keys
+
+Tạo database cho AI chat:
+
+```bash
+mysql -u root -p -e "CREATE DATABASE demo_laravel;"
+mysql -u root -p demo_laravel < init.sql
+```
+
+Chạy AI chat server:
+
+```bash
+cd C:\laragon\www\demo-laravel\dealership-ai-chat-main\app
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+### 12. Build assets frontend
 
 ```bash
 # Development (hot reload)
@@ -101,7 +179,7 @@ npm run dev
 npm run build
 ```
 
-### 11. Khởi chạy server
+### 13. Khởi chạy server Laravel
 
 ```bash
 php artisan serve
@@ -111,15 +189,30 @@ Truy cập: [http://localhost:8000](http://localhost:8000)
 
 ---
 
+## 🌐 Expose ra Internet (Cloudflare Tunnel)
+
+Dùng khi cần test PWA hoặc chấm công GPS qua HTTPS thật:
+
+```bash
+# Bước 1 — Chạy Laravel
+php artisan serve --port=8000
+
+# Bước 2 — Mở tunnel (chạy cửa sổ khác)
+.\cloudflared-windows-amd64.exe tunnel --url http://localhost:8000
+```
+
+> Cập nhật URL nhận được vào `APP_URL` trong `.env`, sau đó chạy `php artisan config:clear`.
+
+---
+
 ## 📁 Cấu Trúc Dự Án
 
 ```
 demo-laravel/
-│
 ├── app/
 │   ├── Http/
 │   │   ├── Controllers/
-│   │   │   ├── Admin/                      # Nhóm controller quản trị (admin panel)
+│   │   │   ├── Admin/                      # Controller quản trị
 │   │   │   ├── Auth/                       # Đăng nhập, đăng ký, quên mật khẩu
 │   │   │   ├── CarController.php           # Danh sách, chi tiết, so sánh, báo giá xe
 │   │   │   ├── BookingController.php       # Đặt lịch lái thử / dịch vụ
@@ -128,73 +221,35 @@ demo-laravel/
 │   │   │   ├── ContactController.php       # Form liên hệ
 │   │   │   ├── BaoGiaNhanhController.php   # Báo giá nhanh
 │   │   │   ├── NewsletterController.php    # Đăng ký nhận bản tin
-│   │   │   ├── PickupDeliveryController.php # Nhận/giao xe miễn phí
-│   │   │   └── MaintenanceReminderController.php # Nhắc lịch bảo dưỡng
-│   │   ├── Middleware/
-│   │   └── Requests/
-│   │       ├── Auth/
-│   │       └── ProfileUpdateRequest.php
-│   │
+│   │   │   ├── PickupDeliveryController.php
+│   │   │   └── MaintenanceReminderController.php
+│   │   └── Middleware/
 │   ├── Mail/
-│   │   ├── BaoGiaMail.php                  # Email báo giá xe
-│   │   ├── MaintenanceReminderMail.php     # Email nhắc bảo dưỡng
-│   │   ├── NewsletterSubscribed.php        # Email xác nhận newsletter
-│   │   └── PickupDeliveryRequest.php       # Email xác nhận nhận/giao xe
-│   │
 │   └── Models/
-│       ├── Car.php                         # Model xe chính
-│       ├── CarVariant.php                  # Phiên bản xe
-│       ├── CarColor.php                    # Màu sắc xe
-│       ├── CarSpec.php                     # Thông số kỹ thuật
-│       ├── CarFeature.php                  # Tính năng xe
-│       ├── CarGallery.php                  # Thư viện ảnh xe
-│       ├── Brand.php                       # Hãng xe
-│       ├── Order.php                       # Đơn hàng
-│       ├── News.php                        # Tin tức
-│       ├── NewsCategory.php                # Danh mục tin tức
-│       ├── NewsTag.php                     # Tag tin tức
-│       ├── Newsletter.php                  # Danh sách đăng ký nhận bản tin
-│       ├── Contact.php                     # Liên hệ từ khách hàng
-│       ├── BaoGiaNhanh.php                 # Yêu cầu báo giá nhanh
-│       ├── Kpi.php                         # Chỉ số KPI
-│       └── User.php                        # Người dùng nội bộ (admin / manager / staff)
-│
+│       ├── Car.php / CarVariant.php / CarColor.php / CarSpec.php
+│       ├── Brand.php / Order.php / News.php / User.php
+│       └── ...
 ├── database/
-│   ├── migrations/                         # Toàn bộ lịch sử cấu trúc DB
+│   ├── migrations/
 │   └── seeders/
-│       ├── DatabaseSeeder.php              # Seeder chính — tạo accounts + xe + gọi các seeder con
-│       ├── CarDetailSeeder.php             # Seed chi tiết xe (variants, specs, features, gallery)
-│       └── NewsSeeder.php                  # Seed tin tức mẫu
-│
-├── resources/
-│   └── views/
-│       ├── admin/
-│       │   ├── cars/          # Quản lý xe (index, create, edit)
-│       │   ├── contacts/      # Xem liên hệ khách
-│       │   ├── dashboard/     # Dashboard doanh thu
-│       │   ├── kpi/           # Báo cáo KPI
-│       │   ├── news/          # Quản lý tin tức, categories, tags
-│       │   ├── newsletter/    # Quản lý danh sách bản tin
-│       │   ├── orders/        # Quản lý đơn hàng
-│       │   ├── staff/         # Quản lý nhân viên
-│       │   └── users/         # Quản lý tài khoản
-│       ├── auth/              # Đăng nhập, đăng ký, đặt lại mật khẩu (dành cho staff/admin)
-│       ├── cars/              # Trang xe: danh sách, chi tiết, so sánh, báo giá, đặt lịch
-│       ├── emails/            # Template email gửi đi (booking, báo giá, newsletter, bảo dưỡng...)
-│       ├── layouts/           # Layout chính: admin.blade.php, frontend.blade.php, guest.blade.php
-│       ├── orders/            # Theo dõi đơn hàng
-│       ├── partials/          # Các partial tái sử dụng
-│       ├── profile/           # Hồ sơ nội bộ (staff)
-│       ├── services/          # Trang dịch vụ
-│       └── [trang frontend]   # welcome, about, news, services, dat-lich-dich-vu, v.v.
-│
+│       ├── DatabaseSeeder.php
+│       ├── CarDetailSeeder.php
+│       └── NewsSeeder.php
+├── resources/views/
+│   ├── admin/        # cars, orders, news, staff, dashboard, kpi
+│   ├── cars/         # danh sách, chi tiết, so sánh, báo giá, đặt lịch
+│   ├── layouts/      # admin.blade.php, frontend.blade.php, guest.blade.php
+│   ├── emails/       # template email gửi đi
+│   └── partials/
 ├── public/
+│   ├── face-models/  # Model nhận diện khuôn mặt (tải ở bước 10)
+│   ├── manifest.json # PWA manifest
+│   ├── sw.js         # Service Worker
 │   └── images/
-│       ├── car/               # Ảnh xe KHÔNG có nền — dùng trong card, danh sách, so sánh
-│       └── CTN/               # Ảnh xe CÓ nền — dùng trong banner, trang chủ, giới thiệu
-│
-└── routes/
-    └── web.php                # Toàn bộ route của ứng dụng
+│       ├── car/      # Ảnh xe không nền (PNG) — dùng trong card, danh sách
+│       └── CTN/      # Ảnh xe có nền (JPG) — dùng trong banner, trang chủ
+├── dealership-ai-chat-main/  # AI Chat FastAPI
+└── routes/web.php
 ```
 
 ---
@@ -203,63 +258,96 @@ demo-laravel/
 
 | Thư mục | Loại ảnh | Dùng ở đâu |
 |---------|----------|------------|
-| `public/images/car/` | Ảnh **không có nền** (PNG trong suốt) | Card xe, danh sách, trang so sánh |
-| `public/images/CTN/` | Ảnh **có nền** (JPG/PNG với background) | Banner trang chủ, trang giới thiệu |
-
-> Trong seeder, `image_url` trỏ tới `images/car/Ten-Xe-TN.png` (ảnh không nền).
+| `public/images/car/` | PNG trong suốt (không nền) | Card xe, danh sách, trang so sánh |
+| `public/images/CTN/` | JPG/PNG có background | Banner trang chủ, trang giới thiệu |
 
 ---
 
-## 🔐 Tài Khoản Mặc Định (sau khi seed)
+## 🔐 Tài Khoản Mặc Định
 
-Được tạo tự động bởi `DatabaseSeeder`. **Không có đăng ký tài khoản cho khách hàng** — chỉ nhân viên nội bộ mới cần đăng nhập.
+Tạo tự động sau khi chạy `migrate --seed`. **Không có đăng ký cho khách hàng** — chỉ nhân viên nội bộ.
 
 | Vai trò | Email | Mật khẩu |
 |---------|-------|----------|
-| Admin | admin@autoviet.vn | password |
-| Manager | manager@autoviet.vn | password |
-| Staff | staff@autoviet.vn | password |
+| Admin | admin@autox.vn | password |
+| Manager | manager@autox.vn | password |
+| Staff | staff@autox.vn | password |
 
-Truy cập trang quản trị: [http://localhost:8000/admin](http://localhost:8000/admin)
+Trang quản trị: [http://localhost:8000/admin](http://localhost:8000/admin)
 
 ---
 
 ## ✨ Tính Năng
 
 ### Trang khách — không cần đăng nhập
-- Xem danh sách và chi tiết xe Mercedes
-- So sánh xe, xem thư viện ảnh, thông số kỹ thuật
-- Yêu cầu báo giá nhanh (gửi qua email)
-- Đặt lịch lái thử / dịch vụ
-- Đặt lịch bảo dưỡng định kỳ (gửi nhắc qua email)
+- Xem danh sách, chi tiết, so sánh xe Mercedes
+- Báo giá nhanh, đặt lịch lái thử / dịch vụ
+- Nhắc lịch bảo dưỡng định kỳ qua email
 - Đăng ký nhận/giao xe tận nơi miễn phí
 - Xem tin tức, lọc theo danh mục và tag
-- Đăng ký nhận bản tin newsletter
-- Gửi liên hệ, tra cứu chi phí ước tính
+- Đăng ký newsletter, gửi liên hệ
+- Chat AI tư vấn xe (Groq API)
 
 ### Trang quản trị — cần đăng nhập
+
 | Quyền | Có thể làm |
 |-------|-----------|
 | **Admin** | Toàn quyền: xe, đơn hàng, tin tức, người dùng, KPI, doanh thu |
 | **Manager** | Quản lý xe, đơn hàng, liên hệ, newsletter |
-| **Staff** | Xem và xử lý đơn hàng, lịch dịch vụ |
+| **Staff** | Xem và xử lý đơn hàng, lịch dịch vụ, chấm công GPS |
 
 ---
 
-## 📧 Cấu Hình Email
+## 📍 Chấm Công GPS
 
-Dự án tự động gửi email cho các sự kiện: xác nhận đặt lịch, báo giá, nhắc bảo dưỡng, xác nhận newsletter.
-
-**Môi trường development — dùng Mailtrap để test:**
+Cấu hình tọa độ văn phòng trong `.env`:
 
 ```env
-MAIL_MAILER=smtp
-MAIL_HOST=sandbox.smtp.mailtrap.io
-MAIL_PORT=2525
-MAIL_USERNAME=your_mailtrap_username
-MAIL_PASSWORD=your_mailtrap_password
-MAIL_FROM_ADDRESS=no-reply@autoviet.vn
-MAIL_FROM_NAME="AutoViet"
+OFFICE_LAT=10.855313
+OFFICE_LNG=106.629887
+OFFICE_RADIUS=150   # Bán kính tính bằng mét
+```
+
+Cấu hình `config/app.php` — thêm vào cuối mảng trước dấu `];`:
+
+```php
+'office' => [
+    'lat'    => env('OFFICE_LAT'),
+    'lng'    => env('OFFICE_LNG'),
+    'radius' => env('OFFICE_RADIUS', 150),
+],
+```
+
+> Địa chỉ văn phòng: Công viên phần mềm Quang Trung, Tòa nhà JPVE, Đường Số 2, Trung Mỹ Tây, HCM
+
+---
+
+## 📱 PWA (Progressive Web App)
+
+Cho phép cài web lên màn hình điện thoại như app thật, hoạt động fullscreen và hỗ trợ GPS qua HTTPS.
+
+Các file cần có:
+- `public/manifest.json` — cấu hình PWA
+- `public/sw.js` — Service Worker (cache + bypass cho checkin/checkout)
+- Thêm thẻ link vào `views/layouts/admin.blade.php`
+
+> Cần chạy qua HTTPS thật (dùng Cloudflare Tunnel ở bước 11) để GPS và PWA hoạt động đúng trên mobile.
+
+---
+
+## 🤖 Chat Bot AI
+
+Luồng hoạt động:
+```
+Layout → partial nút toggle → click mở popup → iframe load GET /chat
+→ ChatController@index → chat/index.blade.php → gọi FastAPI Groq
+```
+
+Thư viện Python sử dụng:
+- `google-genai` — Google Gemini API (thay thế `google-generativeai` đã deprecated)
+
+```bash
+C:\laragon\bin\python\python-3.10\python.exe -m pip install google-genai
 ```
 
 ---
@@ -297,264 +385,16 @@ chmod -R 775 storage bootstrap/cache
 **Ảnh không hiển thị:**
 ```bash
 php artisan storage:link
-# Kiểm tra file ảnh có đúng trong public/images/car/ và public/images/CTN/
+# Kiểm tra file ảnh đúng trong public/images/car/ và public/images/CTN/
 ```
 
 **Lỗi npm build:**
 ```bash
 npm cache clean --force && npm install && npm run build
 ```
-** Chat bot **
-layout → partial gọi nút toggle → click mở popup → iframe load GET /chat → ChatController@index → trả về chat/index.blade.php
-# Tích hợp PWA vào laravel 
-User vào web → nhấn "Thêm vào màn hình chính"
-Nó tạo icon trên điện thoại y hệt app thật
-Mở lên thì không có thanh địa chỉ, toàn màn hình như app
-GPS hoạt động bình thường vì chạy HTTPS
 
-B1 ** Tạo public/manifest.json **
-B2   ** Tạo Service Worker 
-         Tạo file public/sw.js **
- B3 ** Sửa lại views/layout/admin **    
-đổi đia chỉ trong env 
-xong php artisan config:clear     
-# Hướng dẫn setup chấm công GPS
-
-## 1. Cấu hình `.env`
-
-```dotenv
-# Tọa độ văn phòng (lấy từ Google Maps)
-OFFICE_LAT=10.855313
-OFFICE_LNG=106.629887
-OFFICE_RADIUS=150
-OFFICE_WIFI_SSID="Trầm và Tình"
+**SSL lỗi khi tải face-models (PowerShell):**
+```powershell
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+# Chạy dòng này trước rồi mới chạy lệnh tải model
 ```
-
----
-
-## 2. Cấu hình `config/app.php`
-
-Thêm vào cuối mảng, trước dấu `];`:
-
-```php
-'office' => [
-    'lat'    => env('OFFICE_LAT'),
-    'lng'    => env('OFFICE_LNG'),
-    'radius' => env('OFFICE_RADIUS', 150),
-],
-```
-
----
-
-## 3. Cấu hình `bootstrap/app.php`
-
-```php
-->withMiddleware(function (Middleware $middleware) {
-    $middleware->trustProxies(at: '*');
-    $middleware->alias([
-        'role' => \App\Http\Middleware\RoleMiddleware::class,
-    ]);
-})
-```
-
----
-
-## 4. Cấu hình `httpd.conf` (Laragon)
-
-Đảm bảo có dòng:
-```apache
-Listen 80
-```
-
----
-
-## 5. Cấu hình Virtual Host
-
-File: `C:/laragon/etc/apache2/sites-enabled/auto.demo-laravel.test.conf`
-
-```apache
-<VirtualHost *:80>
-    DocumentRoot "C:/laragon/www/demo-laravel/public"
-    ServerName demo-laravel.test
-    ServerAlias *.demo-laravel.test
-    ServerAlias murky-rematch-flaring.ngrok-free.dev
-    <Directory "C:/laragon/www/demo-laravel/public">
-        AllowOverride All
-        Require all granted
-    </Directory>
-</VirtualHost>
-```
-
----
-
-## 6. Cấu hình `sw.js` (Service Worker)
-
-Thêm danh sách bypass cache:
-
-```javascript
-const NO_CACHE_PATHS = [
-    '/admin/staff/attendance/checkin',
-    '/admin/staff/attendance/checkout',
-    '/api/',
-];
-
-self.addEventListener('fetch', e => {
-    if (e.request.method !== 'GET') return;
-
-    const url = new URL(e.request.url);
-    const noCache = NO_CACHE_PATHS.some(path => url.pathname.startsWith(path));
-    if (noCache) return;
-
-    e.respondWith(
-        fetch(e.request)
-            .then(response => {
-                const clone = response.clone();
-                caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
-                return response;
-            })
-            .catch(() => caches.match(e.request))
-    );
-});
-```
-
----
-
-## 7. StaffController — logic GPS
-
-File: `app/Http/Controllers/Admin/StaffController.php`
-
-```php
-public function checkIn(Request $request)
-{
-    $officeLat    = (float) config('app.office.lat');
-    $officeLng    = (float) config('app.office.lng');
-    $officeRadius = (int)   config('app.office.radius', 150);
-
-    $dist = $this->getDistance(
-        $request->lat, $request->lng,
-        $officeLat, $officeLng
-    );
-
-    if ($dist > $officeRadius) {
-        return back()->with('error',
-            "Bạn đang cách văn phòng {$dist}m — cần trong vòng {$officeRadius}m!"
-        );
-    }
-    // ... lưu attendance
-}
-```
-
----
-
-## 8. Blade JS — `attendance.blade.php`
-
-```javascript
-const OFFICE_LAT    = {{ config('app.office.lat') }};
-const OFFICE_LNG    = {{ config('app.office.lng') }};
-const OFFICE_RADIUS = {{ config('app.office.radius', 150) }};
-const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
-
-navigator.geolocation.getCurrentPosition(
-    async (pos) => { /* xử lý */ },
-    (err) => { /* báo lỗi */ },
-    {
-        enableHighAccuracy: true,
-        timeout: isIOS ? 15000 : 10000,
-        maximumAge: 0
-    }
-);
-```
-
----
-
-## 9. Chạy ngrok (test trên điện thoại)
-
-### Cài đặt lần đầu
-
-```cmd
-# Tải ngrok tại https://ngrok.com/download
-# Đăng ký tài khoản tại https://dashboard.ngrok.com/signup
-# Lấy token tại https://dashboard.ngrok.com/get-started/your-authtoken
-
-ngrok config add-authtoken <token>
-```
-
-### Chạy mỗi lần test
-
-```cmd
-ngrok http 80 --host-header=demo-laravel.test
-```
-
-Sẽ hiện link dạng:
-```
-https://xxxx.ngrok-free.app
-```
-
-Cập nhật `.env`:
-```dotenv
-APP_URL=https://xxxx.ngrok-free.app
-```
-
-Chạy:
-```cmd
-php artisan config:clear
-php artisan cache:clear
-```
-
-### URL đúng trên điện thoại
-
-```
-https://xxxx.ngrok-free.app/admin/staff/attendance
-```
-
-> ⚠️ Link ngrok thay đổi mỗi lần restart (bản free). Cần cập nhật lại `APP_URL` và `ServerAlias` mỗi lần.
-
----
-
-## 10. Lệnh hay dùng
-
-```cmd
-# Xóa cache config
-php artisan config:clear
-php artisan cache:clear
-
-# Kiểm tra route
-php artisan route:list | findstr attendance
-
-# Kiểm tra port 80
-netstat -ano | findstr :80 | findstr LISTENING
-```
-
----
-
-## Lưu ý quan trọng
-
-| | Android | iOS |
-|---|---|---|
-| GPS | ✅ Hoạt động tốt | ✅ Cần cấp quyền trong Settings |
-| WiFi SSID | ✅ Đọc được | ❌ Không hỗ trợ |
-| Zalo WebView | ⚠️ GPS hạn chế | ❌ GPS bị chặn |
-| Giải pháp Zalo | Mở bằng Chrome | Mở bằng Safari |
-| Timeout GPS | 10 giây | 15 giây |
-
-> **Tọa độ văn phòng**: `10.855313, 106.629887`  
-> Công viên phần mềm Quang, Tòa nhà JPVE, Đường Số 2, Trung Mỹ Tây, HCM
-chạy AI chat bằng groq
-Bước 1 — Clone project
-git clone <your-repo-url>
-chạy lệnh 
-cd dealership-ai-chat-vn
-Bước 2 — Cài thư viện
-pip install -r requirements.txt
-Bước 3 — Tạo file .env
-cp .env.example .env
-Mở file .env vừa tạo, điền vào:
-GROQ_API_KEY=your_groq_api_key_here
-MYSQL_PASSWORD=your_mysql_password
->  dùng MySQL localhost giữ nguyên 
-Bước 4 — Tạo database
-mysql -u root -p -e "CREATE DATABASE demo_laravel;"
-mysql -u root -p demo_laravel < init.sql
-Bước 5 — Chạy project
-> uvicorn app.main:app --reload
->  Lấy Groq API key miễn phí tại: https://console.groq.com/keys

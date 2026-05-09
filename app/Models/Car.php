@@ -14,34 +14,36 @@ class Car extends Model
         'name',
         'brand_id',
         'model',
+        'tagline',
+        'slug',
         'price_per_day',
+        'cost_price',
+        'sale_price',
         'color',
         'mileage',
         'fuel_type',
-        'image_url',
+        'transmission',   // ← thêm
         'condition',
         'engine',
         'seats',
         'description',
+        'content',        // ← thêm
         'images',
         'image',
+        'image_url',
+        'hero_image',
         'status',
         'is_available',
         'is_featured',
         'badge_label',
-        'slug',
-        'tagline',
-        'hero_image',
         'image_360_prefix',
         'image_360_frames',
-        'cost_price',
-        'sale_price',   // ← thêm
     ];
 
     protected $casts = [
         'price_per_day'    => 'decimal:0',
-        'cost_price'       => 'decimal:0',  // ← thêm
-        'sale_price'       => 'decimal:0',  // ← thêm
+        'cost_price'       => 'decimal:0',
+        'sale_price'       => 'decimal:0',
         'is_available'     => 'boolean',
         'is_featured'      => 'boolean',
         'image_360_frames' => 'integer',
@@ -52,7 +54,10 @@ class Car extends Model
     {
         parent::boot();
         static::creating(function ($car) {
-            $car->slug = Str::slug($car->name . '-' . uniqid());
+            // Chỉ tự tạo slug nếu chưa có (form có thể gửi slug thủ công)
+            if (empty($car->slug)) {
+                $car->slug = Str::slug($car->name . '-' . uniqid());
+            }
         });
     }
 
@@ -111,6 +116,11 @@ class Car extends Model
         return $this->hasMany(CarGallery::class)
                     ->where('type', 'video')
                     ->orderBy('sort_order');
+    }
+
+    public function expenses()
+    {
+        return $this->hasMany(\App\Models\CarExpense::class)->orderBy('id');
     }
 
     // ── Helpers ──────────────────────────────────────────────────
@@ -185,10 +195,5 @@ class Car extends Model
             'sold'      => ['label' => 'Đã bán',      'color' => 'red'],
             default     => ['label' => 'Không rõ',    'color' => 'gray'],
         };
-    }
-
-    public function expenses()
-    {
-        return $this->hasMany(\App\Models\CarExpense::class)->orderBy('id');
     }
 }

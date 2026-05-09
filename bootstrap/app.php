@@ -11,13 +11,17 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->prepend(\App\Http\Middleware\DynamicSession::class);
         $middleware->trustProxies(at: '*');
+        $middleware->encryptCookies(except: []);
         $middleware->alias([
-            'role' => \App\Http\Middleware\RoleMiddleware::class,
+            'role'           => \App\Http\Middleware\RoleMiddleware::class,
+            'office.network' => \App\Http\Middleware\OfficeNetwork::class,
         ]);
         $middleware->validateCsrfTokens(except: [
             'bao-gia-nhanh',
             'bao-gia-nhanh/*',
+            'login',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

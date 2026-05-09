@@ -8,13 +8,17 @@ use Illuminate\Http\Request;
 
 class CarController extends Controller
 {
-    public function home()
-    {
-        $featuredCars = Car::with('brand')->latest()->take(6)->get();
-        $brands = Brand::orderBy('name')->pluck('name');
+public function home()
+{
+    $featuredCars = Car::with('brand')
+        ->where('is_featured', true)
+        ->latest()
+        ->get();
 
-        return view('welcome', compact('featuredCars', 'brands'));
-    }
+    $brands = Brand::orderBy('name')->pluck('name');
+
+    return view('welcome', compact('featuredCars', 'brands'));
+}
 
     public function index(Request $request)
     {

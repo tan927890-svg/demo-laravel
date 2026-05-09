@@ -25,7 +25,6 @@ class AuthController extends Controller
 
         $loginValue = trim($request->input('login'));
 
-        // có "@" → email, không có → username
         $field = filter_var($loginValue, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
         $credentials = [
@@ -71,7 +70,8 @@ class AuthController extends Controller
         return redirect()->route('login');
     }
 
-    private function redirectByRole($user)
+    // Đổi private -> public để gọi từ routes/web.php
+    public function redirectByRole($user)
     {
         if ($user->role === 'staff') {
             $today = now()->toDateString();

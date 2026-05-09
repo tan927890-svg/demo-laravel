@@ -7,42 +7,48 @@
 #ax-chat-overlay {
   display: none;
   position: fixed;
-  top: 0;
-  left: 260px;
-  width: 400px;
-  height: 100vh;
+  bottom: 90px;
+  right: 28px;
+  width: 380px;
+  height: min(560px, calc(100vh - 110px));
+  max-height: calc(100vh - 110px);
   overflow: hidden;
   z-index: 8500;
-  box-shadow: 6px 0 32px rgba(0,0,0,0.18);
-  border-right: 1px solid #e8edf4;
-  transition: left .28s ease;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.22), 0 2px 8px rgba(0,0,0,0.1);
+  border-radius: 18px;
   flex-direction: column;
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+  transform-origin: bottom right;
+  transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
 }
-#ax-chat-overlay.open         { display: flex; }
-#ax-chat-overlay.sb-collapsed { left: 64px; }
+#ax-chat-overlay.open {
+  display: flex;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
 
 #ax-chat-close-btn {
   position: fixed;
-  top: 14px;
-  left: calc(260px + 400px - 44px);
-  width: 30px;
-  height: 30px;
+  bottom: calc(90px + min(560px, calc(100vh - 110px)) + 8px);
+  right: 28px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.18);
+  background: rgba(0,0,0,0.45);
   border: none;
   cursor: pointer;
   display: none;
   align-items: center;
   justify-content: center;
-  color: #8eafc8;
-  font-size: 16px;
+  color: #fff;
+  font-size: 13px;
   line-height: 1;
-  transition: background .15s, color .15s, left .28s ease;
+  transition: background .15s;
   z-index: 9999;
 }
-#ax-chat-close-btn.visible      { display: flex; }
-#ax-chat-close-btn:hover        { background: rgba(255,255,255,0.3); color: #fff; }
-#ax-chat-close-btn.sb-collapsed { left: calc(64px + 400px - 44px); }
+#ax-chat-close-btn.visible { display: flex; }
+#ax-chat-close-btn:hover   { background: rgba(0,0,0,0.7); }
 
 #ax-chat-overlay iframe {
   width: 100%;
@@ -53,17 +59,28 @@
   display: block;
 }
 
+@media (max-width: 480px) {
+  #ax-chat-overlay {
+    right: 12px;
+    bottom: 80px;
+    width: calc(100vw - 24px);
+    height: min(70vh, calc(100vh - 100px));
+    border-radius: 14px;
+  }
+  #ax-chat-close-btn {
+    right: 12px;
+    bottom: calc(80px + min(70vh, calc(100vh - 100px)) + 6px);
+  }
+}
+
 /* ══════════════════════════════════════════
    HIỆU ỨNG NÚT CHAT – VIETNAM AIRLINES STYLE
    ══════════════════════════════════════════ */
-
-/* Wrapper bọc ngoài nút để chứa các vòng sóng */
 #ax-chat-open-btn {
   position: relative;
   overflow: visible !important;
 }
 
-/* ── Vòng sóng ripple – đặt thẳng trên nút ── */
 #ax-chat-open-btn::before,
 #ax-chat-open-btn::after {
   content: '';
@@ -79,7 +96,6 @@
 #ax-chat-open-btn::before { animation-delay: 0s; }
 #ax-chat-open-btn::after  { animation-delay: 0.9s; }
 
-/* Vòng thứ 3 */
 .ax-chat-ring3 {
   position: absolute;
   inset: 0;
@@ -97,19 +113,16 @@
   100% { transform: scale(1.18); opacity: 0;    }
 }
 
-/* Glow nền nhấp nháy nhẹ */
 @keyframes ax-glow {
   0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.06); }
   50%       { box-shadow: 0 0 16px 5px rgba(255,255,255,0.12); }
 }
 
-/* Icon robot nhún nhẹ */
 @keyframes ax-bob {
   0%, 100% { transform: translateY(0);    }
   50%       { transform: translateY(-3px); }
 }
 
-/* Chữ shimmer như logo Vietnam Airlines */
 @keyframes ax-shimmer {
   0%   { background-position: -200% center; }
   100% { background-position:  200% center; }
@@ -140,7 +153,6 @@
   font-weight: 700 !important;
 }
 
-/* Khi hover – tắt shimmer, sáng solid */
 #ax-chat-open-btn:hover span {
   background: none !important;
   -webkit-text-fill-color: #ffffff !important;
@@ -148,7 +160,6 @@
   animation: none !important;
 }
 
-/* Dot gõ phím – hiện khi chat đang mở */
 #ax-chat-open-btn.is-open .sb-chat-avatar::after {
   content: '' !important;
   font-size: 0 !important;
@@ -178,11 +189,13 @@
 
 {{-- Nút X đặt NGOÀI div overlay để iframe không che --}}
 <div id="ax-chat-overlay">
-  <iframe
+ <iframe
     src="{{ route('chat.index') }}"
     title="AUTO X Chat"
     allowtransparency="true"
-  ></iframe>
+    allow="storage-access; fullscreen"
+    id="ax-chat-iframe"
+></iframe>
 </div>
 <button id="ax-chat-close-btn" title="Đóng chat">✕</button>
 

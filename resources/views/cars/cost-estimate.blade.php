@@ -92,6 +92,7 @@
 .dtt-form-panel {
   background: #fff;
   border-top: 3px solid var(--red);
+  border-radius: 14px;
   box-shadow: 0 4px 32px rgba(0,0,0,.10);
   padding: 40px;
 }
@@ -115,6 +116,7 @@
 .dtt-select {
   width: 100%; padding: 13px 16px;
   border: 1.5px solid #d0cec8; background: #f5f4f0;
+  border-radius: 10px;
   font-family: 'Barlow', sans-serif; font-size: 14px; color: #333;
   appearance: none; -webkit-appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
@@ -128,6 +130,7 @@
 .dtt-submit-btn {
   width: 100%; padding: 16px;
   background: var(--red); border: none; cursor: pointer;
+  border-radius: 10px;
   font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 700;
   letter-spacing: 4px; text-transform: uppercase; color: #fff;
   margin-top: 8px; transition: background .2s, transform .15s;
@@ -179,6 +182,7 @@
 
 .dtt-result-box {
   background: #fff; border-top: 3px solid var(--red);
+  border-radius: 14px;
   box-shadow: 0 4px 32px rgba(0,0,0,.10); padding: 36px 40px;
 }
 
@@ -278,26 +282,6 @@
   .dtt-region-row { grid-template-columns: 1fr; }
   .dtt-hero { padding: 40px 20px 36px; }
 }
-/* PANEL */
-.dtt-form-panel,
-.dtt-result-box {
-  border-radius: 14px;
-}
-
-/* SELECT */
-.dtt-select {
-  border-radius: 10px;
-}
-
-/* BUTTON */
-.dtt-submit-btn {
-  border-radius: 10px;
-}
-
-/* RESULT ROW */
-.dtt-row {
-  border-radius: 8px;
-}
 </style>
 @endpush
 
@@ -336,14 +320,16 @@
           @if(isset($car))
             @foreach($car->variants as $variant)
               <option value="{{ $variant->id }}"
-                      data-price="{{ $variant->price }}"
+                      data-price="{{ $variant->price_with_battery ?? $variant->price }}"
+                      data-price-no-battery="{{ $variant->price_without_battery ?? $variant->price }}"
                       {{ $loop->first ? 'selected' : '' }}>
                 {{ $car->name }} {{ $variant->name }}
               </option>
             @endforeach
             @if($car->variants->isEmpty())
               <option value="0"
-                      data-price="{{ $car->price_per_day ?? $car->price ?? 0 }}">
+                      data-price="{{ $car->price_with_battery ?? $car->price_per_day ?? $car->price ?? 0 }}"
+                      data-price-no-battery="{{ $car->price_without_battery ?? $car->price_per_day ?? $car->price ?? 0 }}">
                 {{ $car->name }}
               </option>
             @endif
@@ -352,18 +338,38 @@
             @foreach($cars as $c)
               @foreach($c->variants as $v)
                 <option value="{{ $v->id }}"
-                        data-price="{{ $v->price }}">
+                        data-price="{{ $v->price_with_battery ?? $v->price }}"
+                        data-price-no-battery="{{ $v->price_without_battery ?? $v->price }}">
                   {{ $c->name }} {{ $v->name }}
                 </option>
               @endforeach
               @if($c->variants->isEmpty())
                 <option value="car-{{ $c->id }}"
-                        data-price="{{ $c->price_per_day ?? $c->price ?? 0 }}">
+                        data-price="{{ $c->price_with_battery ?? $c->price_per_day ?? $c->price ?? 0 }}"
+                        data-price-no-battery="{{ $c->price_without_battery ?? $c->price_per_day ?? $c->price ?? 0 }}">
                   {{ $c->name }}
                 </option>
               @endif
             @endforeach
           @endif
+        </select>
+      </div>
+
+      {{-- Pin --}}
+      <div class="dtt-field">
+        <label class="dtt-label">Pin</label>
+        <select class="dtt-select" id="sel-pin">
+          <option value="included">Bao gồm Pin</option>
+          <option value="excluded">Không bao gồm Pin</option>
+        </select>
+      </div>
+
+      {{-- Phương thức thanh toán --}}
+      <div class="dtt-field">
+        <label class="dtt-label">Phương thức thanh toán</label>
+        <select class="dtt-select" id="sel-payment">
+          <option value="cash">Trả thẳng</option>
+          <option value="installment">Trả góp</option>
         </select>
       </div>
 
@@ -381,22 +387,22 @@
               <option value="hcm"     data-zone="1">TP. Hồ Chí Minh</option>
             </optgroup>
             <optgroup label="Khu vực II">
-              <option value="haiphong"    data-zone="2">Hải Phòng</option>
-              <option value="danang"      data-zone="2">Đà Nẵng</option>
-              <option value="cantho"      data-zone="2">Cần Thơ</option>
-              <option value="binhduong"   data-zone="2">Bình Dương</option>
-              <option value="dongnai"     data-zone="2">Đồng Nai</option>
+              <option value="haiphong"     data-zone="2">Hải Phòng</option>
+              <option value="danang"       data-zone="2">Đà Nẵng</option>
+              <option value="cantho"       data-zone="2">Cần Thơ</option>
+              <option value="binhduong"    data-zone="2">Bình Dương</option>
+              <option value="dongnai"      data-zone="2">Đồng Nai</option>
               <option value="bariavungtau" data-zone="2">Bà Rịa - Vũng Tàu</option>
-              <option value="bacninh"     data-zone="2">Bắc Ninh</option>
-              <option value="quangninh"   data-zone="2">Quảng Ninh</option>
-              <option value="hatinh"      data-zone="2">Hà Tĩnh</option>
-              <option value="nghean"      data-zone="2">Nghệ An</option>
-              <option value="thanhhoa"    data-zone="2">Thanh Hóa</option>
-              <option value="khanhhoa"    data-zone="2">Khánh Hòa</option>
-              <option value="binhthuan"   data-zone="2">Bình Thuận</option>
-              <option value="longaon"     data-zone="2">Long An</option>
-              <option value="tiengiang"   data-zone="2">Tiền Giang</option>
-              <option value="vinhlong"    data-zone="2">Vĩnh Long</option>
+              <option value="bacninh"      data-zone="2">Bắc Ninh</option>
+              <option value="quangninh"    data-zone="2">Quảng Ninh</option>
+              <option value="hatinh"       data-zone="2">Hà Tĩnh</option>
+              <option value="nghean"       data-zone="2">Nghệ An</option>
+              <option value="thanhhoa"     data-zone="2">Thanh Hóa</option>
+              <option value="khanhhoa"     data-zone="2">Khánh Hòa</option>
+              <option value="binhthuan"    data-zone="2">Bình Thuận</option>
+              <option value="longaon"      data-zone="2">Long An</option>
+              <option value="tiengiang"    data-zone="2">Tiền Giang</option>
+              <option value="vinhlong"     data-zone="2">Vĩnh Long</option>
             </optgroup>
             <optgroup label="Khu vực III">
               <option value="other" data-zone="3">Các tỉnh thành khác</option>
@@ -465,7 +471,7 @@
       {{-- Result box --}}
       <div class="dtt-result-box" id="result-box">
 
-        {{-- Empty state (mặc định) --}}
+        {{-- Empty state --}}
         <div id="result-empty" class="dtt-empty-state">
           <svg class="dtt-empty-icon" viewBox="0 0 64 64" fill="none" stroke="#333" stroke-width="1.5">
             <rect x="8" y="8" width="48" height="48" rx="4"/>
@@ -476,16 +482,16 @@
           <div class="dtt-empty-text">Chọn xe & khu vực<br>để xem dự toán</div>
         </div>
 
-        {{-- Result rows (ẩn khi chưa tính) --}}
+        {{-- Result rows --}}
         <div id="result-content" style="display:none;">
 
           <div class="dtt-row">
-            <div class="dtt-row-label">Giá xe (bao gồm VAT)</div>
+            <div class="dtt-row-label">Giá công bố (bao gồm VAT)</div>
             <div class="dtt-row-val" id="r-car-price">—</div>
           </div>
 
           <div class="dtt-row">
-            <div class="dtt-row-label">Lệ phí trước bạ</div>
+            <div class="dtt-row-label">Phí trước bạ</div>
             <div class="dtt-row-val" id="r-tb-total">—</div>
           </div>
           <div class="dtt-row sub">
@@ -498,16 +504,13 @@
           </div>
 
           <div class="dtt-row">
-            <div class="dtt-row-label">
-              Lệ phí đăng ký
-              <small>Biển số xe</small>
-            </div>
+            <div class="dtt-row-label">Phí đăng ký biển số</div>
             <div class="dtt-row-val" id="r-reg-fee">—</div>
           </div>
 
           <div class="dtt-row">
             <div class="dtt-row-label">
-              Phí sử dụng đường bộ
+              Phí bảo trì đường bộ
               <small>1 năm</small>
             </div>
             <div class="dtt-row-val" id="r-road-fee">—</div>
@@ -515,29 +518,34 @@
 
           <div class="dtt-row">
             <div class="dtt-row-label">
-              Bảo hiểm TNDS
+              Bảo hiểm trách nhiệm dân sự
               <small>1 năm (đã gồm 10% VAT)</small>
             </div>
             <div class="dtt-row-val" id="r-insurance">—</div>
           </div>
 
+          <div class="dtt-row">
+            <div class="dtt-row-label">
+              Phí đăng kiểm
+              <small>Lần đầu</small>
+            </div>
+            <div class="dtt-row-val" id="r-inspection">—</div>
+          </div>
+
           <div class="dtt-row total">
-            <div class="dtt-row-label">Tổng cộng (VNĐ)</div>
+            <div class="dtt-row-label">Chi phí lăn bánh dự kiến</div>
             <div class="dtt-row-val" id="r-total">
               <small>*Tạm tính</small>
             </div>
           </div>
 
           <div class="dtt-disclaimer">
-            Mức biểu phí trên đây là tạm tính và có thể thay đổi do sự thay đổi của thuế và các bên cung cấp dịch vụ khác. Mức bảo hiểm đã gồm 10% VAT.
+            Bảng tính trên chỉ mang tính chất tham khảo. Quý khách vui lòng liên hệ Showroom gần nhất để có báo giá chính xác nhất.
           </div>
 
           <div class="dtt-cta-row">
             @if(isset($car))
-             <a href="{{ route('services.booking', ['car_id' => $car->id]) }}"
-              class="dtt-cta-btn primary">
-                ĐẶT XE NGAY →
-            </a>
+              <a href="{{ route('services.booking', ['car_id' => $car->id]) }}" class="dtt-cta-btn primary">ĐẶT XE NGAY →</a>
               <a href="{{ route('cars.show', $car->id) }}" class="dtt-cta-btn secondary">XEM XE</a>
             @else
               <a href="{{ route('cars.index') }}" class="dtt-cta-btn primary">XEM TẤT CẢ XE →</a>
@@ -558,9 +566,10 @@
   'use strict';
 
   const FIXED = {
-    regFee    : 1_000_000,
-    roadFee   : 1_560_000,
-    insurance : 480_700,
+    regFee     : 1_000_000,
+    roadFee    : 1_560_000,
+    insurance  : 480_700,
+    inspection : 340_000,
   };
 
   const ZONE_RATE  = { '1': 0.10, '2': 0.10, '3': 0.08 };
@@ -569,7 +578,7 @@
   const fmt = n => new Intl.NumberFormat('vi-VN').format(Math.round(n));
   function el(id) { return document.getElementById(id); }
 
-  /* Chỉ fill khu vực, KHÔNG tính kết quả */
+  /* Tự động fill khu vực khi chọn tỉnh */
   window.onProvinceChange = function () {
     const prov = el('sel-province');
     const opt  = prov.options[prov.selectedIndex];
@@ -582,22 +591,27 @@
         }
       }
     }
-    // Không gọi recalculate() ở đây
   };
 
-  /* Chỉ chạy khi bấm nút */
+  /* Tính toán khi bấm nút */
   window.recalculate = function () {
     const carSel  = el('sel-car');
     const zoneSel = el('sel-zone');
+    const pinSel  = el('sel-pin');
 
-    if (!carSel || !zoneSel) return;
+    if (!carSel || !zoneSel || !pinSel) return;
 
-    const carOpt  = carSel.options[carSel.selectedIndex];
-    const zoneOpt = zoneSel.options[zoneSel.selectedIndex];
+    const carOpt      = carSel.options[carSel.selectedIndex];
+    const zoneOpt     = zoneSel.options[zoneSel.selectedIndex];
+    const withBattery = pinSel.value === 'included';
 
-    const carPrice = parseFloat(carOpt?.dataset?.price) || 0;
-    const zone     = zoneOpt?.value;
-    const rate     = ZONE_RATE[zone] || null;
+    // Lấy đúng giá theo lựa chọn pin
+    const carPrice = withBattery
+      ? parseFloat(carOpt?.dataset?.price) || 0
+      : parseFloat(carOpt?.dataset?.priceNoBattery) || 0;
+
+    const zone = zoneOpt?.value;
+    const rate = ZONE_RATE[zone] || null;
 
     if (!carPrice || !rate) {
       el('result-empty').style.display   = 'block';
@@ -606,7 +620,7 @@
     }
 
     const tbAmount = carPrice * rate;
-    const total    = carPrice + tbAmount + FIXED.regFee + FIXED.roadFee + FIXED.insurance;
+    const total    = carPrice + tbAmount + FIXED.regFee + FIXED.roadFee + FIXED.insurance + FIXED.inspection;
 
     el('result-empty').style.display   = 'none';
     el('result-content').style.display = 'block';
@@ -614,14 +628,15 @@
     el('result-content').classList.add('calculating');
     setTimeout(() => el('result-content').classList.remove('calculating'), 600);
 
-    el('r-car-price').textContent = fmt(carPrice);
-    el('r-tb-total').textContent  = fmt(tbAmount);
-    el('r-tb-rate').textContent   = ZONE_LABEL[zone];
-    el('r-tb-amount').textContent = fmt(tbAmount);
-    el('r-reg-fee').textContent   = fmt(FIXED.regFee);
-    el('r-road-fee').textContent  = fmt(FIXED.roadFee);
-    el('r-insurance').textContent = fmt(FIXED.insurance);
-    el('r-total').innerHTML       = fmt(total) + '<small>*Tạm tính</small>';
+    el('r-car-price').textContent  = fmt(carPrice);
+    el('r-tb-total').textContent   = fmt(tbAmount);
+    el('r-tb-rate').textContent    = ZONE_LABEL[zone];
+    el('r-tb-amount').textContent  = fmt(tbAmount);
+    el('r-reg-fee').textContent    = fmt(FIXED.regFee);
+    el('r-road-fee').textContent   = fmt(FIXED.roadFee);
+    el('r-insurance').textContent  = fmt(FIXED.insurance);
+    el('r-inspection').textContent = fmt(FIXED.inspection);
+    el('r-total').innerHTML        = fmt(total) + '<small>*Tạm tính</small>';
 
     const variantEl = el('result-car-variant');
     if (variantEl) variantEl.textContent = carOpt.text || '';

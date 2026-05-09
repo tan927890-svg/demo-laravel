@@ -88,13 +88,11 @@
     nav::-webkit-scrollbar { width: 4px; }
     nav::-webkit-scrollbar-thumb { background: var(--sb-border); border-radius: 4px; }
 
-    /* ─── NAV GROUP TĨNH (không collapsible) ──────── */
     .nav-group {
       font-size: 10px; color: var(--sb-text-3); letter-spacing: 1.4px;
       text-transform: uppercase; padding: 14px 10px 5px; font-weight: 700;
     }
 
-    /* ─── NAV GROUP COLLAPSIBLE ───────────────────── */
     .nav-group-btn {
       display: flex; align-items: center; justify-content: space-between;
       width: 100%; background: none; border: none; cursor: pointer;
@@ -113,7 +111,6 @@
     .nav-group-btn:hover .chev { color: rgba(240,239,235,0.8); }
     .nav-group-btn.open .chev { transform: rotate(180deg); color: rgba(240,239,235,0.7); }
 
-    /* Grid-based collapse — không cần JS height đo */
     .nav-group-content {
       display: grid;
       grid-template-rows: 1fr;
@@ -123,7 +120,6 @@
     .nav-group-content.closed { grid-template-rows: 0fr; }
     .nav-group-inner { min-height: 0; }
 
-    /* ─── NAV LINKS ───────────────────────────────── */
     .nav-link {
       display: flex; align-items: center; gap: 11px; padding: 10px 12px;
       border-radius: 10px; font-size: 14px; font-weight: 600;
@@ -185,7 +181,6 @@
     }
     .logout-btn:hover { background: var(--sb-hover); color: var(--sb-text); }
 
-    /* ─── SIDEBAR OVERLAY (mobile) ────────────────── */
     .sidebar-overlay {
       display: none;
       position: fixed; inset: 0; z-index: 19;
@@ -212,11 +207,12 @@
     .hamburger svg { width: 18px; height: 18px; color: var(--text-2); }
 
     .page-title {
-      position: absolute; left: 50%; transform: translateX(-50%);
+      flex: 1;
+      text-align: center;
       font-size: 20px; font-weight: 800; letter-spacing: -0.3px;
-      white-space: nowrap; pointer-events: none; color: var(--text);
+      white-space: nowrap; color: var(--text);
+      pointer-events: none;
     }
-    .topbar-spacer { flex: 1; }
 
     /* ─── NOTIFICATION BELL ───────────────────────── */
     .notif-wrap { position: relative; }
@@ -241,7 +237,6 @@
       border: 2px solid #fff; display: none;
     }
 
-    /* ─── NOTIFICATION DROPDOWN ───────────────────── */
     .notif-panel {
       display: none;
       position: absolute; top: calc(100% + 10px); right: 0;
@@ -397,18 +392,20 @@
     @keyframes fadeout { 0%{opacity:1} 80%{opacity:1} 100%{opacity:0} }
     .flash { animation: fadeout 4s forwards; }
 
-    /* ─── MOBILE RESPONSIVE ───────────────────────── */
+    /* ─── MOBILE ──────────────────────────────────── */
     @media (max-width: 768px) {
       .sidebar { transform: translateX(-100%); z-index: 30; }
       .sidebar.open { transform: translateX(0); }
       .sidebar-overlay.open { display: block; }
-      .main { margin-left: 0; }
+      .main { margin-left: 0 !important; }
+      .main.sb-collapsed { margin-left: 0 !important; }
       .hamburger { display: flex; }
-      .page-title { font-size: 17px; }
+      .page-title { font-size: 16px; }
       .content { padding: 8px 14px 24px; }
       .topbar { padding: 0 14px; }
       .notif-panel { width: calc(100vw - 28px); right: -10px; }
       .form-row { grid-template-columns: 1fr; }
+      .sb-admin-toggle { display: none !important; }
     }
   </style>
   <style>
@@ -416,7 +413,7 @@
     .sidebar {
       width: 240px;
       overflow: hidden;
-      transition: width .28s ease, transform .25s ease !important;
+      transition: width .28s ease, transform .25s ease;
     }
     .sidebar.collapsed { width: 64px !important; }
 
@@ -438,9 +435,6 @@
     .sidebar.collapsed .user-role,
     .sidebar.collapsed .logout-btn { display: none !important; }
 
-    /* Tăng độ sáng chevron khi open để dễ nhìn hơn */
-
-    /* Khi collapsed: mở hết các group để icon vẫn hiện */
     .sidebar.collapsed .nav-group-content { grid-template-rows: 1fr !important; }
 
     .sidebar.collapsed .logo img { height: 64px; object-fit: cover; }
@@ -479,7 +473,6 @@
 
   <nav>
 
-    {{-- ── TỔNG QUAN (chỉ admin/manager) ── --}}
     @if(Auth::user()->canManageStaff())
       <div class="nav-group">Tổng quan</div>
       <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
@@ -492,19 +485,17 @@
       </a>
     @endif
 
-    {{-- ── QUẢN LÝ (collapsible) ── --}}
     @php
       $quanlyActive = request()->routeIs('admin.cars*') || request()->routeIs('admin.featured-cars*')
         || request()->routeIs('admin.orders*') || request()->routeIs('admin.staff.orders*')
         || request()->routeIs('admin.staff.customers*') || request()->routeIs('admin.users*');
     @endphp
-    <button class="nav-group-btn {{ $quanlyActive ? 'open' : 'open' }}" id="btn-quanly" onclick="toggleGroup('quanly')" aria-expanded="true">
+    <button class="nav-group-btn open" id="btn-quanly" onclick="toggleGroup('quanly')" aria-expanded="true">
       <span>Quản lý</span>
       <svg class="chev" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
     </button>
     <div class="nav-group-content" id="grp-quanly">
       <div class="nav-group-inner">
-
         <a href="{{ route('admin.cars.index') }}" class="nav-link {{ request()->routeIs('admin.cars*') || request()->routeIs('admin.featured-cars*') ? 'active' : '' }}">
           <span class="icon-wrap icon-orange"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M5 17H3a2 2 0 01-2-2v-4l2.5-7h13L19 11v4a2 2 0 01-2 2h-2M5 17a2 2 0 104 0m6 0a2 2 0 104 0"/></svg></span>
           Quản lý xe
@@ -537,11 +528,9 @@
             Quản lý nhân viên
           </a>
         @endif
-
       </div>
     </div>
 
-    {{-- ── KPI (collapsible) ── --}}
     @php
       $kpiActive = request()->routeIs('admin.kpi*') || request()->routeIs('admin.attendance*') || request()->routeIs('admin.staff.attendance*');
     @endphp
@@ -551,7 +540,6 @@
     </button>
     <div class="nav-group-content" id="grp-kpi">
       <div class="nav-group-inner">
-
         @if(Auth::user()->canManageStaff())
           <a href="{{ route('admin.kpi.index') }}" class="nav-link {{ request()->routeIs('admin.kpi.index') || request()->routeIs('admin.kpi.show') ? 'active' : '' }}">
             <span class="icon-wrap icon-cyan"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
@@ -573,11 +561,39 @@
             Chấm công của tôi
           </a>
         @endif
-
       </div>
     </div>
 
-    {{-- ── TÀI CHÍNH (collapsible, chỉ admin/manager) ── --}}
+    {{-- ── TÍNH LƯƠNG — chỉ hiển thị cho Admin ── --}}
+    @if(Auth::user()->isAdmin())
+    <button class="nav-group-btn open" id="btn-luong" onclick="toggleGroup('luong')" aria-expanded="true">
+      <span>Tính lương</span>
+      <svg class="chev" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div class="nav-group-content" id="grp-luong">
+      <div class="nav-group-inner">
+        <a href="{{ route('admin.payroll.index') }}" class="nav-link {{ request()->routeIs('admin.payroll.index') || request()->routeIs('admin.payroll.show') || request()->routeIs('admin.payroll.calculate') ? 'active' : '' }}">
+          <span class="icon-wrap icon-green">
+            <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <line x1="12" y1="1" x2="12" y2="23"/>
+              <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
+            </svg>
+          </span>
+          Bảng lương
+        </a>
+        <a href="{{ route('admin.payroll.salary.index') }}" class="nav-link {{ request()->routeIs('admin.payroll.salary*') ? 'active' : '' }}">
+          <span class="icon-wrap icon-amber">
+            <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <rect x="2" y="3" width="20" height="14" rx="2"/>
+              <path d="M8 21h8M12 17v4"/>
+            </svg>
+          </span>
+          Quản lý lương cứng
+        </a>
+      </div>
+    </div>
+    @endif
+
     @if(Auth::user()->canManageStaff())
       <button class="nav-group-btn open" id="btn-taichi" onclick="toggleGroup('taichi')" aria-expanded="true">
         <span>Tài chính</span>
@@ -591,10 +607,7 @@
           </a>
         </div>
       </div>
-    @endif
 
-    {{-- ── HỆ THỐNG (collapsible, chỉ admin/manager) ── --}}
-    @if(Auth::user()->canManageStaff())
       <button class="nav-group-btn open" id="btn-hethong" onclick="toggleGroup('hethong')" aria-expanded="true">
         <span>Hệ thống</span>
         <svg class="chev" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
@@ -626,17 +639,17 @@
   </nav>
 
   <div class="sidebar-foot">
-   <a href="{{ route('admin.profile') }}" class="user-chip"
+    <a href="{{ route('admin.profile') }}" class="user-chip"
        style="text-decoration:none; transition: background .15s;"
        onmouseover="this.style.background='#252525'"
        onmouseout="this.style.background=''">
-     <div class="avatar" style="overflow:hidden; padding:0;">
-    @if(Auth::user()->avatar)
-        <img src="/images/{{ Auth::user()->avatar }}" style="width:100%;height:100%;object-fit:cover;">
-    @else
-        {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
-    @endif
-</div>
+      <div class="avatar" style="overflow:hidden; padding:0;">
+        @if(Auth::user()->avatar)
+          <img src="/images/{{ Auth::user()->avatar }}" style="width:100%;height:100%;object-fit:cover;">
+        @else
+          {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
+        @endif
+      </div>
       <div>
         <div class="user-name">{{ Auth::user()->name }}</div>
         <div class="user-role">
@@ -671,7 +684,6 @@
     </button>
 
     <div class="page-title">@yield('page-title', 'Admin')</div>
-    <div class="topbar-spacer"></div>
 
     {{-- 🔔 NOTIFICATION BELL --}}
     <div class="notif-wrap" style="margin-right:10px">
@@ -813,7 +825,6 @@ setInterval(async () => {
   } catch(e) {}
 }, 60000);
 
-// ── COLLAPSIBLE NAV GROUPS ──────────────────────────────
 function toggleGroup(id) {
   const btn = document.getElementById('btn-' + id);
   const grp = document.getElementById('grp-' + id);
@@ -822,19 +833,16 @@ function toggleGroup(id) {
   grp.classList.toggle('closed', isOpen);
   btn.classList.toggle('open', !isOpen);
   btn.setAttribute('aria-expanded', String(!isOpen));
-  // Lưu trạng thái
   try { localStorage.setItem('nav-grp-' + id, isOpen ? '0' : '1'); } catch(e) {}
 }
 
-// Khôi phục trạng thái đã lưu khi load trang
 document.addEventListener('DOMContentLoaded', function() {
-  ['quanly', 'kpi', 'taichi', 'hethong'].forEach(function(id) {
+  ['quanly', 'kpi', 'luong', 'taichi', 'hethong'].forEach(function(id) {
     const btn = document.getElementById('btn-' + id);
     const grp = document.getElementById('grp-' + id);
     if (!btn || !grp) return;
     try {
       const saved = localStorage.getItem('nav-grp-' + id);
-      // Mặc định open, chỉ đóng nếu user đã chủ động đóng
       if (saved === '0') {
         grp.classList.add('closed');
         btn.classList.remove('open');
@@ -853,7 +861,15 @@ document.addEventListener('DOMContentLoaded', function() {
   var btn      = document.getElementById('sb-admin-toggle');
   var collapsed = localStorage.getItem('admin-sb-collapsed') === '1';
 
+  function isMobile() { return window.innerWidth <= 768; }
+
   function apply() {
+    if (isMobile()) {
+      sidebar.classList.remove('collapsed');
+      main.classList.remove('sb-collapsed');
+      btn.classList.remove('collapsed');
+      return;
+    }
     if (collapsed) {
       sidebar.classList.add('collapsed');
       main.classList.add('sb-collapsed');
@@ -865,6 +881,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
   apply();
+
+  window.addEventListener('resize', apply);
 
   btn.addEventListener('click', function() {
     collapsed = !collapsed;

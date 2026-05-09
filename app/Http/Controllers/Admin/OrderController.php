@@ -36,7 +36,15 @@ class OrderController extends Controller
         $orders    = $query->paginate(20)->withQueryString();
         $staffList = User::where('role', 'staff')->get();
 
-        return view('admin.orders.index', compact('orders', 'staffList'));
+        // Đếm số đơn theo số điện thoại + tên để tránh nhầm người trùng SĐT
+        $allOrders = Order::selectRaw('customer_phone, customer_name, COUNT(*) as total')
+            ->groupBy('customer_phone', 'customer_name')
+            ->get()
+            ->mapWithKeys(fn($row) => [
+                $row->customer_phone . '|' . $row->customer_name => $row->total
+            ]);
+
+        return view('admin.orders.index', compact('orders', 'staffList', 'allOrders'));
     }
 
     /**
@@ -85,7 +93,6 @@ class OrderController extends Controller
             'note'                => $validated['note'] ?? null,
             'assigned_to'         => $validated['assigned_to'] ?? null,
             'status'              => 'pending',
-            // Manager tự tạo → coi như đã tư vấn luôn, Admin vẫn cần qua flow
             'consultation_status' => $user->isManager() ? 'da_tu_van' : 'chua_tu_van',
             'consulted_at'        => $user->isManager() ? now() : null,
         ]);
@@ -128,7 +135,7 @@ class OrderController extends Controller
     }
 
     /**
-     * Manager chốt đơn: nhập giá bán + % hoa hồng (old method – giữ lại cho tương thích route)
+     * Manager chốt đơn: nhập giá bán + % hoa hồng
      */
     public function closeOrder(Request $request, Order $order)
     {
@@ -205,10 +212,6 @@ class OrderController extends Controller
 
     /**
      * Chốt đơn nhanh: hoa hồng tự động 0.05% nếu < 10 tỷ, 0.1% nếu ≥ 10 tỷ
-     *
-     * Quyền:
-     *  - Admin  : chốt tất cả đơn đã ở trạng thái "đã tư vấn"
-     *  - Manager: chốt tất cả đơn của staff lẫn của mình (kể cả chưa tư vấn)
      */
     public function close(Request $request, Order $order): RedirectResponse
     {
@@ -217,12 +220,10 @@ class OrderController extends Controller
             abort(403);
         }
 
-        // Không cho chốt đơn đã chốt rồi
         if ($order->consultation_status === 'da_chot_don') {
             return back()->with('error', 'Đơn hàng này đã được chốt!');
         }
 
-        // Admin yêu cầu đơn phải "đã tư vấn"; Manager chốt thẳng được
         if ($user->isAdmin() && $order->consultation_status !== 'da_tu_van') {
             return back()->with('error', 'Chỉ có thể chốt đơn đã tư vấn!');
         }

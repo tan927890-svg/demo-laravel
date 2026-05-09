@@ -185,8 +185,19 @@
   /* ── BRANDS ── */
   .brands-section { background: var(--white); padding: 80px 0; }
   .brands-header { text-align: center; margin-bottom: 52px; }
-  .brands-grid   { display: grid; grid-template-columns: repeat(5,1fr); gap: 0.5px; background: var(--gray-2); }
-  .brands-grid-2 { display: grid; grid-template-columns: repeat(4,1fr); gap: 0.5px; background: var(--gray-2); margin-top: 1px; }
+
+  /* ── BRANDS GRID CŨ: ẩn đi, dùng brands-grid-single thay thế ── */
+  .brands-grid,
+  .brands-grid-2 { display: none !important; }
+
+  /* ── BRANDS GRID MỚI: 1 grid duy nhất, tự wrap ── */
+  .brands-grid-single {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* Desktop: 5 cột, 9 brand = hàng 1 có 5, hàng 2 có 4 */
+    gap: 0.5px;
+    background: var(--gray-2);
+  }
+
   .brand-card {
     background: var(--white); display: flex; flex-direction: column; align-items: center;
     justify-content: center; padding: 30px 16px; position: relative; overflow: hidden;
@@ -318,48 +329,33 @@
     .container { padding: 0 28px; }
     .section { padding: 56px 0; }
 
-    /* Hero */
     .hero { height: 400px; }
 
-    /* Who */
-    .who-grid {
-      grid-template-columns: 1fr;
-      gap: 48px;
-    }
+    .who-grid { grid-template-columns: 1fr; gap: 48px; }
     .who-badge { bottom: -14px; right: -8px; width: 88px; height: 88px; }
     .who-badge strong { font-size: 24px; }
 
-    /* Stats — 2×2 trên tablet */
-    .stats-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
     .stat-item:nth-child(2) { border-right: none; }
     .stat-item:nth-child(3) { border-right: 1px solid var(--gray-2); border-top: 1px solid var(--gray-2); }
     .stat-item:nth-child(4) { border-top: 1px solid var(--gray-2); border-right: none; }
     .stat-num { font-size: 44px; }
 
-    /* Values — 2×2 */
-    .values-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
+    .values-grid { grid-template-columns: repeat(2, 1fr); }
     .value-card:nth-child(2) { border-right: none; }
     .value-card:nth-child(3) { border-right: 1px solid var(--gray-2); }
     .value-card:nth-child(4) { border-right: none; }
 
-    /* Brands */
-    .brands-grid { grid-template-columns: repeat(3, 1fr); }
-    .brands-grid-2 { grid-template-columns: repeat(3, 1fr); }
+    /* Brands: 3 cột tablet */
+    .brands-grid-single { grid-template-columns: repeat(3, 1fr); }
 
-    /* Features img row */
     .features-img-row { grid-template-columns: 1fr 1fr; }
     .feat-img-card:last-child { display: none; }
 
-    /* Why layout */
     .why-layout { grid-template-columns: 1fr; gap: 36px; }
     .why-right { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     .why-highlight { grid-column: 1 / -1; }
 
-    /* CTA */
     .cta-inner { padding: 64px 0; }
   }
 
@@ -370,7 +366,6 @@
     .container { padding: 0 18px; }
     .section { padding: 48px 0; }
 
-    /* Hero */
     .hero { height: 360px; }
     .hero-eyebrow { font-size: 11px; letter-spacing: 3px; gap: 8px; }
     .hero-eyebrow::before, .hero-eyebrow::after { width: 18px; }
@@ -378,16 +373,11 @@
     .hero-sub { font-size: 12px; }
     .breadcrumb { font-size: 11px; padding: 6px 12px; bottom: 14px; }
 
-    /* Section labels & titles */
     .section-label { font-size: 11px; letter-spacing: 2px; }
     .section-label::before, .section-label::after { width: 22px; }
 
-    /* Who we are */
     .who-grid { gap: 36px; }
-    .who-badge {
-      bottom: -12px; right: -6px;
-      width: 78px; height: 78px;
-    }
+    .who-badge { bottom: -12px; right: -6px; width: 78px; height: 78px; }
     .who-badge strong { font-size: 20px; }
     .who-badge span { font-size: 8px; }
     .who-text p { font-size: 14px; }
@@ -396,10 +386,7 @@
     .btn-row { margin-top: 20px; }
     .divider-line { margin: 18px 0; }
 
-    /* Stats — 2×2 mobile */
-    .stats-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
     .stat-item { padding: 28px 12px; }
     .stat-item:nth-child(2) { border-right: none; }
     .stat-item:nth-child(3) { border-right: 1px solid var(--gray-2); border-top: 1px solid var(--gray-2); }
@@ -407,10 +394,7 @@
     .stat-num { font-size: 36px; }
     .stat-label { font-size: 12px; }
 
-    /* Values — 1 cột trên mobile nhỏ */
-    .values-grid {
-      grid-template-columns: 1fr 1fr;
-    }
+    .values-grid { grid-template-columns: 1fr 1fr; }
     .value-card { padding: 28px 18px; }
     .value-card:nth-child(odd) { border-right: 1px solid var(--gray-2); }
     .value-card:nth-child(even) { border-right: none; }
@@ -419,13 +403,8 @@
     .val-title { font-size: 14px; }
     .val-text { font-size: 13px; }
 
-    /* Brands — 3 cột mobile */
-    .brands-grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
-    .brands-grid-2 {
-      grid-template-columns: repeat(2, 1fr);
-    }
+    /* Brands: 2 cột mobile */
+    .brands-grid-single { grid-template-columns: repeat(2, 1fr); }
     .brands-section { padding: 52px 0; }
     .brand-card { padding: 22px 10px; }
     .brand-logo-wrap { width: 46px; height: 46px; margin-bottom: 8px; }
@@ -433,7 +412,6 @@
     .brand-type { font-size: 9px; }
     .trust-row { font-size: 12px; line-height: 1.9; margin-top: 28px; }
 
-    /* Why section */
     .why-section { padding: 48px 0; }
     .why-layout { grid-template-columns: 1fr; gap: 28px; }
     .features-img-row { grid-template-columns: 1fr; margin-bottom: 28px; }
@@ -452,11 +430,9 @@
     .checklist-item { font-size: 13px; gap: 10px; }
     .why-header { margin-bottom: 36px; }
 
-    /* Reviews */
     .reviews-strip { margin-top: 32px; padding: 14px 0; }
     .review-text { font-size: 12px; }
 
-    /* CTA */
     .cta-inner { padding: 52px 0; }
     .cta-section p { font-size: 14px; margin-bottom: 24px; padding: 0 8px; }
     .cta-section h2 { font-size: clamp(28px, 9vw, 48px) !important; padding: 0 8px; }
@@ -471,10 +447,9 @@
     .stat-num { font-size: 30px; }
     .values-grid { grid-template-columns: 1fr; }
     .value-card { border-right: none !important; }
-    .brands-grid { grid-template-columns: repeat(2, 1fr); }
-    /* Ẩn brand thứ 5 để tránh lẻ */
-    .brands-grid .brand-card:nth-child(5) { display: none; }
-    .brands-grid-2 { grid-template-columns: repeat(2, 1fr); }
+
+    /* Brands: vẫn 2 cột ở màn rất nhỏ */
+    .brands-grid-single { grid-template-columns: repeat(2, 1fr); }
   }
 </style>
 @endpush
@@ -585,73 +560,7 @@
       <p style="color:var(--gray-4);margin-top:14px;font-size:16px;max-width:480px;margin-left:auto;margin-right:auto;">Chúng tôi là đại lý chính hãng được ủy quyền bởi các thương hiệu ô tô danh tiếng nhất thế giới.</p>
     </div>
 
-    <div class="brands-grid" data-anim>
-      {{-- Ferrari --}}
-      <div class="brand-card">
-        <div class="brand-logo-wrap">
-          <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
-            <path d="M40 6 L66 14 L66 46 Q66 62 40 74 Q14 62 14 46 L14 14 Z" fill="#CC0000" stroke="#990000" stroke-width="1.5"/>
-            <path d="M14 52 Q14 62 40 74 Q66 62 66 52 Z" fill="#FDCC02"/>
-            <rect x="14" y="14" width="52" height="6" fill="#fff"/>
-            <rect x="14" y="14" width="17" height="6" fill="#009246"/>
-            <rect x="49" y="14" width="17" height="6" fill="#009246"/>
-            <path d="M36 22 Q34 18 37 16 Q40 14 42 17 L43 20 Q45 19 46 21 Q47 23 45 24 L44 28 Q45 30 44 33 L42 36 Q41 38 39 37 L38 33 Q36 32 35 30 L34 26 Q33 24 36 22Z" fill="#1a1a1a"/>
-            <line x1="38" y1="34" x2="36" y2="42" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"/>
-            <line x1="41" y1="35" x2="43" y2="43" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <div class="brand-name">Ferrari</div>
-        <div class="brand-type">Siêu xe Ý</div>
-      </div>
-
-      {{-- Lamborghini --}}
-      <div class="brand-card">
-        <div class="brand-logo-wrap">
-          <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
-            <path d="M40 6 L66 14 L66 50 Q66 64 40 74 Q14 64 14 50 L14 14 Z" fill="#D4A017" stroke="#A07800" stroke-width="1.5"/>
-            <path d="M40 12 L61 18 L61 48 Q61 60 40 69 Q19 60 19 48 L19 18 Z" fill="#1a1000"/>
-            <g fill="#D4A017">
-              <ellipse cx="40" cy="44" rx="13" ry="8"/>
-              <circle cx="30" cy="40" r="6"/>
-              <path d="M26 36 Q22 28 18 30 Q20 34 24 37Z"/>
-              <path d="M28 35 Q26 27 30 26 Q31 31 29 36Z"/>
-              <rect x="34" y="50" width="3" height="8" rx="1"/>
-              <rect x="39" y="51" width="3" height="7" rx="1"/>
-              <rect x="44" y="50" width="3" height="8" rx="1"/>
-              <rect x="49" y="49" width="3" height="9" rx="1"/>
-              <path d="M53 44 Q60 40 58 36" fill="none" stroke="#D4A017" stroke-width="2" stroke-linecap="round"/>
-            </g>
-          </svg>
-        </div>
-        <div class="brand-name">Lamborghini</div>
-        <div class="brand-type">Siêu xe Ý</div>
-      </div>
-
-      {{-- Porsche --}}
-      <div class="brand-card">
-        <div class="brand-logo-wrap">
-          <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="40" cy="40" r="34" fill="none" stroke="#8B0000" stroke-width="2"/>
-            <path d="M40 10 L62 16 L62 50 Q62 64 40 70 Q18 64 18 50 L18 16 Z" fill="#1a1a1a"/>
-            <path d="M40 10 L18 16 L18 50 Q18 64 40 70 Z" fill="#8B0000"/>
-            <clipPath id="leftHalf"><path d="M40 10 L18 16 L18 50 Q18 64 40 70 Z"/></clipPath>
-            <rect x="18" y="22" width="22" height="6" fill="#1a1a1a" clip-path="url(#leftHalf)"/>
-            <rect x="18" y="34" width="22" height="6" fill="#1a1a1a" clip-path="url(#leftHalf)"/>
-            <rect x="18" y="46" width="22" height="10" fill="#1a1a1a" clip-path="url(#leftHalf)"/>
-            <path d="M40 10 L62 16 L62 50 Q62 64 40 70 Z" fill="#FDCC02"/>
-            <g fill="#1a1a1a">
-              <line x1="51" y1="14" x2="51" y2="28" stroke="#1a1a1a" stroke-width="2.5"/>
-              <line x1="51" y1="18" x2="56" y2="14" stroke="#1a1a1a" stroke-width="2"/>
-              <line x1="51" y1="22" x2="57" y2="20" stroke="#1a1a1a" stroke-width="2"/>
-              <line x1="51" y1="18" x2="46" y2="14" stroke="#1a1a1a" stroke-width="2"/>
-              <line x1="51" y1="22" x2="46" y2="20" stroke="#1a1a1a" stroke-width="2"/>
-            </g>
-            <circle cx="40" cy="40" r="33" fill="none" stroke="#8B0000" stroke-width="1"/>
-          </svg>
-        </div>
-        <div class="brand-name">Porsche</div>
-        <div class="brand-type">Xe thể thao Đức</div>
-      </div>
+    <div class="brands-grid-single" data-anim>
 
       {{-- Mercedes-Benz --}}
       <div class="brand-card">
@@ -684,36 +593,6 @@
         <div class="brand-name">BMW</div>
         <div class="brand-type">Xe sang Đức</div>
       </div>
-    </div>
-
-    <div class="brands-grid-2" data-anim>
-      {{-- Audi --}}
-      <div class="brand-card">
-        <div class="brand-logo-wrap">
-          <svg viewBox="0 0 100 40" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="15" cy="20" r="13" fill="none" stroke="#1a1a1a" stroke-width="3.5"/>
-            <circle cx="38" cy="20" r="13" fill="none" stroke="#1a1a1a" stroke-width="3.5"/>
-            <circle cx="61" cy="20" r="13" fill="none" stroke="#1a1a1a" stroke-width="3.5"/>
-            <circle cx="84" cy="20" r="13" fill="none" stroke="#1a1a1a" stroke-width="3.5"/>
-          </svg>
-        </div>
-        <div class="brand-name">Audi</div>
-        <div class="brand-type">Xe sang Đức</div>
-      </div>
-
-      {{-- Bentley --}}
-      <div class="brand-card">
-        <div class="brand-logo-wrap">
-          <svg viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
-            <path d="M50 30 Q35 10 5 15 Q20 22 30 30 Q20 38 5 45 Q35 50 50 30Z" fill="#5C4A1E" stroke="#8B6914" stroke-width="1"/>
-            <path d="M50 30 Q65 10 95 15 Q80 22 70 30 Q80 38 95 45 Q65 50 50 30Z" fill="#5C4A1E" stroke="#8B6914" stroke-width="1"/>
-            <circle cx="50" cy="30" r="14" fill="#5C4A1E" stroke="#8B6914" stroke-width="1.5"/>
-            <text x="50" y="35" text-anchor="middle" font-size="18" fill="#D4AF37" font-family="Georgia, serif" font-weight="bold">B</text>
-          </svg>
-        </div>
-        <div class="brand-name">Bentley</div>
-        <div class="brand-type">Siêu sang Anh</div>
-      </div>
 
       {{-- Rolls-Royce --}}
       <div class="brand-card">
@@ -729,18 +608,37 @@
         <div class="brand-type">Siêu sang Anh</div>
       </div>
 
-      {{-- McLaren --}}
+      {{-- Audi --}}
       <div class="brand-card">
         <div class="brand-logo-wrap">
-          <svg viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
-            <path d="M10 42 Q30 8 50 10 Q70 8 90 42" fill="none" stroke="#FF6600" stroke-width="5" stroke-linecap="round"/>
-            <path d="M20 48 Q40 18 50 20 Q60 18 80 48" fill="none" stroke="#FF6600" stroke-width="4" stroke-linecap="round" opacity=".5"/>
-            <path d="M45 12 L50 5 L55 12 Z" fill="#FF6600"/>
+          <svg viewBox="0 0 100 40" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="15" cy="20" r="13" fill="none" stroke="#1a1a1a" stroke-width="3.5"/>
+            <circle cx="38" cy="20" r="13" fill="none" stroke="#1a1a1a" stroke-width="3.5"/>
+            <circle cx="61" cy="20" r="13" fill="none" stroke="#1a1a1a" stroke-width="3.5"/>
+            <circle cx="84" cy="20" r="13" fill="none" stroke="#1a1a1a" stroke-width="3.5"/>
           </svg>
         </div>
-        <div class="brand-name">McLaren</div>
-        <div class="brand-type">Siêu xe Anh</div>
+        <div class="brand-name">Audi</div>
+        <div class="brand-type">Xe sang Đức</div>
       </div>
+
+ {{-- VinFast --}}
+<div class="brand-card">
+  <div class="brand-logo-wrap" style="display:flex; align-items:center; justify-content:center;">
+    <svg viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg" style="width:180px; height:auto;">
+      <!-- Chữ V cách điệu -->
+      <polygon points="10,5 24,5 40,45 56,5 70,5 40,55" fill="#63666a"/>
+      <!-- Chữ INFAST -->
+      <text x="82" y="40" font-family="'Arial Black', Arial, sans-serif"
+            font-size="26" font-weight="900" letter-spacing="1.5" fill="#003DA5">INFAST</text>
+      <!-- Chữ V trong text (ghép với polygon) -->
+      <text x="82" y="40" font-family="'Arial Black', Arial, sans-serif"
+            font-size="26" font-weight="900" letter-spacing="1.5" fill="#939599">INFAST</text>
+    </svg>
+  </div>
+  <div class="brand-name">VinFast</div>
+  <div class="brand-type">Xe điện Việt Nam</div>
+</div>
     </div>
 
     <div class="trust-row" data-anim>

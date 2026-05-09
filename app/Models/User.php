@@ -53,4 +53,13 @@ class User extends Authenticatable
     {
         return $this->hasMany(\App\Models\UserLog::class)->latest();
     }
+    public function salaryHistories()
+{
+    return $this->hasMany(SalaryHistory::class)->orderByDesc('effective_year')->orderByDesc('effective_month');
+}
+
+public function payrolls()
+{
+    return $this->hasMany(Payroll::class);
+}
 }

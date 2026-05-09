@@ -24,6 +24,56 @@
   <span class="badge badge-gray" style="margin-left:auto">{{ ucfirst($user->role ?? 'staff') }}</span>
 </div>
 
+{{-- Form đặt KPI target --}}
+@if(auth()->user()->isManager() || auth()->user()->isAdmin())
+@php
+  $currentKpi = \App\Models\Kpi::where('user_id', $user->id)
+    ->where('month', now()->month)->where('year', now()->year)->first();
+@endphp
+<div class="card card-pad" style="margin-bottom:16px">
+  <div style="font-size:14px;font-weight:700;margin-bottom:14px">🎯 Đặt KPI tháng</div>
+  <form method="POST" action="{{ route('admin.kpi.setTarget', $user) }}" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+    @csrf
+    <div>
+      <label class="form-label">Tháng</label>
+      <select name="month" class="form-input">
+        @for($m = 1; $m <= 12; $m++)
+          <option value="{{ $m }}" @selected($m == now()->month)>Tháng {{ $m }}</option>
+        @endfor
+      </select>
+    </div>
+    <div>
+      <label class="form-label">Năm</label>
+      <select name="year" class="form-input">
+        @for($y = 2024; $y <= now()->year + 1; $y++)
+          <option value="{{ $y }}" @selected($y == now()->year)>{{ $y }}</option>
+        @endfor
+      </select>
+    </div>
+    <div>
+      <label class="form-label">Doanh thu mục tiêu (đ)</label>
+      <input type="number" name="target_revenue" class="form-input"
+             value="{{ $currentKpi?->target_revenue ?? '' }}"
+             placeholder="VD: 5000000000" min="1" style="width:200px" required>
+    </div>
+    <div>
+      <label class="form-label">Số đơn mục tiêu</label>
+      <input type="number" name="target_orders" class="form-input"
+             value="{{ $currentKpi?->target_orders ?? '' }}"
+             placeholder="VD: 3" min="0" style="width:100px">
+    </div>
+    <button class="btn btn-primary" type="submit">Lưu KPI</button>
+    @if($currentKpi)
+      <span style="font-size:12px;color:var(--text-3);align-self:center">
+        Hiện tại tháng {{ now()->month }}/{{ now()->year }}:
+        {{ number_format($currentKpi->target_revenue, 0, ',', '.') }}đ
+      </span>
+    @endif
+  </form>
+  @if(session('success'))<div class="alert alert-success flash" style="margin-top:10px">{{ session('success') }}</div>@endif
+</div>
+@endif
+
 {{-- Stat cards --}}
 <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
   <div class="stat-card">
@@ -48,7 +98,7 @@
   </div>
 </div>
 
-{{-- Biểu đồ — chỉ hiện khi có dữ liệu --}}
+{{-- Biểu đồ --}}
 @if($monthly->count())
 @php
   $revenueByMonth    = array_fill(1, 12, 0);
@@ -106,7 +156,7 @@ new Chart(document.getElementById('kpiChart').getContext('2d'), {
 </script>
 @endif
 
-{{-- Danh sách đơn hàng — chỉ hiện khi có đơn --}}
+{{-- Danh sách đơn hàng --}}
 @if($orders->count())
 <div class="card" style="margin-bottom:20px">
   <div style="padding:14px 18px;border-bottom:1px solid var(--border);font-weight:600;font-size:14px">
@@ -157,23 +207,29 @@ new Chart(document.getElementById('kpiChart').getContext('2d'), {
         <td style="text-align:right">
           <div style="display:flex;gap:6px;justify-content:flex-end;align-items:center;flex-wrap:wrap">
 
-            {{-- Chưa tư vấn: nút Đã tư vấn + Xóa --}}
             @if($order->consultation_status === 'chua_tu_van')
-              <form action="{{ route('admin.kpi.markConsulted', $order) }}" method="POST" style="display:inline">
+              {{-- hidden form tư vấn --}}
+              <form id="consulted-form-{{ $order->id }}" action="{{ route('admin.kpi.markConsulted', $order) }}" method="POST" style="display:none">
                 @csrf
-                <button type="submit" class="btn btn-sm"
-                  style="background:#dbeafe;color:#1e40af;border-color:#bfdbfe;font-size:12px"
-                  onclick="return confirm('Xác nhận đã tư vấn cho khách hàng này?')">
-                  💬 Đã tư vấn
-                </button>
               </form>
-              <form action="{{ route('admin.kpi.destroyOrder', [$user, $order]) }}" method="POST"
-                onsubmit="return confirm('Xóa đơn này?')" style="display:inline">
-                @csrf @method('DELETE')
-                <button type="submit" class="btn btn-sm btn-danger" style="font-size:12px">Xóa</button>
-              </form>
+              <button type="button"
+                class="btn btn-sm"
+                style="background:#dbeafe;color:#1e40af;border-color:#bfdbfe;font-size:12px"
+                onclick="openKpiConfirm('consulted-form-{{ $order->id }}', 'Xác nhận tư vấn', 'Xác nhận đã tư vấn xong khách <strong>{{ addslashes($order->customer_name) }}</strong>?', 'info')">
+                💬 Đã tư vấn
+              </button>
 
-            {{-- Đã tư vấn: nút Chốt đơn --}}
+              {{-- hidden form xóa --}}
+              <form id="delete-form-{{ $order->id }}" action="{{ route('admin.kpi.destroyOrder', [$user, $order]) }}" method="POST" style="display:none">
+                @csrf @method('DELETE')
+              </form>
+              <button type="button"
+                class="btn btn-sm btn-danger"
+                style="font-size:12px"
+                onclick="openKpiConfirm('delete-form-{{ $order->id }}', 'Xóa đơn hàng', 'Xóa đơn <strong>#{{ $order->id }}</strong> của <strong>{{ addslashes($order->customer_name) }}</strong>? Không thể hoàn tác!', 'danger')">
+                Xóa
+              </button>
+
             @elseif($order->consultation_status === 'da_tu_van')
               <button type="button" class="btn btn-sm"
                 style="background:#dcfce7;color:#166534;border-color:#bbf7d0;font-size:12px"
@@ -181,7 +237,6 @@ new Chart(document.getElementById('kpiChart').getContext('2d'), {
                 ✅ Chốt đơn
               </button>
 
-            {{-- Đã chốt --}}
             @else
               <span style="font-size:12px;color:var(--text-muted)">Hoàn tất</span>
             @endif
@@ -200,15 +255,13 @@ new Chart(document.getElementById('kpiChart').getContext('2d'), {
 
 {{-- ── Modal chốt đơn ── --}}
 <div id="close-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.45);backdrop-filter:blur(3px);align-items:center;justify-content:center">
-  <div style="background:#fff;border-radius:14px;padding:28px;width:400px;box-shadow:0 20px 60px rgba(0,0,0,.18);animation:modalIn .18s ease">
+  <div style="background:#fff;border-radius:14px;padding:28px;width:400px;max-width:calc(100vw - 32px);box-shadow:0 20px 60px rgba(0,0,0,.18);animation:modalIn .18s ease">
     <div style="font-size:22px;margin-bottom:8px">✅</div>
     <div style="font-weight:700;font-size:16px;margin-bottom:4px">Chốt đơn hàng</div>
     <div id="modal-car-name" style="font-size:13px;color:var(--text-3);margin-bottom:18px"></div>
-
     <form id="close-order-form" method="POST" action="">
       @csrf
       <div style="display:flex;flex-direction:column;gap:12px">
-
         <div>
           <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:5px">
             Giá bán cuối (đ) <span style="color:var(--danger)">*</span>
@@ -216,7 +269,6 @@ new Chart(document.getElementById('kpiChart').getContext('2d'), {
           <input type="number" name="sale_price" id="modal-sale-price" class="form-control"
             placeholder="5500000000" required oninput="calcModalCommission()">
         </div>
-
         <div style="padding:10px 12px;background:#f9fafb;border-radius:8px;font-size:13px">
           Hoa hồng dự tính:
           <strong id="modal-commission-val" style="color:var(--success)">—</strong>
@@ -225,18 +277,29 @@ new Chart(document.getElementById('kpiChart').getContext('2d'), {
             0.05% nếu &lt; 10 tỷ &nbsp;·&nbsp; 0.1% nếu ≥ 10 tỷ
           </div>
         </div>
-
         <div>
           <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:5px">Ghi chú</label>
           <textarea name="manager_note" class="form-control" rows="2" placeholder="Ghi chú thêm..."></textarea>
         </div>
-
         <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
           <button type="button" onclick="closeCloseModal()" class="btn">Hủy</button>
           <button type="submit" class="btn btn-primary">✅ Xác nhận chốt đơn</button>
         </div>
       </div>
     </form>
+  </div>
+</div>
+
+{{-- ── Modal xác nhận chung (thay confirm()) ── --}}
+<div id="kpi-confirm-modal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.45);backdrop-filter:blur(3px);align-items:center;justify-content:center;padding:16px">
+  <div style="background:#fff;border-radius:16px;padding:28px 28px 22px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.18);animation:modalIn .18s ease">
+    <div id="kpi-confirm-icon" style="width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-size:22px"></div>
+    <div id="kpi-confirm-title" style="font-size:16px;font-weight:700;color:#111827;margin-bottom:6px"></div>
+    <div id="kpi-confirm-message" style="font-size:13.5px;color:#6b7280;line-height:1.5;margin-bottom:22px"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button onclick="closeKpiConfirm()" style="padding:9px 18px;background:#f3f4f6;color:#374151;border:1px solid #e5e7eb;border-radius:8px;font-size:13.5px;font-weight:600;font-family:inherit;cursor:pointer">Hủy bỏ</button>
+      <button id="kpi-confirm-ok" style="padding:9px 18px;border:none;border-radius:8px;font-size:13.5px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit">Xác nhận</button>
+    </div>
   </div>
 </div>
 
@@ -248,6 +311,7 @@ new Chart(document.getElementById('kpiChart').getContext('2d'), {
 </style>
 
 <script>
+/* ── Chốt đơn modal ── */
 function openCloseModal(orderId, carName, defaultPrice) {
   document.getElementById('close-order-form').action =
     '{{ url("admin/kpi/orders") }}/' + orderId + '/close';
@@ -257,24 +321,56 @@ function openCloseModal(orderId, carName, defaultPrice) {
   document.getElementById('close-modal').style.display = 'flex';
   calcModalCommission();
 }
-
 function closeCloseModal() {
   document.getElementById('close-modal').style.display = 'none';
 }
-
 document.getElementById('close-modal').addEventListener('click', function(e) {
   if (e.target === this) closeCloseModal();
 });
-
 function calcModalCommission() {
   const price = parseFloat(document.getElementById('modal-sale-price').value) || 0;
-  const rate  = price >= 10000000000 ? 0.1 : 0.05;
+  const rate  = price >= 10000000000 ? 10 : 5;
   const comm  = Math.round(price * rate / 100);
   document.getElementById('modal-commission-val').textContent =
     price > 0 ? new Intl.NumberFormat('vi-VN').format(comm) + 'đ' : '—';
   document.getElementById('modal-commission-rate').textContent =
     price > 0 ? ' (' + rate + '%)' : '';
 }
+
+/* ── Confirm modal (thay confirm()) ── */
+const THEMES = {
+  info:    { bg:'#eff6ff', icon:'💬', btn:'#2563eb' },
+  danger:  { bg:'#fef2f2', icon:'🗑️',  btn:'#dc2626' },
+  success: { bg:'#f0fdf4', icon:'✅', btn:'#16a34a' },
+};
+let _kpiFormId = null;
+
+function openKpiConfirm(formId, title, message, type) {
+  _kpiFormId = formId;
+  const t = THEMES[type] || THEMES.info;
+  const icon = document.getElementById('kpi-confirm-icon');
+  icon.style.background = t.bg;
+  icon.textContent = t.icon;
+  document.getElementById('kpi-confirm-title').textContent = title;
+  document.getElementById('kpi-confirm-message').innerHTML = message;
+  document.getElementById('kpi-confirm-ok').style.background = t.btn;
+  document.getElementById('kpi-confirm-modal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+function closeKpiConfirm() {
+  document.getElementById('kpi-confirm-modal').style.display = 'none';
+  document.body.style.overflow = '';
+  _kpiFormId = null;
+}
+document.getElementById('kpi-confirm-ok').addEventListener('click', function() {
+  const id = _kpiFormId;
+  closeKpiConfirm();
+  if (id) { const f = document.getElementById(id); if (f) f.submit(); }
+});
+document.getElementById('kpi-confirm-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeKpiConfirm();
+});
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeKpiConfirm(); });
 </script>
 
 @endsection

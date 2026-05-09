@@ -38,4 +38,38 @@ class Attendance extends Model
         }
         return null;
     }
+
+    /** Giờ tăng ca trong ngày (chỉ tính từ giờ thứ 9 trở đi) */
+    public function getOvertimeHoursAttribute(): float
+    {
+        if (!$this->check_in_at || !$this->check_out_at) return 0;
+        $worked = $this->check_in_at->diffInMinutes($this->check_out_at) / 60;
+        return round(max(0, $worked - 8), 1);
+    }
+
+    /** Đếm số ngày làm đủ 8 tiếng trong tháng */
+    public static function countValidDays(int $userId, int $month, int $year): int
+    {
+        return self::where('user_id', $userId)
+            ->whereYear('work_date', $year)
+            ->whereMonth('work_date', $month)
+            ->whereNotNull('check_out_at')
+            ->get()
+            ->filter(fn($a) => $a->work_hours >= 8)
+            ->count();
+    }
+
+    /** Tổng giờ tăng ca trong tháng */
+    public static function countOvertimeHours(int $userId, int $month, int $year): float
+    {
+        return round(
+            self::where('user_id', $userId)
+                ->whereYear('work_date', $year)
+                ->whereMonth('work_date', $month)
+                ->whereNotNull('check_out_at')
+                ->get()
+                ->sum(fn($a) => $a->overtime_hours),
+            1
+        );
+    }
 }

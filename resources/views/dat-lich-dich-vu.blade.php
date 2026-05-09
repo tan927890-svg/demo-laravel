@@ -535,48 +535,43 @@
                 </div>
               </div>
               <div class="form-row">
-                <div class="form-group" style="margin-bottom:0">
-                  <label>Email <span class="req">*</span></label>
-                  <input type="email" name="email" placeholder="email@example.com" required>
-                </div>
-                <div class="form-group" style="margin-bottom:0">
-                  <label>Hãng xe</label>
-                  <select name="hang_xe">
-                    <option value="">-- Chọn hãng xe --</option>
-                    <option>Toyota</option><option>Honda</option><option>Ford</option>
-                    <option>Mazda</option><option>Hyundai</option><option>Kia</option>
-                    <option>Mercedes-Benz</option><option>BMW</option><option>Audi</option>
-                    <option>VinFast</option><option>Khác</option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group" style="margin-bottom:0">
-                  <label>Mẫu xe &amp; Năm sản xuất</label>
-                  <input type="text" name="mau_xe" placeholder="VD: Camry 2022">
-                </div>
-                <div class="form-group" style="margin-bottom:0">
-                  <label>Biển số xe</label>
-                  <input type="text" name="bien_so" placeholder="VD: 51A-123.45">
-                </div>
-              </div>
+  <div class="form-group" style="margin-bottom:0">
+    <label>Email <span class="req">*</span></label>
+    <input type="email" name="email" placeholder="email@example.com" required>
+  </div>
+  <div class="form-group" style="margin-bottom:0">
+    <label>Hãng xe</label>
+    <select name="hang_xe" id="selectHangXe" onchange="loadDongXe()">
+      <option value="">-- Chọn hãng xe --</option>
+      <option value="mercedes">Mercedes-Benz</option>
+      <option value="vinfast">VinFast</option>
+    </select>
+  </div>
+</div>
+<div class="form-row">
+  <div class="form-group" style="margin-bottom:0">
+    <label>Dòng xe</label>
+    <select name="mau_xe" id="selectDongXe">
+      <option value="">-- Chọn hãng trước --</option>
+    </select>
+  </div>
+</div>
 
-              <hr class="form-step-divider">
+<hr class="form-step-divider">
 
-              {{-- BƯỚC 3: NGÀY GIỜ --}}
-              <div class="form-block-title"><span class="step-badge">3</span> Chọn ngày &amp; giờ</div>
+{{-- BƯỚC 3: NGÀY GIỜ --}}
+<div class="form-block-title"><span class="step-badge">3</span> Chọn ngày &amp; giờ</div>
 
-              <div class="form-row">
-                <div class="form-group" style="margin-bottom:0">
-                  <label>Ngày đặt lịch <span class="req">*</span></label>
-                  <input type="date" id="booking-date" name="ngay" required>
-                </div>
-                <div class="form-group" style="margin-bottom:0">
-                  <label>Số km hiện tại</label>
-                  <input type="text" name="so_km" placeholder="VD: 45,000 km">
-                </div>
-              </div>
-
+<div class="form-row">
+  <div class="form-group" style="margin-bottom:0">
+    <label>Ngày đặt lịch <span class="req">*</span></label>
+    <input type="date" id="booking-date" name="ngay" required>
+  </div>
+  <div class="form-group" style="margin-bottom:0">
+    <label>Số km hiện tại</label>
+    <input type="text" name="so_km" placeholder="VD: 45,000 km">
+  </div>
+</div>
               <div class="form-group" style="margin-top:4px">
                 <label>Khung giờ ưu tiên <span class="req">*</span></label>
                 <div class="time-slots-grid">
@@ -849,10 +844,9 @@ function handleSubmit() {
   const ngay  = document.querySelector('[name="ngay"]').value.trim();
 
   let hasError = false;
-
   function flag(name, msg) { showError(name, msg); hasError = true; }
 
-  if (!ten)   flag('ho_ten', 'Vui lòng nhập họ và tên');
+  if (!ten) flag('ho_ten', 'Vui lòng nhập họ và tên');
   if (!tel) {
     flag('dien_thoai', 'Vui lòng nhập số điện thoại');
   } else if (!/^[0-9]{10}$/.test(tel.replace(/\s/g, ''))) {
@@ -863,11 +857,10 @@ function handleSubmit() {
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     flag('email', 'Email không hợp lệ');
   }
-  if (!ngay)  flag('ngay', 'Vui lòng chọn ngày đặt lịch');
+  if (!ngay) flag('ngay', 'Vui lòng chọn ngày đặt lịch');
 
   if (hasError) return false;
 
-  /* show loading state */
   const btn = document.getElementById('btnSubmit');
   btn.classList.add('loading');
   btn.disabled = true;
@@ -886,12 +879,11 @@ function submitBooking(btn) {
     ngay:       document.querySelector('[name="ngay"]').value,
     dich_vu:    document.getElementById('hiddenDichVu').value,
     chu_de:     document.getElementById('hiddenChuDe').value,
-    hang_xe:    document.querySelector('[name="hang_xe"]').value,
-    mau_xe:     document.querySelector('[name="mau_xe"]').value,
-    bien_so:    document.querySelector('[name="bien_so"]').value,
-    so_km:      document.querySelector('[name="so_km"]').value,
+    hang_xe:    document.querySelector('[name="hang_xe"]')?.value ?? '',
+    mau_xe:     document.querySelector('[name="mau_xe"]')?.value ?? '',
+    so_km:      document.querySelector('[name="so_km"]')?.value ?? '',
     gio:        document.querySelector('.time-slot.active')?.textContent ?? '',
-    ghi_chu:    document.querySelector('[name="ghi_chu"]').value,
+    ghi_chu:    document.querySelector('[name="ghi_chu"]')?.value ?? '',
   };
 
   fetch('{{ route("booking.store") }}', {
@@ -908,7 +900,6 @@ function submitBooking(btn) {
       s.style.display = 'block';
       s.scrollIntoView({ behavior: 'smooth', block: 'center' });
     } else {
-      /* reset button on failure */
       btn.classList.remove('loading');
       btn.disabled = false;
       alert('Có lỗi xảy ra, vui lòng thử lại!');
@@ -918,6 +909,48 @@ function submitBooking(btn) {
     btn.classList.remove('loading');
     btn.disabled = false;
     alert('Có lỗi xảy ra, vui lòng thử lại!');
+  });
+}
+
+/* ── Dependent dropdown ── */
+const DONG_XE = {
+  mercedes: [
+    'Mercedes-AMG GLE',
+    'Mercedes-Benz E-Class',
+    'Mercedes-Benz EQS',
+    'Mercedes-Benz G-Class',
+    'Mercedes-Benz GLE',
+    'Mercedes-Benz GLS',
+    'Mercedes-Benz S-Class',
+    'Mercedes-Benz SL-Class',
+    'Mercedes-Maybach GLS',
+    'Mercedes-Maybach S-Class',
+  ],
+  vinfast: [
+    'VinFast VF 3',
+    'VinFast VF 5',
+    'VinFast VF 6',
+    'VinFast VF 7',
+    'VinFast VF 8',
+    'VinFast VF 9',
+  ],
+};
+
+function loadDongXe() {
+  const hang   = document.getElementById('selectHangXe').value;
+  const select = document.getElementById('selectDongXe');
+
+  if (!hang || !DONG_XE[hang]) {
+    select.innerHTML = '<option value="">-- Chọn hãng trước --</option>';
+    return;
+  }
+
+  select.innerHTML = '<option value="">-- Chọn dòng xe --</option>';
+  DONG_XE[hang].forEach(xe => {
+    const opt = document.createElement('option');
+    opt.value = xe;
+    opt.textContent = xe;
+    select.appendChild(opt);
   });
 }
 
