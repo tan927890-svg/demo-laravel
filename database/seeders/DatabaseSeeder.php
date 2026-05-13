@@ -25,7 +25,7 @@ class DatabaseSeeder extends Seeder
     {
         User::create([
             'name'     => 'Admin',
-            'email'    => 'admin@autoviet.vn',
+            'email'    => 'Admin',
             'password' => Hash::make('password'),
             'is_admin' => true,
             'role'     => 'admin',
@@ -39,9 +39,9 @@ class DatabaseSeeder extends Seeder
         ]);
 
         User::create([
-            'name'     => 'Trần Nhân Viên',
-            'email'    => 'staff@autoviet.vn',
-            'password' => Hash::make('password'),
+            'name'     => 'staff',
+            'email'    => 'staff',
+            'password' => Hash::make('123456789azaz'),
             'role'     => 'staff',
         ]);
     }

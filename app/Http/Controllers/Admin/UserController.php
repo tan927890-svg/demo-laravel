@@ -134,7 +134,7 @@ class UserController extends Controller
                 'user_id'   => $user->id,
                 'causer_id' => Auth::id(),
                 'action'    => 'updated',
-                'changes'   => $changes,
+                'changes'   => json_encode($changes), // ← đã sửa
             ]);
         }
 

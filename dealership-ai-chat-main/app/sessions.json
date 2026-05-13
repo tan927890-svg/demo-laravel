@@ -361,5 +361,18 @@
       }
     ],
     "last_interaction": "2026-05-09T20:00:34.886362"
+  },
+  "iFa57wAkBqiApz6TNasKGKISZWyZyfWsKgu72HTI": {
+    "messages": [
+      {
+        "role": "user",
+        "content": "Bảng giá"
+      },
+      {
+        "role": "assistant",
+        "content": "Dưới đây là bảng giá của các mẫu xe ô tô hiện có tại AutoViet:\n- Mercedes-AMG GLE: 5 tỷ 500 triệu - 8 tỷ 900 triệu\n- Mercedes-Benz E-Class: 3 tỷ 250 triệu - 4 tỷ 550 triệu\n- Mercedes-Benz EQS: 7 tỷ 800 triệu - 14 tỷ 200 triệu\n- Mercedes-Benz G-Class: 11 tỷ 500 triệu - 19 tỷ 500 triệu\n- Mercedes-Benz GLE: 4 tỷ 750 triệu - 7 tỷ 800 triệu\n- Mercedes-Benz GLS: 6 tỷ 350 triệu - 12 tỷ 500 triệu\n- Mercedes-Benz S-Class: 8 tỷ 500 triệu - 18 tỷ\n- Mercedes-Benz SL-Class: 7 tỷ 200 triệu - 12 tỷ 800 triệu\n- Mercedes-Maybach GLS: 18 tỷ 900 triệu - 21 tỷ\n- Mercedes-Maybach S-Class: 22 tỷ 500 triệu - 45 tỷ\n- VinFast VF 3: 235 triệu - 265 triệu\n- VinFast VF 5: 458 triệu - 488 triệu\n- VinFast VF 6: 675 triệu - 720 triệu\n- VinFast VF 7: 850 triệu - 950 triệu\n- VinFast VF 8: 1 tỷ 90 triệu - 1 tỷ 190 triệu\n- VinFast VF 9: 1 tỷ 690 triệu - 1 tỷ 890 triệu"
+      }
+    ],
+    "last_interaction": "2026-05-12T15:50:26.916421"
   }
 }
