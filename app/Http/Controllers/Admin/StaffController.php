@@ -6,9 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\User;
 use App\Models\Contact;
+use App\Models\Deposit;
 use App\Models\Attendance;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
+use App\Mail\InvoiceMail;
+use Illuminate\Support\Facades\Mail;
 
 class StaffController extends Controller
 {
@@ -73,6 +77,158 @@ class StaffController extends Controller
             ]);
 
         return view('admin.staff.customers', compact('orders', 'staffList', 'allOrders'));
+    }
+
+    public function depositsShow(Deposit $deposit)
+    {
+        $user = Auth::user();
+
+        if ($user->isStaff() && $deposit->assigned_to !== $user->id) {
+            abort(403, 'Bạn không có quyền xem đặt cọc này.');
+        }
+
+        $deposit->load(['car.brand', 'car.colors', 'car.galleries', 'color', 'assignedTo', 'finalizedBy']);
+
+        $carPrice        = $deposit->car?->price_per_day ?? $deposit->car?->sale_price ?? 0;
+        $remainingAmount = max(0, $carPrice - $deposit->deposit_amount);
+
+        $bank = config('services.payment');
+
+        $transferContent = 'TTTX ' . $deposit->transaction_code . ' ' . preg_replace('/\s+/', '', $deposit->customer_name);
+
+        $vietQrUrl = '';
+        if ($bank['bank_id'] && $bank['bank_account'] && $remainingAmount > 0) {
+            $vietQrUrl = sprintf(
+                'https://img.vietqr.io/image/%s-%s-compact2.png?amount=%s&addInfo=%s&accountName=%s',
+                $bank['bank_id'],
+                $bank['bank_account'],
+                (int) $remainingAmount,
+                urlencode($transferContent),
+                urlencode($bank['bank_owner'])
+            );
+        }
+
+        return view('admin.staff.deposits.show', compact(
+            'deposit', 'carPrice', 'remainingAmount',
+            'bank', 'transferContent', 'vietQrUrl'
+        ));
+    }
+
+    public function depositsFinalize(Request $request, Deposit $deposit)
+    {
+        $user = Auth::user();
+
+        if ($user->isStaff() && $deposit->assigned_to !== $user->id) {
+            abort(403);
+        }
+
+        if ($deposit->status === 'completed') {
+            return back()->with('error', 'Đặt cọc này đã được hoàn tất rồi.');
+        }
+
+        $request->validate([
+            'final_payment_method' => 'required|in:bank_transfer,cash,momo,vnpay',
+            'final_payment_note'   => 'nullable|string|max:500',
+        ]);
+
+        $carPrice        = $deposit->car?->price_per_day ?? $deposit->car?->sale_price ?? 0;
+        $remainingAmount = max(0, $carPrice - $deposit->deposit_amount);
+
+        $deposit->update([
+            'status'               => 'completed',
+            'final_amount'         => $remainingAmount,
+            'final_payment_method' => $request->final_payment_method,
+            'final_payment_note'   => $request->final_payment_note,
+            'final_paid_at'        => now(),
+            'finalized_by'         => $user->id,
+        ]);
+
+        // ── Load relationships cho PDF & email ──
+        $deposit->load(['car.brand', 'color', 'assignedTo']);
+
+        // ── Chuẩn bị chữ ký base64 ──
+        $signatureSrc  = null;
+        $signaturePath = public_path('images/signatures/accountant_signature.png');
+        if (file_exists($signaturePath)) {
+            $mime         = mime_content_type($signaturePath);
+            $signatureSrc = 'data:' . $mime . ';base64,' . base64_encode(file_get_contents($signaturePath));
+        }
+
+        // ── Generate PDF ──
+        $pdf        = Pdf::loadView('pdf.invoice-pdf', compact('deposit', 'signatureSrc'))
+                         ->setPaper('a4', 'portrait');
+        $pdfContent = $pdf->output();
+
+        // ── Gửi email kèm PDF ──
+        if ($deposit->customer_email) {
+            try {
+                Mail::to($deposit->customer_email)
+                    ->send(new InvoiceMail($deposit, $pdfContent));
+            } catch (\Exception $e) {
+                \Log::error('Invoice email failed [' . $deposit->transaction_code . ']: ' . $e->getMessage());
+            }
+        }
+
+        return redirect()
+            ->route('admin.staff.deposits.show', $deposit)
+            ->with('success', '🎉 Xác nhận hoàn tất! Hóa đơn PDF đã được gửi qua email cho khách.');
+    }
+
+    // ── Download PDF hóa đơn thủ công ──
+    public function depositsInvoice(Deposit $deposit)
+    {
+        $user = Auth::user();
+
+        if ($user->isStaff() && $deposit->assigned_to !== $user->id) {
+            abort(403);
+        }
+
+        $deposit->load(['car.brand', 'color', 'assignedTo']);
+
+        $signatureSrc  = null;
+        $signaturePath = public_path('images/signatures/accountant_signature.png');
+        if (file_exists($signaturePath)) {
+            $mime         = mime_content_type($signaturePath);
+            $signatureSrc = 'data:' . $mime . ';base64,' . base64_encode(file_get_contents($signaturePath));
+        }
+
+        $pdf = Pdf::loadView('pdf.invoice-pdf', compact('deposit', 'signatureSrc'))
+                  ->setPaper('a4', 'portrait');
+
+        return $pdf->download('HoaDon_' . $deposit->transaction_code . '.pdf');
+    }
+
+    public function depositsIndex(Request $request)
+    {
+        $user  = Auth::user();
+        $query = Deposit::with(['car', 'color'])
+            ->where('assigned_to', $user->id)
+            ->latest();
+
+        if ($request->filled('dep_status')) {
+            $query->where('status', $request->dep_status);
+        }
+
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $query->where(function ($q) use ($s) {
+                $q->where('customer_name',     'like', "%{$s}%")
+                  ->orWhere('customer_phone',  'like', "%{$s}%")
+                  ->orWhere('transaction_code','like', "%{$s}%");
+            });
+        }
+
+        $deposits = $query->paginate(15)->withQueryString();
+
+        $stats = [
+            'total'     => Deposit::where('assigned_to', $user->id)->count(),
+            'pending'   => Deposit::where('assigned_to', $user->id)->where('status', 'pending')->count(),
+            'confirmed' => Deposit::where('assigned_to', $user->id)->where('status', 'confirmed')->count(),
+            'completed' => Deposit::where('assigned_to', $user->id)->where('status', 'completed')->count(),
+            'cancelled' => Deposit::where('assigned_to', $user->id)->where('status', 'cancelled')->count(),
+        ];
+
+        return view('admin.staff.deposits.index', compact('deposits', 'stats'));
     }
 
     public function ordersIndex(Request $request)

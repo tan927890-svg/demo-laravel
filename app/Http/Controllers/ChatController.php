@@ -11,13 +11,15 @@ class ChatController extends Controller
 {
     /**
      * URL của Python chatbot service.
-     * Đặt trong .env: CHATBOT_API_URL=http://localhost:8000
+     * Đặt trong .env: CHATBOT_API_URL=http://127.0.0.1:8000
      */
     private string $apiUrl;
 
     public function __construct()
     {
-        $this->apiUrl = rtrim(env('CHATBOT_API_URL', 'http://localhost:8000'), '/');
+        // ✅ FIX 1: ép dùng 127.0.0.1 thay vì localhost để tránh lỗi IPv6 trên Windows
+        $url = rtrim(env('CHATBOT_API_URL', 'http://127.0.0.1:8000'), '/');
+        $this->apiUrl = str_replace('http://localhost', 'http://127.0.0.1', $url);
     }
 
     // ── Keywords kích hoạt tìm video ──────────────────────────────────────
@@ -84,7 +86,6 @@ class ChatController extends Controller
         $videos  = $result['videos'];
         $all     = $result['all'];
 
-        // Không khớp xe → hỏi lại, lưu session chờ khách gõ tên xe
         if (!$matched) {
             $carNames = $all
                 ->map(fn($v) => $v->car?->name)
@@ -98,7 +99,6 @@ class ChatController extends Controller
             ]);
         }
 
-        // Tìm thấy → chỉ trả video đúng xe, xóa session
         Session::forget('awaiting_video_car');
 
         $lines = $videos->map(function ($v) {
@@ -111,7 +111,6 @@ class ChatController extends Controller
             ? "Đây là video chính thức của dòng xe bạn quan tâm 🎬"
             : "Đây là các video chính thức phù hợp với yêu cầu của bạn 🎬";
 
-        // Gợi ý xe khác còn lại
         $matchedCarIds = $videos->pluck('car_id')->filter()->unique();
         $otherCarNames = $all
             ->filter(fn($v) => !$matchedCarIds->contains($v->car_id))
@@ -218,8 +217,11 @@ class ChatController extends Controller
      */
     public function send(Request $request)
     {
-        $message   = trim($request->input('message', ''));
-        $sessionId = $request->session()->getId();
+        $message = trim($request->input('message', ''));
+
+        // ✅ FIX 2: ưu tiên session_id từ frontend (browser tab),
+        //           fallback về Laravel session nếu không có
+        $sessionId = $request->input('session_id') ?: $request->session()->getId();
 
         if (!$message) {
             return response()->json([
@@ -228,7 +230,7 @@ class ChatController extends Controller
             ]);
         }
 
-        // ① Đang chờ khách gõ tên xe để xem video (context từ lượt trước)
+        // ① Đang chờ khách gõ tên xe để xem video
         if (Session::get('awaiting_video_car', false)) {
             return $this->handleVideoResponse($message);
         }
@@ -238,7 +240,7 @@ class ChatController extends Controller
             return $this->handleVideoResponse($message);
         }
 
-        // ③ Khách muốn đặt lịch → trả form (không cần gọi AI)
+        // ③ Khách muốn đặt lịch → trả form
         if ($this->isBookingRequest($message)) {
             return response()->json([
                 'status'   => 'success',
@@ -256,9 +258,9 @@ class ChatController extends Controller
      */
     public function sendImage(Request $request)
     {
-        $sessionId = $request->session()->getId();
+        // ✅ FIX 2 (áp dụng cả sendImage)
+        $sessionId = $request->input('session_id') ?: $request->session()->getId();
 
-        // Nhận file upload hoặc base64 trực tiếp
         if ($request->hasFile('image')) {
             $file      = $request->file('image');
             $imageB64  = base64_encode(file_get_contents($file->getRealPath()));
@@ -281,7 +283,8 @@ class ChatController extends Controller
      */
     public function clearSession(Request $request)
     {
-        $sessionId = $request->session()->getId();
+        // ✅ FIX 2 (áp dụng cả clearSession)
+        $sessionId = $request->input('session_id') ?: $request->session()->getId();
         Session::forget('awaiting_video_car');
 
         Http::timeout(5)->post("{$this->apiUrl}/chat/clear", [

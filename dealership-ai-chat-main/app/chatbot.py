@@ -1,5 +1,5 @@
 """
-chatbot.py — AutoViet Showroom AI Chatbot
+chatbot.py — Auto X Showroom AI Chatbot
 ──────────────────────────────────────────
 Provider: Groq (primary) → Gemini (fallback)
   - Primary      : llama-3.3-70b-versatile  (tool calling, chat)
@@ -9,6 +9,7 @@ Provider: Groq (primary) → Gemini (fallback)
 """
 
 import os
+import re
 import json
 import logging
 from typing import Dict, List, Optional, Tuple
@@ -81,7 +82,7 @@ GROQ_TOOLS = [
         "function": {
             "name": "list_cars",
             "description": (
-                "Lấy danh sách TẤT CẢ xe trong kho AutoViet. "
+                "Lấy danh sách TẤT CẢ xe trong kho Auto X. "
                 "Gọi khi: hỏi danh sách xe, có xe gì, xe nào đang bán, "
                 "xe rẻ/đắt nhất, bảng giá tổng quát."
             ),
@@ -150,7 +151,7 @@ GEMINI_TOOLS = [
             types.FunctionDeclaration(
                 name="list_cars",
                 description=(
-                    "Lấy danh sách TẤT CẢ xe trong kho AutoViet. "
+                    "Lấy danh sách TẤT CẢ xe trong kho Auto X. "
                     "Gọi khi: hỏi danh sách xe, có xe gì, xe nào đang bán, "
                     "xe rẻ/đắt nhất, bảng giá tổng quát."
                 ),
@@ -212,6 +213,18 @@ GEMINI_SAFETY = [
 ]
 
 
+# ─── JSON Decimal encoder ────────────────────────────────────────────────────
+import decimal
+
+class _DecimalEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, decimal.Decimal):
+            return int(obj)
+        return super().default(obj)
+
+def _json_dumps(obj) -> str:
+    return json.dumps(obj, ensure_ascii=False, cls=_DecimalEncoder)
+
 # ─── DB helpers ───────────────────────────────────────────────────────────────
 def _normalize(text: str) -> str:
     return " ".join(text.lower().split())
@@ -222,9 +235,19 @@ def _match_car(db: Session, query: str) -> Optional[Car]:
     if not cars:
         return None
     q = _normalize(query)
+
+    # 1. Khớp chính xác tên
     for car in cars:
         if _normalize(car.name) == q:
             return car
+
+    # 2. Khớp theo model (vd: "gle" → model="GLE" → "Mercedes-Benz GLE")
+    for car in cars:
+        model = _normalize(getattr(car, "model", "") or "")
+        if model and (model == q or model in q or q in model):
+            return car
+
+    # 3. Khớp substring tên
     candidates = []
     for car in cars:
         name_lower = _normalize(car.name)
@@ -233,13 +256,17 @@ def _match_car(db: Session, query: str) -> Optional[Car]:
     if candidates:
         candidates.sort(key=lambda x: x[0])
         return candidates[0][1]
+
+    # 4. Token score
     q_tokens = [t for t in q.split() if len(t) >= 2]
     if not q_tokens:
         return None
     best, best_score = None, 0
     for car in cars:
-        name_lower = _normalize(car.name)
-        score = sum(1 for t in q_tokens if t in name_lower)
+        name_lower  = _normalize(car.name)
+        model_lower = _normalize(getattr(car, "model", "") or "")
+        score  = sum(1 for t in q_tokens if t in name_lower)
+        score += sum(2 for t in q_tokens if model_lower and t in model_lower)
         if score > best_score:
             best_score, best = score, car
     return best if best_score > 0 else None
@@ -301,7 +328,7 @@ def _build_car_data(db: Session, car: Car) -> Dict:
         "status":      "found",
         "db_name":     car.name,
         "price_range": price_range,
-        "variants":    [{"name": v.name, "price": _fmt_price(v.price), "price_raw": v.price} for v in variants],
+        "variants":    [{"name": v.name, "price": _fmt_price(v.price), "price_raw": int(v.price) if v.price else 0} for v in variants],
         "colors":      color_names or ["Liên hệ showroom"],
         "specs":       specs_grouped,
         "features":    features_grouped,
@@ -324,7 +351,7 @@ def tool_list_cars() -> str:
             if getattr(car, "seats", None):     entry["seats"]     = car.seats
             result.append(entry)
         logger.info(f"list_cars → {len(result)} cars")
-        return json.dumps({"note": "TOÀN BỘ xe kho AutoViet.", "total": len(result), "cars": result}, ensure_ascii=False)
+        return json.dumps({"note": "TOÀN BỘ xe kho Auto X.", "total": len(result), "cars": result}, ensure_ascii=False)
     except Exception as e:
         logger.error(f"list_cars error: {e}")
         return json.dumps({"error": str(e)})
@@ -341,7 +368,7 @@ def tool_get_car_detail(car_name: str) -> str:
                                "note": "Không có trong kho. Dùng list_cars để gợi ý xe khác."}, ensure_ascii=False)
         data = _build_car_data(db, car)
         logger.info(f"get_car_detail({car_name!r}) → {car.name}")
-        return json.dumps(data, ensure_ascii=False, indent=2)
+        return _json_dumps(data)
     except Exception as e:
         logger.error(f"get_car_detail error: {e}")
         return json.dumps({"error": str(e)})
@@ -359,7 +386,7 @@ def tool_compare_cars(car_name_1: str, car_name_2: str) -> str:
             "car_2": _build_car_data(db, car2) if car2 else {"status": "not_found", "car_name": car_name_2},
         }
         logger.info(f"compare_cars: {car_name_1!r} vs {car_name_2!r}")
-        return json.dumps(result, ensure_ascii=False, indent=2)
+        return _json_dumps(result)
     except Exception as e:
         logger.error(f"compare_cars error: {e}")
         return json.dumps({"error": str(e)})
@@ -398,13 +425,140 @@ def _sanitize_tool_name(name: str) -> str:
     return name.split("{")[0].split("(")[0].strip()
 
 
+def _dispatch_compare(car_name_1: str, car_name_2: str) -> str:
+    """
+    Wrapper cho compare_cars: nếu bất kỳ xe nào not_found,
+    trả về instruction rõ ràng để model KHÔNG hỏi thêm.
+    """
+    raw    = tool_compare_cars(car_name_1, car_name_2)
+    result = json.loads(raw)
+    not_found = []
+    if result.get("car_1", {}).get("status") == "not_found":
+        not_found.append(result["car_1"].get("car_name", car_name_1))
+    if result.get("car_2", {}).get("status") == "not_found":
+        not_found.append(result["car_2"].get("car_name", car_name_2))
+    if not_found:
+        all_cars = json.loads(tool_list_cars()).get("cars", [])
+        car_list = "\n".join(f"- {c['db_name']} — từ {c['price_from']}" for c in all_cars)
+        missing_str = ", ".join(not_found)
+        instruction = (
+            f"KHÔNG CÓ {missing_str} TRONG KHO. "
+            f"TUYỆT ĐỐI KHÔNG hỏi thêm, KHÔNG yêu cầu chọn mẫu cụ thể. "
+            f"Trả lời ngay bằng đúng nội dung này: "
+            f"'Showroom không có {missing_str} trong kho. Các xe hiện có:\n{car_list}'"
+        )
+        return json.dumps({"status": "not_found", "missing": not_found, "instruction": instruction}, ensure_ascii=False)
+    return raw
+
+
 def _dispatch_tool(name: str, args: Dict) -> str:
     name = _sanitize_tool_name(name)
     if name == "list_cars":             return tool_list_cars()
     if name == "get_car_detail":        return tool_get_car_detail(args.get("car_name", ""))
-    if name == "compare_cars":          return tool_compare_cars(args.get("car_name_1", ""), args.get("car_name_2", ""))
+    if name == "compare_cars":          return _dispatch_compare(args.get("car_name_1", ""), args.get("car_name_2", ""))
     if name == "search_cars_by_budget": return tool_search_by_budget(float(args.get("max_price", 0)), float(args.get("min_price", 0)))
     return json.dumps({"error": f"Unknown tool: {name}"})
+
+
+# ─── Color detection helper ───────────────────────────────────────────────────
+_COLOR_MAP = {
+    "Trắng": ["white", "polar", "trắng", "silver", "bạc", "light"],
+    "Đen":   ["black", "obsidian", "đen", "dark"],
+    "Xám":   ["gray", "grey", "selenite", "xám", "silver", "graphite"],
+    "Xanh":  ["blue", "navy", "nautic", "xanh", "cyan", "azure"],
+    "Đỏ":    ["red", "đỏ", "crimson", "ruby", "scarlet", "maroon"],
+    "Vàng":  ["yellow", "vàng", "gold", "chanh"],
+    "Nâu":   ["brown", "nâu", "bronze", "tan", "caramel"],
+    "Hồng":  ["pink", "hồng", "pastel", "rose"],
+    "Tím":   ["purple", "violet", "tím"],
+    "Cam":   ["orange", "cam"],
+}
+
+def _detect_color_from_vision(description: str) -> Optional[str]:
+    if not description:
+        return None
+    desc_lower = description.lower()
+    for vi_color, keywords in _COLOR_MAP.items():
+        if any(kw in desc_lower for kw in keywords):
+            return vi_color
+    return None
+
+def _color_exists_in_db(detected_color_vi: str, db_colors: List[str]) -> bool:
+    if not detected_color_vi or not db_colors:
+        return False
+    detected_lower = detected_color_vi.lower()
+    for db_color in db_colors:
+        if detected_lower in db_color.lower():
+            return True
+    return False
+
+def _normalize_model_name(model: str) -> str:
+    m = model.strip()
+    m = m.replace("-", " ").replace("_", " ")
+    m = re.sub(r'([a-zA-Z])(\d)', r'\1 \2', m)
+    m = re.sub(r'(\d)([a-zA-Z])', r'\1 \2', m)
+    m = re.sub(r'\s+', ' ', m)
+    return m.strip()
+
+def _make_keywords(make: str) -> List[str]:
+    mk = make.lower().strip()
+    if "vinfast" in mk:
+        return ["vinfast"]
+    if any(x in mk for x in ["mercedes", "benz", "amg", "maybach"]):
+        return ["mercedes"]
+    if "bmw" in mk:
+        return ["bmw"]
+    if "audi" in mk:
+        return ["audi"]
+    if "toyota" in mk:
+        return ["toyota"]
+    if "honda" in mk:
+        return ["honda"]
+    if "hyundai" in mk:
+        return ["hyundai"]
+    if "kia" in mk:
+        return ["kia"]
+    if "lexus" in mk:
+        return ["lexus"]
+    return [mk]
+
+def _score_car_match(db_name: str, make: str, model_name: str) -> int:
+    dn = db_name.lower()
+    score = 0
+
+    for kw in _make_keywords(make):
+        if kw in dn:
+            score += 10
+            break
+
+    mo_raw   = model_name.lower().strip()
+    mo_norm  = _normalize_model_name(model_name).lower().strip()
+    mo_plain = re.sub(r'[-_]', ' ', mo_raw).strip()
+    mo_plain = re.sub(r'\s+', ' ', mo_plain)
+
+    candidates = []
+    for mo in [mo_raw, mo_norm, mo_plain]:
+        if mo and mo not in candidates:
+            candidates.append(mo)
+
+    best_model_score = 0
+    for mo in candidates:
+        local_score = 0
+        if mo in dn:
+            local_score = 20
+        else:
+            tokens = [t for t in mo.split() if len(t) >= 1]
+            if tokens:
+                matched = sum(1 for t in tokens if t in dn)
+                ratio   = matched / len(tokens)
+                local_score = int(ratio * 15)
+        if local_score > best_model_score:
+            best_model_score = local_score
+        if best_model_score >= 20:
+            break
+
+    score += best_model_score
+    return score
 
 
 # ─── Chatbot ──────────────────────────────────────────────────────────────────
@@ -419,10 +573,12 @@ class Chatbot:
     GEMINI_MODEL    = "gemini-2.0-flash-lite"
     GEMINI_FALLBACK = "gemini-2.0-flash"
 
-    SHOWROOM        = "AutoViet"
+    SHOWROOM        = "Auto X"
     MAX_HISTORY     = 10
     MAX_TOOL_ROUNDS = 4
     TEMPERATURE     = 0.4
+
+    _MATCH_THRESHOLD = 12
 
     def __init__(self):
         logger.info(f"Initializing chatbot (Groq/{self.GROQ_MODEL} → Gemini/{self.GEMINI_MODEL})...")
@@ -473,8 +629,16 @@ TOOL — GỌI KHI NÀO:
 
 QUY TẮC:
 - Giá, tên, thông số: lấy CHÍNH XÁC từ tool, không ước đoán.
-- Xe không có trong tool → nói thẳng showroom chưa có.
+- Xe không có trong tool → KHÔNG nhắc đến xe đó nữa. Chỉ gợi ý các xe CÓ trong kho.
+- So sánh mà tool trả về not_found cho bất kỳ xe nào → DỪNG NGAY. KHÔNG hỏi thêm, KHÔNG yêu cầu chọn mẫu cụ thể. Chỉ nói "Showroom không có [tên xe]." rồi gọi list_cars và liệt kê danh sách xe có trong kho.
+- Khách hỏi xe ngoài kho → KHÔNG tư vấn, KHÔNG bịa thông số. Chỉ nói không có và gợi ý xe tương tự trong kho.
 - Câu hỏi chung về xe (không cần tool): trả lời tự nhiên theo kiến thức chung, không bịa thông số cụ thể.
+
+VÍ DỤ XỬ LÝ SO SÁNH THẤT BẠI (làm đúng như thế này):
+Khách: "So sánh VinFast VF 5 và BMW"
+Tool compare_cars trả về: car_2 status=not_found
+Trả lời ĐÚNG: "Showroom không có BMW trong kho. Các xe hiện có:\n- [danh sách từ list_cars]"
+Trả lời SAI (tuyệt đối không làm): "Bạn cần chọn mẫu BMW cụ thể vì không có thông tin về BMW trong danh sách."
 
 CÁCH VIẾT:
 - Tối đa 150 từ mỗi câu trả lời.
@@ -561,7 +725,7 @@ CÁCH VIẾT:
         prompt = (
             "Phân tích ảnh. Nếu là xe ô tô, trả về JSON (không markdown):\n"
             '{"make":"hãng","model":"model","year_estimate":"năm",'
-            '"confidence":"high/medium/low","description":"1 câu tiếng Việt"}\n'
+            '"confidence":"high/medium/low","description":"1 câu tiếng Việt mô tả màu sắc và kiểu dáng"}\n'
             "Nếu không phải xe:\n"
             '{"make":null,"model":null,"year_estimate":null,'
             '"confidence":"low","description":"Không phải ảnh xe"}'
@@ -596,10 +760,10 @@ CÁCH VIẾT:
                     {
                         "type": "text",
                         "text": (
-                            "Phân tích ảnh. Nếu là xe ô tô, trả về JSON (không markdown):\n"
-                            '{"make":"hãng","model":"model","year_estimate":"năm",'
-                            '"confidence":"high/medium/low","description":"1 câu tiếng Việt"}\n'
-                            "Nếu không phải xe:\n"
+                            "Phân tích ảnh xe ô tô. Trả về JSON (không markdown, không giải thích):\n"
+                            '{"make":"hãng xe (VD: Mercedes-Benz, VinFast, BMW, Audi)","model":"model đầy đủ (VD: GLE, VF 8, S-Class, E-Class, VF 6)","year_estimate":"năm ước tính hoặc null",'
+                            '"confidence":"high/medium/low","description":"1 câu mô tả ngắn tiếng Việt bao gồm màu sắc và kiểu dáng xe"}\n'
+                            "Nếu không phải xe ô tô:\n"
                             '{"make":null,"model":null,"year_estimate":null,'
                             '"confidence":"low","description":"Không phải ảnh xe"}'
                         ),
@@ -607,7 +771,6 @@ CÁCH VIẾT:
                 ],
             }
         ]
-        # Thử Groq vision trước
         try:
             response, model_used = self._call_vision_groq(vision_messages, session_id)
             logger.info(f"[{session_id}] Vision model (Groq): {model_used}")
@@ -618,7 +781,6 @@ CÁCH VIẾT:
         except Exception as e:
             logger.warning(f"[{session_id}] Groq vision failed, trying Gemini: {e}")
 
-        # Fallback Gemini vision
         try:
             return self._call_vision_gemini(image_b64, media_type, session_id)
         except Exception as e:
@@ -629,41 +791,117 @@ CÁCH VIẾT:
     # ── Handle image ──────────────────────────────────────────────────────
     def handle_image(self, image_b64: str, media_type: str = "image/jpeg", session_id: str = "default") -> Dict:
         logger.info(f"[{session_id}] Image processing...")
-        vision     = self._analyze_image(image_b64, media_type, session_id)
-        make       = vision.get("make")
-        model_name = vision.get("model")
-        year_est   = vision.get("year_estimate", "")
-        confidence = vision.get("confidence", "low")
+        vision      = self._analyze_image(image_b64, media_type, session_id)
+        make        = (vision.get("make") or "").strip()
+        model_name  = (vision.get("model") or "").strip()
+        year_est    = (vision.get("year_estimate") or "").strip()
+        confidence  = vision.get("confidence", "low")
+        description = vision.get("description", "")
+
+        logger.info(f"[{session_id}] Vision: make={make!r}, model={model_name!r}, "
+                    f"year={year_est!r}, confidence={confidence}, desc={description!r}")
 
         if not make or not model_name:
-            reply = "Không nhận diện được xe. Vui lòng gửi ảnh rõ hơn hoặc cho biết tên xe."
+            reply = (
+                "Không nhận diện được xe trong ảnh. "
+                "Vui lòng gửi ảnh rõ hơn hoặc cho biết tên xe bạn muốn hỏi."
+            )
             self._append_history(session_id, "[Ảnh — không nhận ra xe]", reply)
             return {"status": "success", "response": reply, "vision": vision, "car_detail": None}
 
-        raw    = tool_get_car_detail(f"{make} {model_name}")
+        all_cars_raw = json.loads(tool_list_cars())
+        all_cars     = all_cars_raw.get("cars", [])
+
+        if not all_cars:
+            reply = "Hiện tại hệ thống không thể truy xuất dữ liệu kho xe. Vui lòng thử lại sau."
+            self._append_history(session_id, f"[Ảnh: {make} {model_name}]", reply)
+            return {"status": "error", "response": reply, "vision": vision, "car_detail": None}
+
+        scored = [
+            (c["db_name"], _score_car_match(c["db_name"], make, model_name), c)
+            for c in all_cars
+        ]
+        scored.sort(key=lambda x: x[1], reverse=True)
+        best_name, best_score, best_car_entry = scored[0]
+
+        logger.info(f"[{session_id}] Score detail — make={make!r} model={model_name!r}")
+        for _n, _s, _ in scored[:5]:
+            logger.info(f"[{session_id}]   {_n!r:40s} → {_s}đ")
+
+        logger.info(f"[{session_id}] Top matches: {[(s[0], s[1]) for s in scored[:5]]}")
+
+        if best_score < self._MATCH_THRESHOLD:
+            suggest_lines = "\n".join(
+                f"- {c['db_name']} — từ {c['price_from']}" for c in all_cars
+            )
+            reply = (
+                f"Showroom không có mẫu {make} {model_name} trong kho.\n\n"
+                f"Các xe đang có tại showroom:\n{suggest_lines}"
+            )
+            self._append_history(session_id, f"[Ảnh: {make} {model_name}]", reply)
+            return {
+                "status": "success", "response": reply,
+                "vision": vision, "car_detail": {"status": "not_found"},
+            }
+
+        raw    = tool_get_car_detail(best_name)
         detail = json.loads(raw)
 
-        if detail.get("status") == "found":
-            lines = [
-                f"Nhận diện: **{detail['db_name']}**" + (f" (khoảng {year_est})" if year_est else ""),
-                "", "**Phiên bản & Giá:**",
-                *[f"- {v['name']}: {v['price']}" for v in detail["variants"]],
-                "", f"**Màu:** {', '.join(detail['colors'])}", "",
-                "Đặt lịch lái thử: /services/dat-lich",
-            ]
+        if detail.get("status") != "found":
+            suggest_lines = "\n".join(
+                f"- {c['db_name']} — từ {c['price_from']}" for c in all_cars
+            )
+            reply = (
+                f"Showroom không có mẫu {make} {model_name} trong kho.\n\n"
+                f"Các xe đang có tại showroom:\n{suggest_lines}"
+            )
+            self._append_history(session_id, f"[Ảnh: {make} {model_name}]", reply)
+            return {
+                "status": "success", "response": reply,
+                "vision": vision, "car_detail": {"status": "not_found"},
+            }
+
+        db_name  = detail["db_name"]
+        variants = detail.get("variants", [])
+        colors   = detail.get("colors", [])
+
+        detected_color = _detect_color_from_vision(description)
+        logger.info(f"[{session_id}] Detected color from vision: {detected_color!r}")
+        logger.info(f"[{session_id}] Colors in DB: {colors}")
+
+        color_in_stock = True
+        if detected_color:
+            color_in_stock = _color_exists_in_db(detected_color, colors)
+
+        year_str = f" (khoảng {year_est})" if year_est else ""
+        lines    = [f"Nhận diện: **{db_name}**{year_str}", ""]
+
+        lines.append("**Phiên bản & Giá:**")
+        for v in variants:
+            lines.append(f"- {v['name']}: {v['price']}")
+
+        lines.append("")
+
+        if detected_color and not color_in_stock:
+            colors_str = ", ".join(colors)
+            lines.append(
+                f"Màu **{detected_color}** trong ảnh hiện không có tại showroom. "
+                f"Hiện tại chúng tôi chỉ có: {colors_str}."
+            )
         else:
-            cars_raw  = json.loads(tool_list_cars()).get("cars", [])[:3]
-            suggest   = "\n".join(f"- {c['db_name']} — từ {c['price_from']}" for c in cars_raw)
-            conf_note = "" if confidence == "high" else " (nhận diện chưa chắc)"
-            lines = [
-                f"Nhận diện: **{make} {model_name}**" + (f" (khoảng {year_est})" if year_est else "") + conf_note,
-                "", f"Showroom {self.SHOWROOM} chưa có dòng xe này.",
-                "", "**Xe đang có:**", suggest, "", "Liên hệ: /services/dat-lich-bao-duong",
-            ]
+            colors_str = ", ".join(colors)
+            lines.append(f"**Màu có sẵn:** {colors_str}")
+
+        lines += ["", "Đặt lịch lái thử: /services/dat-lich"]
 
         reply = "\n".join(lines)
         self._append_history(session_id, f"[Ảnh: {make} {model_name}]", reply)
-        return {"status": "success", "response": reply, "vision": vision, "car_detail": detail}
+        return {
+            "status":     "success",
+            "response":   reply,
+            "vision":     vision,
+            "car_detail": detail,
+        }
 
     # ── Text chat ─────────────────────────────────────────────────────────
     def get_response(self, user_input: str, session_id: str = "default") -> Dict:
@@ -677,7 +915,6 @@ CÁCH VIẾT:
             reply      = ""
             model_used = self.GROQ_MODEL
 
-            # Build Groq messages
             groq_messages = [{"role": "system", "content": self._system_prompt()}]
             for m in conv.messages[-(self.MAX_HISTORY * 2):]:
                 if m.get("role") in ("user", "assistant") and m.get("content"):
@@ -687,7 +924,6 @@ CÁCH VIẾT:
             working_messages = list(groq_messages)
             groq_exhausted   = False
 
-            # ── Groq tool-calling loop ──────────────────────────────────
             for round_num in range(self.MAX_TOOL_ROUNDS):
                 try:
                     response, model_used = self._call_groq(working_messages, session_id, round_num)
@@ -726,7 +962,6 @@ CÁCH VIẾT:
                 if not reply:
                     reply = "Xin lỗi, không thể xử lý yêu cầu. Vui lòng thử lại."
 
-            # ── Gemini fallback khi Groq hết ────────────────────────────
             if groq_exhausted:
                 gemini_history = []
                 for m in conv.messages[-(self.MAX_HISTORY * 2):]:
@@ -859,3 +1094,19 @@ def clear_chatbot_session(session_id: str = "default") -> None:
 
 def get_session_info(session_id: str = "default") -> Dict:
     return chatbot.get_session_info(session_id)
+
+
+def debug_vision_score(make: str, model_name: str) -> Dict:
+    all_cars = json.loads(tool_list_cars()).get("cars", [])
+    scored = [
+        {"db_name": c["db_name"], "score": _score_car_match(c["db_name"], make, model_name)}
+        for c in all_cars
+    ]
+    scored.sort(key=lambda x: x["score"], reverse=True)
+    return {
+        "input": {"make": make, "model": model_name},
+        "threshold": chatbot._MATCH_THRESHOLD,
+        "best_match": scored[0] if scored else None,
+        "found": scored[0]["score"] >= chatbot._MATCH_THRESHOLD if scored else False,
+        "all_scores": scored,
+    }

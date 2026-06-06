@@ -454,7 +454,7 @@
             </div>
             <div class="filter-actions">
                 <button type="submit" class="filter-btn filter-btn-primary">Lọc</button>
-                <a href="{{ route('admin.orders.index') }}" class="filter-btn filter-btn-reset">✕ Xóa</a>
+                <a href="{{ route('admin.orders.index') }}" class="filter-btn filter-btn-reset"> Xóa</a>
             </div>
         </form>
     </div>

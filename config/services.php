@@ -26,5 +26,11 @@ return [
     'groq' => [
         'key' => env('GROQ_API_KEY', ''),
     ],
+'payment' => [
+    'bank_id'      => env('PAYMENT_BANK_ID',      'MB'),
+    'bank_account' => env('PAYMENT_BANK_ACCOUNT',  '0328078853'),
+    'bank_name'    => env('PAYMENT_BANK_NAME',     'MB Bank'),
+    'bank_owner'   => env('PAYMENT_BANK_OWNER',    'VO MINH TAN'),
+    ],
 
 ];

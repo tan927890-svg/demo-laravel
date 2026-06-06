@@ -15,9 +15,6 @@ body:not(.home-page) main { margin-top: 0 !important; }
 body { background: #fff; color: var(--dark); }
 body:not(.home-page) main { margin-top: 0 !important; padding-top: 0 !important; }
 
-/* ══════════════════════════════════════════
-   HERO SLIDER
-══════════════════════════════════════════ */
 .cars-hero {
   position: relative;
   height: clamp(400px, 55vw, 680px);
@@ -51,9 +48,6 @@ body:not(.home-page) main { margin-top: 0 !important; padding-top: 0 !important;
   font-weight: 700; color: rgba(255,255,255,.7); letter-spacing: 2px;
 }
 
-/* ══════════════════════════════════════════
-   HEADER / BRAND TABS
-══════════════════════════════════════════ */
 .cars-header {
   background: #fff; border-bottom: 1px solid var(--border);
   padding: 28px 60px 0;
@@ -90,14 +84,8 @@ body:not(.home-page) main { margin-top: 0 !important; padding-top: 0 !important;
 .brand-tab:hover { color: var(--dark); }
 .brand-tab.active { color: var(--red); border-bottom-color: var(--red); }
 
-/* ══════════════════════════════════════════
-   CARS WRAP
-══════════════════════════════════════════ */
 .cars-wrap { padding: 44px 60px 60px; max-width: 1400px; margin: 0 auto; background: #fff; }
 
-/* ══════════════════════════════════════════
-   GRID XE
-══════════════════════════════════════════ */
 .brand-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -114,7 +102,6 @@ body:not(.home-page) main { margin-top: 0 !important; padding-top: 0 !important;
   background: transparent;
 }
 
-/* INFO PHÍA TRÊN */
 .brand-card-info { padding: 0 0 12px; }
 .brand-card-name {
   font-family: 'Barlow Condensed', sans-serif;
@@ -128,7 +115,6 @@ body:not(.home-page) main { margin-top: 0 !important; padding-top: 0 !important;
 .brand-card-price strong { font-weight: 800; }
 .brand-card-price small  { font-size: 11px; color: var(--muted); font-weight: 400; }
 
-/* ẢNH PHÍA DƯỚI */
 .brand-card-img-wrap {
   background: transparent;
   overflow: hidden;
@@ -144,7 +130,6 @@ body:not(.home-page) main { margin-top: 0 !important; padding-top: 0 !important;
   transform: scale(1.05) translateX(6px);
 }
 
-/* Unavailable */
 .brand-card.car-unavailable .brand-card-img { opacity: .45; }
 .car-item-status {
   display: inline-block; margin-top: 5px;
@@ -154,7 +139,6 @@ body:not(.home-page) main { margin-top: 0 !important; padding-top: 0 !important;
 .car-item-status.out-of-stock { color: #e53e3e; border: 1px solid #e53e3e; }
 .car-item-status.coming-soon  { color: #d69e2e; border: 1px solid #d69e2e; }
 
-/* ── EMPTY STATE ── */
 .empty-state { grid-column: 1/-1; text-align: center; padding: 80px 20px; color: #ccc; }
 .empty-state p {
   font-family: 'Barlow Condensed', sans-serif; font-size: 24px;
@@ -169,12 +153,48 @@ body:not(.home-page) main { margin-top: 0 !important; padding-top: 0 !important;
 @media (max-width: 800px) {
   .brand-grid,
   #panelVinfast .brand-grid { grid-template-columns: repeat(2, 1fr); }
-  .cars-header, .cars-wrap { padding-left: 24px; padding-right: 24px; }
+  .cars-header { padding-left: 16px; padding-right: 16px; }
+  .cars-wrap   { padding: 24px 16px 40px; }
 }
-@media (max-width: 480px) {
+@media (max-width: 600px) {
+  /* Hero */
+  .cars-hero { height: clamp(200px, 56vw, 320px); }
+  .slider-btn { width: 36px; height: 36px; font-size: 22px; }
+  .slider-btn.prev { left: 10px; }
+  .slider-btn.next { right: 10px; }
+
+  /* Header */
+  .cars-header { padding: 18px 16px 0; }
+  .cars-header-top {
+    flex-direction: column; align-items: flex-start;
+    gap: 10px; margin-bottom: 14px;
+  }
+  .cars-title { font-size: 22px; }
+  .cars-header-actions { width: 100%; display: flex; gap: 8px; }
+  .btn-action {
+    flex: 1; justify-content: center; text-align: center;
+    font-size: 10px; padding: 8px 10px; letter-spacing: 1px;
+    white-space: normal; text-align: center; line-height: 1.3;
+  }
+
+  /* Brand tabs */
+  .brand-tab { font-size: 13px; padding: 12px 14px; letter-spacing: 1px; }
+
+  /* Grid */
   .brand-grid,
-  #panelVinfast .brand-grid { grid-template-columns: repeat(2, 1fr); gap: 24px 12px; }
-  .cars-header-top { flex-direction: column; align-items: flex-start; }
+  #panelVinfast .brand-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px 10px;
+  }
+  .cars-wrap { padding: 20px 12px 40px; }
+
+  /* Card */
+  .brand-card-name { font-size: 15px; }
+  .brand-card-price { font-size: 12px; }
+  .brand-card-price strong { font-size: 13px; }
+  .brand-card-img { height: 130px; padding: 8px 4px; }
+  .brand-card-info { padding-bottom: 6px; }
+  .car-item-status { font-size: 9px; letter-spacing: 1px; padding: 2px 6px; }
 }
 </style>
 @endpush
@@ -200,8 +220,8 @@ body:not(.home-page) main { margin-top: 0 !important; padding-top: 0 !important;
   <div class="cars-header-top">
     <div class="cars-title">Danh Sách Xe</div>
     <div class="cars-header-actions">
-      <a href="{{ route('cars.price-list') }}" class="btn-action">Bảng giá sản phẩm →</a>
-      <a href="{{ route('cars.compare') }}"    class="btn-action">So sánh sản phẩm →</a>
+      <a href="{{ route('cars.price-list') }}" class="btn-action">Bảng giá →</a>
+      <a href="{{ route('cars.compare') }}"    class="btn-action">So sánh →</a>
     </div>
   </div>
   <div class="brand-tabs">
@@ -287,8 +307,8 @@ body:not(.home-page) main { margin-top: 0 !important; padding-top: 0 !important;
     <div class="brand-grid">
       @php
         $vinfastCars = \App\Models\Car::whereHas('brand', fn($q) => $q->where('name', 'VinFast'))
-  ->with(['galleries', 'colors'])
-  ->get();
+          ->with(['galleries', 'colors'])
+          ->get();
       @endphp
 
       @forelse($vinfastCars as $car)
@@ -359,9 +379,6 @@ body:not(.home-page) main { margin-top: 0 !important; padding-top: 0 !important;
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
-  /* ══════════════════════════════════════
-     TAB SWITCHING: Mercedes ↔ VinFast
-  ══════════════════════════════════════ */
   var tabMer   = document.getElementById('tabMercedes');
   var tabVf    = document.getElementById('tabVinfast');
   var panelMer = document.getElementById('panelMercedes');
@@ -384,9 +401,6 @@ document.addEventListener('DOMContentLoaded', function () {
   tabMer.addEventListener('click', showMercedes);
   tabVf.addEventListener('click', showVinfast);
 
-  /* ══════════════════════════════════════
-     HERO SLIDER
-  ══════════════════════════════════════ */
   var slides  = document.querySelectorAll('.hero-slider .slide');
   var prevBtn = document.querySelector('.slider-btn.prev');
   var nextBtn = document.querySelector('.slider-btn.next');

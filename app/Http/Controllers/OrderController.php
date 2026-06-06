@@ -20,18 +20,18 @@ class OrderController extends Controller
         return view('orders.index', compact('orders'));
     }
 
-    // Form đặt xe
+    // Form đặt mua xe
     public function create(Car $car)
     {
         if ($car->status !== 'available') {
             return redirect()->route('cars.show', $car->slug)
-                ->with('error', 'Xe này hiện không có sẵn để đặt.');
+                ->with('error', 'Xe này hiện không còn sẵn để đặt mua.');
         }
 
         return view('cars.order', compact('car'));
     }
 
-    // Lưu đơn hàng
+    // Lưu đơn hàng → redirect sang trang xác nhận + QR cọc
     public function store(Request $request, Car $car)
     {
         $validated = $request->validate([
@@ -39,33 +39,48 @@ class OrderController extends Controller
             'customer_email'   => 'required|email|max:255',
             'customer_phone'   => 'required|string|max:20',
             'customer_address' => 'nullable|string|max:500',
-            'deposit_amount'   => 'required|numeric|min:0',
             'note'             => 'nullable|string|max:500',
+            'start_date'       => 'required|date|after_or_equal:today',
+            'end_date'         => 'required|date|after:start_date',
         ]);
 
-        Order::create([
-            'user_id'          => Auth::id(),
+        // Giá xe: ưu tiên sale_price → price → price_per_day
+        $basePrice     = $car->sale_price ?? $car->price ?? $car->price_per_day ?? 0;
+        $depositAmount = intval($basePrice * 0.3);
+
+        $order = Order::create([
+            'user_id'          => Auth::id(), // null nếu chưa đăng nhập — OK
             'car_id'           => $car->id,
             'customer_name'    => $validated['customer_name'],
             'customer_email'   => $validated['customer_email'],
             'customer_phone'   => $validated['customer_phone'],
             'customer_address' => $validated['customer_address'] ?? null,
-            'deposit_amount'   => $validated['deposit_amount'],
+            'deposit_amount'   => $depositAmount,
             'note'             => $validated['note'] ?? null,
             'status'           => 'pending',
+            'start_date'       => $validated['start_date'],
+            'end_date'         => $validated['end_date'],
         ]);
 
-        // Cập nhật trạng thái xe thành đã đặt cọc
-        $car->update(['status' => 'reserved']);
+        // Cập nhật trạng thái xe — dùng 'sold' thay vì 'reserved' để tránh lỗi ENUM
+        // Nếu muốn dùng 'reserved', chạy migration thêm giá trị đó vào ENUM trước
+        $car->update(['status' => 'sold']);
 
-        return redirect()->route('orders.index')
-            ->with('success', 'Đặt xe thành công! Chờ xác nhận từ admin.');
+        // Lưu order id vào session để show() không cần auth
+        session(['last_order_id' => $order->id]);
+
+        return redirect()->route('orders.show', $order)
+            ->with('success', 'Đặt xe thành công! Vui lòng thanh toán cọc để giữ xe.');
     }
 
-    // Chi tiết đơn hàng
+    // Trang xác nhận đơn hàng + QR cọc
     public function show(Order $order)
     {
-        if ($order->user_id !== Auth::id()) {
+        // Cho phép xem nếu: là chủ đơn (đã login) HOẶC session khớp (khách vãng lai)
+        $isOwner       = Auth::check() && $order->user_id === Auth::id();
+        $isGuestViewer = session('last_order_id') === $order->id;
+
+        if (!$isOwner && !$isGuestViewer) {
             abort(403);
         }
 
@@ -76,7 +91,10 @@ class OrderController extends Controller
     // Hủy đơn hàng
     public function destroy(Order $order)
     {
-        if ($order->user_id !== Auth::id()) {
+        $isOwner       = Auth::check() && $order->user_id === Auth::id();
+        $isGuestViewer = session('last_order_id') === $order->id;
+
+        if (!$isOwner && !$isGuestViewer) {
             abort(403);
         }
 
@@ -87,6 +105,13 @@ class OrderController extends Controller
         // Trả lại trạng thái xe
         $order->car->update(['status' => 'available']);
         $order->update(['status' => 'cancelled']);
+
+        // Xóa session nếu là khách vãng lai
+        if ($isGuestViewer) {
+            session()->forget('last_order_id');
+            return redirect()->route('cars.index')
+                ->with('success', 'Đã hủy đơn hàng.');
+        }
 
         return redirect()->route('orders.index')
             ->with('success', 'Đã hủy đơn hàng.');

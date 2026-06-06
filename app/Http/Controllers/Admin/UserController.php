@@ -37,13 +37,14 @@ class UserController extends Controller
             'username' => 'required|string|max:50|unique:users|alpha_dash',
             'email'    => 'required|email|unique:users',
             'password' => 'required|string|min:6',
-            'role'     => 'required|in:admin,manager,staff',
+            'role'     => 'required|in:manager,staff', // ← bỏ admin
         ], [
             'username.required'   => 'Tên đăng nhập là bắt buộc.',
             'username.unique'     => 'Tên đăng nhập đã tồn tại.',
             'username.alpha_dash' => 'Tên đăng nhập chỉ được chứa chữ cái, số, _ và -.',
         ]);
 
+        // Manager chỉ được tạo staff
         if (Auth::user()->isManager() && $request->role !== 'staff') {
             abort(403, 'Manager chỉ được tạo tài khoản nhân viên.');
         }
@@ -88,7 +89,7 @@ class UserController extends Controller
             'name'     => 'required|string|max:255',
             'username' => 'required|string|max:50|alpha_dash|unique:users,username,' . $user->id,
             'email'    => 'required|email|unique:users,email,' . $user->id,
-            'role'     => 'required|in:admin,manager,staff',
+            'role'     => 'required|in:manager,staff', // ← bỏ admin
             'status'   => 'nullable|in:active,blocked',
         ], [
             'username.required'   => 'Tên đăng nhập là bắt buộc.',
@@ -96,8 +97,14 @@ class UserController extends Controller
             'username.alpha_dash' => 'Tên đăng nhập chỉ được chứa chữ cái, số, _ và -.',
         ]);
 
+        // Manager chỉ được gán role staff
         if (Auth::user()->isManager() && $request->role !== 'staff') {
             abort(403, 'Manager chỉ được gán role nhân viên.');
+        }
+
+        // Không ai được đổi role của admin khác (kể cả admin)
+        if ($user->role === 'admin') {
+            abort(403, 'Không thể chỉnh sửa tài khoản Admin.');
         }
 
         $labels = [
@@ -134,7 +141,7 @@ class UserController extends Controller
                 'user_id'   => $user->id,
                 'causer_id' => Auth::id(),
                 'action'    => 'updated',
-                'changes'   => json_encode($changes), // ← đã sửa
+                'changes'   => json_encode($changes),
             ]);
         }
 
@@ -166,6 +173,11 @@ class UserController extends Controller
     {
         if (Auth::user()->isManager() && $user->role !== 'staff') {
             abort(403, 'Manager chỉ được xóa tài khoản nhân viên.');
+        }
+
+        // Không ai được xóa admin
+        if ($user->role === 'admin') {
+            abort(403, 'Không thể xóa tài khoản Admin.');
         }
 
         if ($user->id === Auth::id()) {

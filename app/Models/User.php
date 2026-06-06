@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, SoftDeletes;
 
     protected $fillable = [
         'name', 'email', 'password', 'is_admin', 'role', 'password_reset_at', 'username', 'avatar',
@@ -53,13 +54,16 @@ class User extends Authenticatable
     {
         return $this->hasMany(\App\Models\UserLog::class)->latest();
     }
-    public function salaryHistories()
-{
-    return $this->hasMany(SalaryHistory::class)->orderByDesc('effective_year')->orderByDesc('effective_month');
-}
 
-public function payrolls()
-{
-    return $this->hasMany(Payroll::class);
-}
+    public function salaryHistories()
+    {
+        return $this->hasMany(SalaryHistory::class)
+                    ->orderByDesc('effective_year')
+                    ->orderByDesc('effective_month');
+    }
+
+    public function payrolls()
+    {
+        return $this->hasMany(Payroll::class);
+    }
 }

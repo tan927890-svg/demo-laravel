@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Contact;
+use App\Models\Deposit;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,67 +13,109 @@ class ContactController extends Controller
 {
     public function index(Request $request)
     {
+        $loai = $request->input('loai', '');
+
+        // ── Contacts query ──────────────────────────────────────────────────
         $query = Contact::latest();
 
-        // Lọc theo trạng thái đọc
         if ($request->input('status') === 'unread') {
             $query->where('is_read', false);
         } elseif ($request->input('status') === 'read') {
             $query->where('is_read', true);
         }
 
-        // Lọc theo loại (dựa vào subject)
-        $loai = $request->input('loai', '');
         if ($loai === 'baogianhanh') {
-            $query->where(function($q) {
+            $query->where(function ($q) {
                 $q->where('subject', 'like', '%báo giá%')
                   ->orWhere('subject', 'like', '%bao gia%');
             });
         } elseif ($loai === 'datlich') {
-            $query->where(function($q) {
+            $query->where(function ($q) {
                 $q->where('subject', 'like', '%đặt lịch%')
                   ->orWhere('subject', 'like', '%dat lich%');
             });
         } elseif ($loai === 'baoduong') {
-            $query->where(function($q) {
+            $query->where(function ($q) {
                 $q->where('subject', 'like', '%bảo dưỡng%')
                   ->orWhere('subject', 'like', '%bao duong%')
                   ->orWhere('subject', 'like', '%nhắc%');
             });
         } elseif ($loai === 'nhangiao') {
-            $query->where(function($q) {
+            $query->where(function ($q) {
                 $q->where('subject', 'like', '%nhận%')
                   ->orWhere('subject', 'like', '%giao xe%')
                   ->orWhere('subject', 'like', '%pickup%');
             });
         } elseif ($loai === 'lienhe') {
-            $query->where(function($q) {
+            $query->where(function ($q) {
                 $q->where('subject', 'not like', '%báo giá%')
                   ->where('subject', 'not like', '%đặt lịch%')
                   ->where('subject', 'not like', '%bảo dưỡng%')
                   ->where('subject', 'not like', '%nhận%')
                   ->where('subject', 'not like', '%giao xe%')
-                  ->where(function($sub) {
+                  ->where(function ($sub) {
                       $sub->whereNull('subject')->orWhere('subject', '!=', '');
                   });
             });
         }
 
-        // Tìm kiếm
         if ($q = $request->input('q')) {
             $query->where(function ($sub) use ($q) {
-                $sub->where('name', 'like', "%$q%")
-                    ->orWhere('email', 'like', "%$q%")
-                    ->orWhere('phone', 'like', "%$q%")
+                $sub->where('name',    'like', "%$q%")
+                    ->orWhere('email',   'like', "%$q%")
+                    ->orWhere('phone',   'like', "%$q%")
                     ->orWhere('subject', 'like', "%$q%");
             });
         }
 
-        $contacts    = $query->paginate(20);
-        $unreadCount = Contact::where('is_read', false)->count();
-        $staffList   = User::whereIn('role', ['staff', 'manager'])->orderBy('name')->get();
+        $contacts          = $query->paginate(20)->withQueryString();
+        $totalContactCount = Contact::count();
+        $unreadCount       = Contact::where('is_read', false)->count();
+        $readCount         = Contact::where('is_read', true)->count();
+        $staffList         = User::whereIn('role', ['staff', 'manager'])->orderBy('name')->get();
 
-        return view('admin.contacts.index', compact('contacts', 'unreadCount', 'staffList'));
+        // ── Deposit stats — luôn truyền (mọi tab dùng để hiển thị badge) ──
+        $depositStats = [
+            'total'     => Deposit::count(),
+            'pending'   => Deposit::where('status', 'pending')->count(),
+            'confirmed' => Deposit::where('status', 'confirmed')->count(),
+            'completed' => Deposit::where('status', 'completed')->count(),
+            'cancelled' => Deposit::where('status', 'cancelled')->count(),
+        ];
+        $depositTotalAmount = Deposit::whereIn('status', ['confirmed', 'completed'])
+                                     ->sum('deposit_amount');
+
+        // ── Deposits list — chỉ query khi ở tab dat-coc ────────────────────
+        $deposits = collect();
+        if ($loai === 'dat-coc') {
+            $depQuery = Deposit::with(['car', 'color', 'assignedTo'])->latest();
+
+            if ($request->filled('dep_status')) {
+                $depQuery->where('status', $request->dep_status);
+            }
+
+            $search = $request->input('search') ?: $request->input('q');
+            if ($search) {
+                $depQuery->where(function ($sub) use ($search) {
+                    $sub->where('customer_name',    'like', "%$search%")
+                        ->orWhere('customer_phone',  'like', "%$search%")
+                        ->orWhere('transaction_code','like', "%$search%");
+                });
+            }
+
+            $deposits = $depQuery->paginate(20)->withQueryString();
+        }
+
+        return view('admin.contacts.index', compact(
+            'contacts',
+            'totalContactCount',
+            'unreadCount',
+            'readCount',
+            'staffList',
+            'depositStats',
+            'depositTotalAmount',
+            'deposits',
+        ));
     }
 
     public function show(Contact $contact)
@@ -116,7 +159,7 @@ class ContactController extends Controller
             'assign_status' => 'assigned',
         ]);
 
-        // Tạo order draft từ contact, gán luôn cho nhân viên
+        // Tạo order draft từ contact nếu chưa có
         $existingOrder = \App\Models\Order::where('contact_id', $contact->id)->first();
 
         if (!$existingOrder) {

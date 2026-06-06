@@ -23,6 +23,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'bao-gia-nhanh/*',
             'login',
         ]);
+        $middleware->appendToGroup('web', [
+            \App\Http\Middleware\CheckUserStatus::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

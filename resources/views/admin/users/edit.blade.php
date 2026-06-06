@@ -182,13 +182,12 @@
             <select name="role" class="field-input" required>
               <option value="staff"   @selected(old('role',$user->role)==='staff')>Staff – Nhân viên tư vấn</option>
               <option value="manager" @selected(old('role',$user->role)==='manager')>Manager – Quản lý team</option>
-              <option value="admin"   @selected(old('role',$user->role)==='admin')>Admin – Toàn quyền hệ thống</option>
+              {{-- Không có option admin — không cho tạo thêm admin --}}
             </select>
             @error('role')<div class="field-error">⚠ {{ $message }}</div>@enderror
             <div class="role-info">
               <strong>Staff</strong>: Tạo đơn, tư vấn khách, chấm công GPS<br>
-              <strong>Manager</strong>: Duyệt đơn, nhập giá &amp; hoa hồng, xem báo cáo team<br>
-              <strong>Admin</strong>: Toàn quyền hệ thống
+              <strong>Manager</strong>: Duyệt đơn, nhập giá &amp; hoa hồng, xem báo cáo team
             </div>
           </div>
         @else
@@ -237,6 +236,9 @@
       <div style="font-size:13px;font-weight:700;color:#111">🕓 Lịch sử thay đổi</div>
     </div>
     @foreach($user->logs->take(10) as $log)
+      @php
+        $changes = is_string($log->changes) ? json_decode($log->changes, true) : $log->changes;
+      @endphp
       <div style="padding:12px 28px;border-bottom:1px solid #f3f4f6">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
           <span style="font-size:12px;font-weight:600;color:#111">
@@ -254,8 +256,8 @@
           <div style="font-size:12px;color:#f59e0b">🔑 Admin đặt lại mật khẩu</div>
         @elseif($log->action === 'password_reset_self')
           <div style="font-size:12px;color:#16a34a">🔑 Tự đổi mật khẩu qua OTP</div>
-        @elseif($log->changes)
-          @foreach($log->changes as $change)
+        @elseif(!empty($changes))
+          @foreach($changes as $change)
             <div style="font-size:12px;color:#374151;margin-top:2px">
               <span style="color:#6b7280">{{ $change['field'] }}:</span>
               <span style="color:#ef4444">{{ $change['old'] }}</span>

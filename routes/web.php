@@ -23,6 +23,8 @@ use App\Http\Controllers\Admin\ProfitController;
 use App\Http\Controllers\Admin\PriceListController;
 use App\Http\Controllers\Admin\AttendanceViewController;
 use App\Http\Controllers\Admin\PayrollController;
+use App\Http\Controllers\DepositController;
+use App\Http\Controllers\Admin\DepositController as AdminDepositController;
 
 // ── Auth routes ──────────────────────────────────────────────────────────────
 Route::get('/login',     [AuthController::class, 'showLogin'])->name('login');
@@ -71,8 +73,8 @@ Route::get('/news/{slug}', [NewsController::class, 'show'])->name('news.show');
 Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
 
 // ── Cars public ──────────────────────────────────────────────────────────────
-Route::get('/cars',               [CarController::class, 'index'])->name('cars.index');
-Route::get('/cars/compare',       [CarController::class, 'compare'])->name('cars.compare');
+Route::get('/cars',         [CarController::class, 'index'])->name('cars.index');
+Route::get('/cars/compare', [CarController::class, 'compare'])->name('cars.compare');
 
 // ── BẢNG GIÁ ─────────────────────────────────────────────────────────────────
 Route::get('/cars/bang-gia', function () {
@@ -84,8 +86,23 @@ Route::get('/cars/bang-gia', function () {
 })->name('cars.price-list');
 
 Route::get('/cars/{car}/du-toan', [CarController::class, 'costEstimate'])->name('cars.costEstimate');
-Route::get('/cars/{car}',         [CarController::class, 'show'])->name('cars.show')->whereNumber('car');
-Route::get('/du-toan-chi-phi',    [CarController::class, 'costEstimateGeneral'])->name('costEstimate');
+
+// ── Đặt mua xe — KHÔNG cần đăng nhập ────────────────────────────────────────
+Route::get('/cars/{car}/order',  [OrderController::class, 'create'])->name('orders.create');
+Route::post('/cars/{car}/order', [OrderController::class, 'store'])->name('orders.store');
+
+// ── ĐẶT CỌC XE ───────────────────────────────────────────────────────────────
+Route::get('/cars/{slug}/dat-coc',  [DepositController::class, 'create'])->name('deposits.create');
+Route::post('/cars/{slug}/dat-coc', [DepositController::class, 'store'])->name('deposits.store');
+Route::get('/dat-coc/{transactionCode}/thanh-cong', [DepositController::class, 'success'])->name('deposits.success');
+
+Route::get('/cars/{car}', [CarController::class, 'show'])->name('cars.show')
+    ->where('car', '[0-9]+|[a-z0-9\-]+');
+
+Route::get('/du-toan-chi-phi', [CarController::class, 'costEstimateGeneral'])->name('costEstimate');
+
+Route::get('/orders/{order}',    [OrderController::class, 'show'])->name('orders.show');
+Route::delete('/orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
 
 // ── Dịch vụ bổ sung ──────────────────────────────────────────────────────────
 Route::get('/services/dat-lich',            [BookingController::class, 'create'])->name('services.booking');
@@ -196,11 +213,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile',  [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::get('/cars/{car}/order',  [OrderController::class, 'create'])->name('orders.create');
-    Route::post('/cars/{car}/order', [OrderController::class, 'store'])->name('orders.store');
-    Route::get('/orders',            [OrderController::class, 'index'])->name('orders.index');
-    Route::get('/orders/{order}',    [OrderController::class, 'show'])->name('orders.show');
-    Route::delete('/orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
 });
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -258,13 +271,15 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::delete('featured-cars/{car}/frames',        [FeaturedCarController::class, 'deleteFrames'])->name('featured-cars.delete-frames');
 
         Route::resource('news', App\Http\Controllers\Admin\NewsController::class);
+
         Route::post('contacts/mark-all-read',
             [App\Http\Controllers\Admin\ContactController::class, 'markAllRead'])
             ->name('contacts.markAllRead');
         Route::post('contacts/{contact}/assign',
             [App\Http\Controllers\Admin\ContactController::class, 'assign'])
             ->name('contacts.assign');
-        Route::resource('contacts',   App\Http\Controllers\Admin\ContactController::class);
+        Route::resource('contacts', App\Http\Controllers\Admin\ContactController::class);
+
         Route::resource('newsletter', App\Http\Controllers\Admin\NewsletterController::class);
 
         Route::post('media/upload', [App\Http\Controllers\Admin\MediaController::class, 'upload'])->name('media.upload');
@@ -286,20 +301,26 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::get('price-list',  [PriceListController::class, 'index'])->name('price-list.index');
         Route::post('price-list', [PriceListController::class, 'update'])->name('price-list.update');
 
-        Route::get('payroll',                          [PayrollController::class, 'index'])->name('payroll.index');
-        Route::post('payroll/calculate',               [PayrollController::class, 'calculate'])->name('payroll.calculate');
-        Route::get('payroll/export',                   [PayrollController::class, 'export'])->name('payroll.export');
-        Route::get('payroll/salary/manage',            [PayrollController::class, 'salaryIndex'])->name('payroll.salary.index');
-        Route::post('payroll/salary/store',            [PayrollController::class, 'storeSalary'])->name('payroll.salary.store');
-        Route::get('payroll/{payroll}',                [PayrollController::class, 'show'])->name('payroll.show');
-        Route::post('payroll/{payroll}/approve',       [PayrollController::class, 'approve'])->name('payroll.approve');
-        Route::post('payroll/{payroll}/reopen',        [PayrollController::class, 'reopen'])->name('payroll.reopen');
-        Route::patch('payroll/{payroll}/base-salary',  [PayrollController::class, 'updateBaseSalary'])->name('payroll.updateBaseSalary');
-       Route::patch(
-    'payroll/{payroll}/overtime-rate',
-    [PayrollController::class, 'updateOvertimeRate']
-)->name('payroll.updateOvertimeRate');
-        Route::delete('payroll/{payroll}',             [PayrollController::class, 'destroy'])->name('payroll.destroy');
+        Route::get('payroll',                           [PayrollController::class, 'index'])->name('payroll.index');
+        Route::post('payroll/calculate',                [PayrollController::class, 'calculate'])->name('payroll.calculate');
+        Route::get('payroll/export',                    [PayrollController::class, 'export'])->name('payroll.export');
+        Route::get('payroll/salary/manage',             [PayrollController::class, 'salaryIndex'])->name('payroll.salary.index');
+        Route::post('payroll/salary/store',             [PayrollController::class, 'storeSalary'])->name('payroll.salary.store');
+        Route::get('payroll/{payroll}',                 [PayrollController::class, 'show'])->name('payroll.show');
+        Route::post('payroll/{payroll}/approve',        [PayrollController::class, 'approve'])->name('payroll.approve');
+        Route::post('payroll/{payroll}/reopen',         [PayrollController::class, 'reopen'])->name('payroll.reopen');
+        Route::patch('payroll/{payroll}/base-salary',   [PayrollController::class, 'updateBaseSalary'])->name('payroll.updateBaseSalary');
+        Route::patch('payroll/{payroll}/overtime-rate', [PayrollController::class, 'updateOvertimeRate'])->name('payroll.updateOvertimeRate');
+        Route::delete('payroll/{payroll}',              [PayrollController::class, 'destroy'])->name('payroll.destroy');
+
+        // ── DEPOSITS (admin) ─────────────────────────────────────────────────
+        Route::get('deposits',                     [AdminDepositController::class, 'index'])->name('deposits.index');
+        Route::get('deposits/export',              [AdminDepositController::class, 'export'])->name('deposits.export');
+        Route::get('deposits/{deposit}',           [AdminDepositController::class, 'show'])->name('deposits.show');
+        Route::patch('deposits/{deposit}',         [AdminDepositController::class, 'update'])->name('deposits.update');
+        Route::delete('deposits/{deposit}',        [AdminDepositController::class, 'destroy'])->name('deposits.destroy');
+        Route::patch('deposits/{deposit}/status',  [AdminDepositController::class, 'updateStatus'])->name('deposits.status');
+        Route::post('deposits/{deposit}/assign',   [AdminDepositController::class, 'assign'])->name('deposits.assign');
     });
 
     // ── TẤT CẢ (admin, manager, staff) ──────────────────────────────────────
@@ -326,6 +347,11 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::middleware(['role:admin,manager,staff', 'office.network'])->prefix('staff')->name('staff.')->group(function () {
 
         Route::get('customers', [StaffController::class, 'customers'])->name('customers');
+
+        Route::get('deposits',                        [StaffController::class, 'depositsIndex'])->name('deposits.index');
+        Route::get('deposits/{deposit}',              [StaffController::class, 'depositsShow'])->name('deposits.show');
+        Route::post('deposits/{deposit}/finalize',    [StaffController::class, 'depositsFinalize'])->name('deposits.finalize');
+        Route::get('deposits/{deposit}/invoice',      [StaffController::class, 'depositsInvoice'])->name('deposits.invoice');  // ← MỚI
 
         Route::get('orders',                [StaffController::class, 'ordersIndex'])->name('orders.index');
         Route::get('orders/create',         [StaffController::class, 'ordersCreate'])->name('orders.create');

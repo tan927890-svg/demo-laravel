@@ -14,47 +14,40 @@ body:not(.home-page) main { margin-top: 0 !important; }
 *, *::before, *::after { box-sizing: border-box; }
 body { background: #fff; color: var(--dark); }
 
+/* ── HERO ── */
 .pg-hero {
   margin-top: 0;
   background: url('{{ asset("images/car/Banner8.jpeg") }}') center/cover no-repeat;
   padding: 56px 0 40px;
   text-align: center;
   border-bottom: 3px solid var(--red);
-  position: relative;
-  overflow: hidden;
+  position: relative; overflow: hidden;
 }
 .pg-hero::before {
   content: ''; position: absolute; inset: 0;
   background: linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.35) 100%);
   pointer-events: none;
 }
-/* ── FIX: hero label cần z-index + background để hiện trên ảnh tối ── */
 .pg-hero-label {
-  position: relative;
-  z-index: 1;
+  position: relative; z-index: 1;
   display: inline-block;
   font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 800;
   letter-spacing: 4px; text-transform: uppercase;
-  color: #fff;
-  margin-bottom: 14px;
-  padding: 6px 20px;
-  background: var(--red);
-  border: 1px solid rgba(255,255,255,0.25);
-  border-radius: 2px;
+  color: #fff; margin-bottom: 14px;
+  padding: 6px 20px; background: var(--red);
+  border: 1px solid rgba(255,255,255,0.25); border-radius: 2px;
 }
 .pg-hero h1 {
   position: relative; z-index: 1;
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: clamp(32px, 5vw, 56px);
-  font-weight: 900;
-  color: #fff;
-  letter-spacing: 3px;
-  text-transform: uppercase;
+  font-size: clamp(28px, 5vw, 56px); font-weight: 900;
+  color: #fff; letter-spacing: 3px; text-transform: uppercase;
   margin: 0 0 12px;
   text-shadow: 0 4px 20px rgba(0,0,0,0.6);
 }
 .pg-hero p { position: relative; z-index: 1; color: #f9f6f6; font-size: 15px; margin: 0; }
 
+/* ── BREADCRUMB ── */
 .pg-breadcrumb {
   padding: 11px 60px; background: #f9f9f9;
   border-bottom: 1px solid #ddd;
@@ -65,6 +58,7 @@ body { background: #fff; color: var(--dark); }
 .pg-breadcrumb a:hover { color: var(--red); }
 .pg-breadcrumb .current { color: var(--red); font-weight: 700; }
 
+/* ── WRAP ── */
 .pg-wrap { max-width: 1100px; margin: 0 auto; padding: 40px 40px 72px; }
 
 .pg-note {
@@ -84,7 +78,9 @@ body { background: #fff; color: var(--dark); }
 .pg-back:hover { color: var(--red); }
 .pg-back::before { content: '←'; font-size: 14px; }
 
-/* TABLE */
+/* ══════════════════════════════
+   DESKTOP TABLE (≥640px)
+══════════════════════════════ */
 .pt-wrap { border: 1px solid #ddd; overflow-x: auto; }
 .pt-table { width: 100%; border-collapse: collapse; font-size: 15px; }
 
@@ -102,7 +98,6 @@ body { background: #fff; color: var(--dark); }
 }
 .pt-table td:last-child { border-right: none; }
 
-/* Image cell */
 .td-img { text-align: center; padding: 18px 16px; width: 220px; background: #fff; }
 .td-img img {
   width: 195px; height: 124px; object-fit: contain;
@@ -110,7 +105,6 @@ body { background: #fff; color: var(--dark); }
 }
 .pt-table tr:hover .td-img img { transform: scale(1.05); }
 
-/* Variant cell */
 .td-model {
   text-align: center; padding: 20px 18px; width: 195px;
   font-size: 15px; font-weight: 600; color: var(--dark);
@@ -121,35 +115,95 @@ body { background: #fff; color: var(--dark); }
   margin-bottom: 7px; line-height: 1.4;
 }
 
-/* Color cell */
-.td-color { text-align: center; padding: 20px 24px; font-size: 17px; color: #333; }
+.td-color { text-align: center; padding: 20px 24px; font-size: 14px; color: #555; }
 
-/* Price cell */
 .td-price { text-align: center; padding: 20px 32px; white-space: nowrap; width: 320px; min-width: 280px; }
 .price-val { font-size: 18px; font-weight: 700; color: var(--red); letter-spacing: .3px; }
 .price-vnd { font-size: 15px; color: #aaa; font-weight: 400; margin-left: 2px; }
 
-/* Striping */
 .pt-table tbody tr.data-row { background: #fff; }
 .pt-table tbody tr.data-row:nth-child(even) { background: #f8f8f8; }
 .pt-table tbody tr.data-row:hover { background: #fff0f0; transition: background .12s; }
 
-/* Separator */
 .car-sep td { height: 12px; background: #ececec; border-bottom: 2px solid #ddd; border-right: none; padding: 0; }
 
-/* Footer */
 .pt-table tfoot td {
   padding: 13px 20px; font-size: 14px; color: #0c0505;
   background: #f9f9f9; border-top: 2px solid #ddd;
 }
 
-@media (max-width: 800px) {
-  .pg-wrap { padding: 24px 14px 56px; }
-  .pg-breadcrumb { padding-left: 14px; padding-right: 14px; }
-  .td-img { width: 140px; } .td-img img { width: 125px; height: 80px; }
-  .td-model { width: auto; font-size: 13px; padding: 14px 10px; }
-  .td-color { padding: 14px 10px; font-size: 13px; }
-  .price-val { font-size: 14px; } .td-price { padding: 14px 12px; }
+/* ══════════════════════════════
+   MOBILE CARD LIST (<640px)
+══════════════════════════════ */
+.price-mobile-list { display: none; }
+
+@media (max-width: 639px) {
+  /* Hero */
+  .pg-hero { padding: 36px 16px 28px; }
+  .pg-hero-label { font-size: 11px; letter-spacing: 2px; padding: 5px 14px; }
+
+  /* Breadcrumb */
+  .pg-breadcrumb { padding: 10px 16px; font-size: 11.5px; flex-wrap: wrap; }
+
+  /* Wrap */
+  .pg-wrap { padding: 20px 14px 48px; }
+  .pg-note { font-size: 13px; padding: 10px 14px; }
+
+  /* Ẩn table, hiện card list */
+  .pt-wrap { display: none; }
+  .price-mobile-list { display: block; }
+}
+
+/* Card item */
+.pml-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid #efefef;
+}
+.pml-item:last-child { border-bottom: none; }
+
+.pml-img {
+  flex-shrink: 0;
+  width: 100px; height: 66px;
+  object-fit: contain;
+}
+.pml-img-placeholder {
+  width: 100px; height: 66px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; color: #ddd; flex-shrink: 0;
+}
+
+.pml-info { flex: 1; min-width: 0; }
+.pml-brand {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 3px;
+}
+.pml-name {
+  font-size: 14px; font-weight: 700; color: var(--dark);
+  line-height: 1.2; margin-bottom: 3px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.pml-variant {
+  font-size: 11.5px; color: #999; margin-bottom: 6px;
+}
+.pml-price {
+  font-size: 15px; font-weight: 800; color: var(--red);
+}
+.pml-price-sub {
+  font-size: 11px; color: #aaa; font-weight: 400;
+}
+
+/* Footer note mobile */
+.price-footer-note {
+  margin-top: 18px;
+  font-size: 12px; color: #999; line-height: 1.6;
+  padding: 12px 14px;
+  background: #f9f9f9;
+  border-top: 1px solid #eee;
 }
 </style>
 @endpush
@@ -180,6 +234,7 @@ body { background: #fff; color: var(--dark); }
     Vui lòng liên hệ showroom để nhận báo giá chính xác nhất.
   </div>
 
+  {{-- ══ DESKTOP TABLE ══ --}}
   <div class="pt-wrap">
     <table class="pt-table">
       <thead>
@@ -191,7 +246,6 @@ body { background: #fff; color: var(--dark); }
         </tr>
       </thead>
       <tbody>
-
         @forelse($cars as $car)
           @php
             $thumb = null;
@@ -215,7 +269,7 @@ body { background: #fff; color: var(--dark); }
                 <div style="font-size:12px;color:#aaa;margin-top:4px;">{{ $car->model }}</div>
               @endif
             </td>
-            <td class="td-color" style="font-size:14px;color:#555;">
+            <td class="td-color">
               {{ $car->status === 'coming_soon' ? 'Sắp ra mắt' : ($car->model ?? '—') }}
             </td>
             <td class="td-price">
@@ -232,7 +286,6 @@ body { background: #fff; color: var(--dark); }
             <td colspan="4" style="padding:40px;text-align:center;color:#aaa;">Chưa có dữ liệu giá.</td>
           </tr>
         @endforelse
-
       </tbody>
       <tfoot>
         <tr>
@@ -243,6 +296,51 @@ body { background: #fff; color: var(--dark); }
         </tr>
       </tfoot>
     </table>
+  </div>
+
+  {{-- ══ MOBILE CARD LIST ══ --}}
+  <div class="price-mobile-list">
+    @forelse($cars as $car)
+      @php
+        $thumb = null;
+        if (!empty($car->image_url)) {
+          $raw   = $car->image_url;
+          $thumb = preg_match('#^https?://#i', $raw) ? $raw : asset(ltrim($raw, '/'));
+        }
+      @endphp
+      <div class="pml-item">
+        {{-- Ảnh --}}
+        @if($thumb)
+          <img class="pml-img" src="{{ $thumb }}" alt="{{ $car->name }}" onerror="this.style.opacity=.1">
+        @else
+          <div class="pml-img-placeholder">🚗</div>
+        @endif
+
+        {{-- Thông tin --}}
+        <div class="pml-info">
+          <div class="pml-brand">{{ $car->brand->name ?? '' }}</div>
+          <div class="pml-name">{{ $car->name }}</div>
+          <div class="pml-variant">
+            {{ $car->status === 'coming_soon' ? 'Sắp ra mắt' : ($car->model ?? '—') }}
+          </div>
+          @if($car->price_per_day)
+            <div class="pml-price">
+              {{ number_format($car->price_per_day, 0, ',', '.') }}
+              <span class="pml-price-sub">VND</span>
+            </div>
+          @else
+            <div class="pml-price" style="font-size:13px;color:#aaa;font-weight:600">Liên hệ</div>
+          @endif
+        </div>
+      </div>
+    @empty
+      <div style="padding:40px 0;text-align:center;color:#aaa;font-size:14px;">Chưa có dữ liệu giá.</div>
+    @endforelse
+
+    <div class="price-footer-note">
+      * Giá trên là MSRP đề xuất. Phí trước bạ, đăng ký biển số và phụ kiện tính riêng.
+      Giá thực tế tại showroom có thể thay đổi theo chương trình ưu đãi hiện hành.
+    </div>
   </div>
 
 </div>

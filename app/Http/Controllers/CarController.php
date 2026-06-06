@@ -145,6 +145,7 @@ public function home()
 
     public function costEstimate(Car $car)
     {
+        $car->load('variants'); // ← FIX: eager load variants
         return view('cars.cost-estimate', compact('car'));
     }
 

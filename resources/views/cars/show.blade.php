@@ -1182,7 +1182,9 @@ window.tvSwitch = function(tab, btn) {
     <div style="position:relative;z-index:1;">
       <div class="info-cta-title">Thông Tin Chi Tiết</div>
       <div class="info-cta-btns">
-        <a href="{{ route('services.booking') }}" class="info-cta-btn">Đặt xe ngay →</a>
+      <a href="{{ route('deposits.create', $car->slug) }}" class="info-cta-btn">
+    Đặt cọc ngay →
+</a>
         <a href="{{ route('cars.compare') }}" class="info-cta-btn">So sánh sản phẩm →</a>
       </div>
     </div>
@@ -1213,7 +1215,7 @@ window.tvSwitch = function(tab, btn) {
             $ri = carImgPath($rg?->file_path ?? null);
         }
       @endphp
-      <a href="{{ route('cars.show',$related->id) }}" class="related-card">
+      <a href="{{ route('cars.show', $related->slug) }}" class="related-card">
         @if($ri)
           <img class="related-img" src="{{ $ri }}" alt="{{ $related->name }}"
                onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">

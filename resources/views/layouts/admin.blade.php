@@ -513,6 +513,14 @@
             <span class="icon-wrap icon-amber"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></span>
             Đơn hàng của tôi
           </a>
+          <a href="{{ route('admin.staff.deposits.index') }}" class="nav-link {{ request()->routeIs('admin.staff.deposits*') ? 'active' : '' }}">
+            <span class="icon-wrap icon-teal"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span>
+            Đặt cọc của tôi
+            @php $myPendingDeposits = \App\Models\Deposit::where('assigned_to', Auth::id())->where('status','pending')->count(); @endphp
+            @if($myPendingDeposits > 0)
+              <span style="margin-left:auto;background:#dc2626;color:#fff;border-radius:20px;font-size:10px;font-weight:700;padding:1px 7px">{{ $myPendingDeposits }}</span>
+            @endif
+          </a>
         @endif
 
         <a href="{{ route('admin.staff.customers') }}" class="nav-link {{ request()->routeIs('admin.staff.customers*') ? 'active' : '' }}">

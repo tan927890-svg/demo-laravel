@@ -161,7 +161,7 @@ Tạo database cho AI chat:
 mysql -u root -p -e "CREATE DATABASE demo_laravel;"
 mysql -u root -p demo_laravel < init.sql
 ```
-
+  
 Chạy AI chat server:
 
 ```bash
@@ -398,3 +398,9 @@ npm cache clean --force && npm install && npm run build
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 # Chạy dòng này trước rồi mới chạy lệnh tải model
 ```
+# cài thư viện dompdf
+composer require barryvdh/laravel-dompdf
+# sau đó chạy tiếp để cài font chữ Ctrl + C 
+cd C:\laragon\www\demo-laravel
+php artisan vendor:publish --provider="Barryvdh\DomPDF\ServiceProvider"
+php artisan config:clear

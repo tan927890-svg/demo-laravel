@@ -22,12 +22,12 @@ class Car extends Model
         'color',
         'mileage',
         'fuel_type',
-        'transmission',   // ← thêm
+        'transmission',
         'condition',
         'engine',
         'seats',
         'description',
-        'content',        // ← thêm
+        'content',
         'images',
         'image',
         'image_url',
@@ -54,11 +54,18 @@ class Car extends Model
     {
         parent::boot();
         static::creating(function ($car) {
-            // Chỉ tự tạo slug nếu chưa có (form có thể gửi slug thủ công)
             if (empty($car->slug)) {
                 $car->slug = Str::slug($car->name . '-' . uniqid());
             }
         });
+    }
+
+    // ── Route Model Binding ──────────────────────────────────────
+    public function resolveRouteBinding($value, $field = null)
+    {
+        return is_numeric($value)
+            ? $this->where('id', $value)->firstOrFail()
+            : $this->where('slug', $value)->firstOrFail();
     }
 
     // ── Relationships ────────────────────────────────────────────

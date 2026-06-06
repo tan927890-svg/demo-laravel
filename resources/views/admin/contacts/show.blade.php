@@ -1,14 +1,7 @@
 @extends('layouts.admin')
 @section('page-title', 'Chi tiết liên hệ')
 
-@section('topbar-actions')
-  @if($unreadCount > 0)
-  <form method="POST" action="{{ route('admin.contacts.markAllRead') }}" style="display:inline">
-    @csrf
-    <button type="submit" class="btn btn-sm">✓ Đánh dấu tất cả đã đọc</button>
-  </form>
-  @endif
-@endsection
+{{-- Bỏ nút "Đánh dấu tất cả đã đọc" ở trang chi tiết để tránh nhầm lẫn --}}
 
 @push('styles')
 <style>
@@ -73,21 +66,16 @@
         Quay lại
       </a>
       <span class="tag {{ $tagClass }}">{{ $tagLabel }}</span>
-      @if($contact->is_read)
-        <span style="font-size:14px;color:#9ca3af;display:flex;align-items:center;gap:4px">
-          <svg width="14" height="14" fill="none" stroke="#9ca3af" stroke-width="2.5" viewBox="0 0 24 24">
-            <path d="M20 6L9 17l-5-5"/>
-          </svg>
-          Đã đọc
-        </span>
-      @else
-        <span style="font-size:13px;background:#dbeafe;color:#1e40af;border-radius:20px;
-                     padding:3px 10px;font-weight:600;">● Chưa đọc</span>
-      @endif
+      {{-- Luôn hiển thị "Đã đọc" vì show() đã mark rồi --}}
+      <span style="font-size:14px;color:#9ca3af;display:flex;align-items:center;gap:4px">
+        <svg width="14" height="14" fill="none" stroke="#9ca3af" stroke-width="2.5" viewBox="0 0 24 24">
+          <path d="M20 6L9 17l-5-5"/>
+        </svg>
+        Đã đọc
+      </span>
     </div>
     <div style="display:flex;align-items:center;gap:16px">
       <span style="font-size:14px;color:#9ca3af">{{ $contact->created_at->format('d/m/Y H:i') }}</span>
-      {{-- Form xóa - dùng modal thay confirm() --}}
       <form method="POST" action="{{ route('admin.contacts.destroy', $contact) }}"
             id="deleteForm" style="margin:0">
         @csrf @method('DELETE')
@@ -230,7 +218,7 @@
 
 </div>
 
-{{-- ===== Custom Delete Modal (không nền tối) ===== --}}
+{{-- Delete Modal --}}
 <div id="deleteModal"
      style="display:none;position:fixed;inset:0;z-index:9999;
             align-items:center;justify-content:center;pointer-events:none">

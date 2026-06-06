@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="csrf-token" content="{{ csrf_token() }}">
-<title>AutoViet Chat</title>
+<title>Auto X Chat</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden}
@@ -80,6 +80,10 @@ body{font-family:'Segoe UI',sans-serif;background:#f0f2f5}
 #img-preview-wrap img{height:48px;width:48px;object-fit:cover;border-radius:6px;border:1px solid #dde3ef}
 #img-preview-wrap .rm{background:#e74c3c;color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 
+/* See all cars link */
+.see-all-cars{display:inline-flex;align-items:center;gap:5px;margin-top:10px;padding:6px 14px;background:#eef4ff;border:1px solid #c8d4e8;border-radius:20px;font-size:12px;font-weight:600;color:#1c69d4;text-decoration:none;transition:background .15s}
+.see-all-cars:hover{background:#ddeaff}
+
 /* Booking form */
 .booking-bubble{background:#fff;border:1.5px solid #1c69d4;border-radius:16px;border-bottom-left-radius:4px;box-shadow:0 2px 12px rgba(28,105,212,0.12);overflow:hidden;width:100%;max-width:340px}
 .booking-bubble-header{background:#1c69d4;padding:10px 14px;display:flex;align-items:center;gap:8px}
@@ -113,10 +117,10 @@ body{font-family:'Segoe UI',sans-serif;background:#f0f2f5}
 <body>
 <div id="app">
   <div id="hd">
-    <div id="hd-logo">AV</div>
+    <div id="hd-logo">AX</div>
     <div class="dot"></div>
     <div id="hd-text">
-      <div class="name">AutoX Advisor</div>
+      <div class="name">Auto X Advisor</div>
       <div class="sub">Trợ lý AI tư vấn xe · Đang trực tuyến</div>
     </div>
     <button id="hd-clear" onclick="clearSession()">Xóa chat</button>
@@ -152,10 +156,11 @@ var CLEAR_URL   = '{{ route("chat.clear") }}';
 var CARS_API    = '{{ url("/api/cars-data") }}';
 var BOOKING_URL = '{{ route("booking.store") }}';
 var CSRF_TOKEN  = document.querySelector('meta[name="csrf-token"]').content;
-var CARS_KEY    = 'autoviet_cars_v2';
-var SESS_KEY    = 'autoviet_session_id';
+var CARS_KEY    = 'autox_cars_v1';
+var SESS_KEY    = 'autox_session_id';
 var DAT_LICH    = '{{ url("/services/dat-lich") }}';
-var SHOWROOM    = 'AutoViet';
+var SHOWROOM    = 'Auto X';
+var CARS_PAGE   = '{{ route("cars.index") }}';
 
 var QUICK_DEFAULT = [
   'Xem tất cả xe', 'Bảng giá', 'Ngân sách dưới 5 tỷ',
@@ -262,37 +267,51 @@ function clearImage() {
 
 // ════════════════════════════════════════════════════════════
 // MARKDOWN-LITE PARSER
-// Hỗ trợ: **bold**, *italic*, - list, \n newline, [link](url)
 // ════════════════════════════════════════════════════════════
 function _parseMarkdown(text) {
   if (!text) return '';
   return text
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    // Bold
     .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
-    // Italic
     .replace(/\*(.+?)\*/g,'<em>$1</em>')
-    // Links [text](url)
     .replace(/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g,
       '<a href="$2" target="_blank" style="color:#1c69d4;text-decoration:underline">$1</a>')
-    // Internal link to /services/dat-lich
     .replace(/\[([^\]]+)\]\((\/[^\)]+)\)/g,
       '<a href="$2" target="_blank" style="color:#1c69d4;text-decoration:underline">$1</a>')
-    // Bare /services/dat-lich
     .replace(/(\/services\/dat-lich)/g,
       '<a href="$1" target="_blank" style="color:#1c69d4;font-weight:600">Đặt lịch lái thử</a>')
-    // List items: lines starting with - or •
     .replace(/^[-•]\s+(.+)$/gm,'<span style="display:block;padding-left:10px">• $1</span>')
-    // Line breaks
     .replace(/\n/g,'<br>');
 }
 
-// Thêm ảnh xe vào cuối bubble nếu AI nhắc đến xe
+// ════════════════════════════════════════════════════════════
+// INJECT CAR IMAGES
+// Chỉ inject khi bot nhắc tên xe trong ngữ cảnh tư vấn bình thường.
+// KHÔNG inject khi response là thông báo xe không có trong kho
+// hoặc so sánh thất bại (để tránh hiển thị card lẫn lộn với chữ).
+// ════════════════════════════════════════════════════════════
+var _NO_INJECT_PATTERNS = [
+  'showroom không có',
+  'chúng tôi không có',
+  'không có trong kho',
+  'không tìm thấy',
+  'các xe đang có tại showroom',
+  'các xe đang có',
+  'xe đang có tại showroom',
+];
+
 function _injectCarImages(text, bubbleEl) {
   if (!_cars.length) return;
+
+  // Không render card khi response báo không có xe / so sánh thất bại
+  var textLower = text.toLowerCase();
+  for (var pi = 0; pi < _NO_INJECT_PATTERNS.length; pi++) {
+    if (textLower.indexOf(_NO_INJECT_PATTERNS[pi]) !== -1) return;
+  }
+
   var mentioned = [];
   _cars.forEach(function(car){
-    if (text.toLowerCase().includes(car.name.toLowerCase()) && mentioned.length < 2) {
+    if (text.toLowerCase().indexOf(car.name.toLowerCase()) !== -1 && mentioned.length < 2) {
       var img = _getCarImg(car);
       if (img && !mentioned.find(function(c){ return c.id === car.id; })) {
         mentioned.push(car);
@@ -300,6 +319,7 @@ function _injectCarImages(text, bubbleEl) {
     }
   });
   if (!mentioned.length) return;
+
   var row = document.createElement('div');
   row.style.cssText = 'display:flex;gap:8px;margin-top:10px;flex-wrap:wrap';
   mentioned.forEach(function(car){
@@ -318,6 +338,16 @@ function _injectCarImages(text, bubbleEl) {
     row.appendChild(card);
   });
   bubbleEl.appendChild(row);
+
+  // ── Link "Xem tất cả xe" ──────────────────────────────────
+  var seeAll = document.createElement('div');
+  seeAll.style.cssText = 'margin-top:8px';
+  seeAll.innerHTML = '<a href="' + CARS_PAGE + '" class="see-all-cars" target="_blank">'
+    + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0">'
+    + '<rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>'
+    + '<circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>'
+    + 'Xem tất cả xe →</a>';
+  bubbleEl.appendChild(seeAll);
 }
 
 // ════════════════════════════════════════════════════════════
@@ -337,12 +367,11 @@ function renderMsg(role, html, rawText) {
   wrap.className = 'm ' + (role === 'bot' ? 'b' : 'u');
   var av = document.createElement('div');
   av.className = 'av';
-  av.textContent = role === 'bot' ? 'AV' : 'Bạn';
+  av.textContent = role === 'bot' ? 'AX' : 'Bạn';
   var bub = document.createElement('div');
   bub.className = 'bub';
   bub.innerHTML = html;
 
-  // Inject car images if bot message
   if (role === 'bot' && rawText) {
     _injectCarImages(rawText, bub);
   }
@@ -365,7 +394,7 @@ function addBotMsg(text) {
 function addErrMsg(text) {
   var wrap = document.createElement('div');
   wrap.className = 'm b';
-  var av = document.createElement('div'); av.className = 'av'; av.textContent = 'AV';
+  var av = document.createElement('div'); av.className = 'av'; av.textContent = 'AX';
   var bub = document.createElement('div'); bub.className = 'bub';
   bub.innerHTML = '<div class="err-banner">' + text + '</div>';
   wrap.appendChild(av); wrap.appendChild(bub);
@@ -376,7 +405,7 @@ function addErrMsg(text) {
 function showTyping() {
   var wrap = document.createElement('div');
   wrap.className = 'm b'; wrap.id = 'typing-indicator';
-  var av = document.createElement('div'); av.className = 'av'; av.textContent = 'AV';
+  var av = document.createElement('div'); av.className = 'av'; av.textContent = 'AX';
   var bub = document.createElement('div'); bub.className = 'bub typing';
   bub.innerHTML = '<span></span><span></span><span></span>';
   wrap.appendChild(av); wrap.appendChild(bub);
@@ -400,12 +429,12 @@ function setQuick(arr) {
 }
 
 // ════════════════════════════════════════════════════════════
-// BOOKING FORM (local — không cần AI)
+// BOOKING FORM
 // ════════════════════════════════════════════════════════════
 function renderBookingForm() {
   var wrap = document.createElement('div');
   wrap.className = 'm b';
-  var av = document.createElement('div'); av.className = 'av'; av.textContent = 'AV';
+  var av = document.createElement('div'); av.className = 'av'; av.textContent = 'AX';
   var bub = document.createElement('div');
   bub.className = 'bub';
   bub.style.cssText = 'padding:0;background:transparent;box-shadow:none';
@@ -529,7 +558,7 @@ function clearSession() {
 }
 
 // ════════════════════════════════════════════════════════════
-// SEND — gọi AI backend thật
+// SEND
 // ════════════════════════════════════════════════════════════
 function send(txt) {
   var t = (txt !== undefined ? txt : uiEl.value).trim();
@@ -539,7 +568,6 @@ function send(txt) {
   setQuick([]);
   _setEnabled(false);
 
-  // Shortcut cục bộ: đặt lịch
   if (!_pendingImg && /^đặt lịch|^lái thử$/i.test(t)) {
     addUserMsg(t);
     _setEnabled(true);
@@ -562,7 +590,7 @@ function send(txt) {
       method: 'POST',
       headers: {'Content-Type':'application/json','X-CSRF-TOKEN':CSRF_TOKEN},
       body: JSON.stringify({
-        image: imgData.b64,
+        image_b64: imgData.b64,
         media_type: imgData.mediaType,
         message: t || ''
       })

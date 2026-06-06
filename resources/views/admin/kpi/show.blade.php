@@ -12,16 +12,117 @@
 
 @section('content')
 
+<style>
+/* ══ STAT CARDS ══ */
+.kpi-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* mobile: 2 cột */
+  gap: 12px;
+  margin-bottom: 20px;
+}
+@media (min-width: 640px) {
+  .kpi-stats-grid {
+    grid-template-columns: repeat(4, 1fr); /* desktop: 4 cột */
+  }
+}
+.kpi-stats-grid .stat-card {
+  min-width: 0; /* tránh tràn */
+}
+.kpi-stats-grid .stat-val {
+  font-size: 20px !important;
+  word-break: break-all;
+}
+
+/* ══ FORM ĐẶT KPI ══ */
+.kpi-target-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-end;
+}
+.kpi-target-form > div { flex: 1 1 120px; min-width: 100px; }
+.kpi-target-form input[style*="width:200px"] { width: 100% !important; }
+.kpi-target-form input[style*="width:100px"] { width: 100% !important; }
+.kpi-target-form .btn { flex-shrink: 0; }
+
+/* ══ BẢNG ĐƠN HÀNG — desktop ══ */
+.order-table-wrap { display: none; }
+@media (min-width: 640px) {
+  .order-table-wrap { display: block; }
+  .order-mobile-list { display: none !important; }
+}
+
+/* ══ BẢNG ĐƠN HÀNG — mobile card list ══ */
+.order-mobile-list { display: block; }
+.order-mobile-item {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.order-mobile-item:last-child { border-bottom: none; }
+
+.order-mi-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.order-mi-name  { font-size: 14px; font-weight: 700; color: #111827; }
+.order-mi-phone { font-size: 12px; color: #9ca3af; margin-top: 2px; }
+.order-mi-car   { font-size: 13px; color: #374151; margin-bottom: 6px; }
+
+.order-mi-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.order-mi-price {
+  font-size: 13px;
+  color: #4f46e5;
+  font-weight: 600;
+}
+.order-mi-comm {
+  font-size: 12px;
+  color: #059669;
+  font-weight: 600;
+}
+.order-mi-date {
+  font-size: 12px;
+  color: #9ca3af;
+  margin-left: auto;
+}
+
+.order-mi-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.order-mi-actions .btn { font-size: 12px; flex: 1; justify-content: center; text-align: center; }
+
+/* ══ NHÂN VIÊN CARD ══ */
+.kpi-staff-card {
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.kpi-staff-card .badge { margin-left: auto; }
+</style>
+
 {{-- Thông tin nhân viên --}}
-<div class="card card-pad" style="margin-bottom:16px;display:flex;align-items:center;gap:14px">
+<div class="card card-pad kpi-staff-card">
   <div style="width:44px;height:44px;font-size:16px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">
     {{ strtoupper(substr($user->name, 0, 2)) }}
   </div>
-  <div>
+  <div style="min-width:0">
     <div style="font-size:15px;font-weight:600">{{ $user->name }}</div>
-    <div style="font-size:12px;color:var(--text-3)">{{ $user->email }}</div>
+    <div style="font-size:12px;color:var(--text-3);word-break:break-all">{{ $user->email }}</div>
   </div>
-  <span class="badge badge-gray" style="margin-left:auto">{{ ucfirst($user->role ?? 'staff') }}</span>
+  <span class="badge badge-gray">{{ ucfirst($user->role ?? 'staff') }}</span>
 </div>
 
 {{-- Form đặt KPI target --}}
@@ -32,7 +133,7 @@
 @endphp
 <div class="card card-pad" style="margin-bottom:16px">
   <div style="font-size:14px;font-weight:700;margin-bottom:14px">🎯 Đặt KPI tháng</div>
-  <form method="POST" action="{{ route('admin.kpi.setTarget', $user) }}" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+  <form method="POST" action="{{ route('admin.kpi.setTarget', $user) }}" class="kpi-target-form">
     @csrf
     <div>
       <label class="form-label">Tháng</label>
@@ -50,24 +151,26 @@
         @endfor
       </select>
     </div>
-    <div>
+    <div style="flex:2 1 160px">
       <label class="form-label">Doanh thu mục tiêu (đ)</label>
       <input type="number" name="target_revenue" class="form-input"
              value="{{ $currentKpi?->target_revenue ?? '' }}"
-             placeholder="VD: 5000000000" min="1" style="width:200px" required>
+             placeholder="VD: 5000000000" min="1" style="width:100%" required>
     </div>
     <div>
       <label class="form-label">Số đơn mục tiêu</label>
       <input type="number" name="target_orders" class="form-input"
              value="{{ $currentKpi?->target_orders ?? '' }}"
-             placeholder="VD: 3" min="0" style="width:100px">
+             placeholder="VD: 3" min="0" style="width:100%">
     </div>
-    <button class="btn btn-primary" type="submit">Lưu KPI</button>
+    <div style="flex:0 0 auto;align-self:flex-end">
+      <button class="btn btn-primary" type="submit">Lưu KPI</button>
+    </div>
     @if($currentKpi)
-      <span style="font-size:12px;color:var(--text-3);align-self:center">
+      <div style="flex:1 1 100%;font-size:12px;color:var(--text-3)">
         Hiện tại tháng {{ now()->month }}/{{ now()->year }}:
         {{ number_format($currentKpi->target_revenue, 0, ',', '.') }}đ
-      </span>
+      </div>
     @endif
   </form>
   @if(session('success'))<div class="alert alert-success flash" style="margin-top:10px">{{ session('success') }}</div>@endif
@@ -75,7 +178,7 @@
 @endif
 
 {{-- Stat cards --}}
-<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
+<div class="kpi-stats-grid">
   <div class="stat-card">
     <div class="stat-label">Tổng đơn</div>
     <div class="stat-val">{{ $stats['total'] }}</div>
@@ -88,12 +191,12 @@
   </div>
   <div class="stat-card">
     <div class="stat-label">Doanh số</div>
-    <div class="stat-val" style="font-size:20px">{{ number_format($stats['revenue'], 0, ',', '.') }}đ</div>
+    <div class="stat-val" style="font-size:16px !important">{{ number_format($stats['revenue'], 0, ',', '.') }}đ</div>
     <div class="stat-sub">tổng giá trị chốt</div>
   </div>
   <div class="stat-card">
     <div class="stat-label">Hoa hồng</div>
-    <div class="stat-val" style="font-size:20px;color:var(--success)">{{ number_format($stats['commission'], 0, ',', '.') }}đ</div>
+    <div class="stat-val" style="font-size:16px !important;color:var(--success)">{{ number_format($stats['commission'], 0, ',', '.') }}đ</div>
     <div class="stat-sub">tổng hoa hồng nhận được</div>
   </div>
 </div>
@@ -108,9 +211,11 @@
     $commissionByMonth[$row->month] = (float) $row->commission;
   }
 @endphp
-<div class="card card-pad" style="margin-bottom:20px">
+<div class="card card-pad" style="margin-bottom:20px;overflow:hidden">
   <div style="font-weight:600;font-size:14px;margin-bottom:16px">📈 Doanh số & Hoa hồng theo tháng — {{ now()->year }}</div>
-  <canvas id="kpiChart" style="max-height:320px"></canvas>
+  <div style="position:relative;width:100%;overflow-x:auto">
+    <canvas id="kpiChart" style="max-height:280px;min-width:320px"></canvas>
+  </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
@@ -162,91 +267,147 @@ new Chart(document.getElementById('kpiChart').getContext('2d'), {
   <div style="padding:14px 18px;border-bottom:1px solid var(--border);font-weight:600;font-size:14px">
     📋 Danh sách đơn hàng
   </div>
-  <table class="table">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Khách hàng</th>
-        <th>Xe</th>
-        <th>Trạng thái</th>
-        <th>Ngày tạo</th>
-        <th style="text-align:right">Hành động</th>
-      </tr>
-    </thead>
-    <tbody>
-      @foreach($orders as $order)
-      <tr>
-        <td style="color:var(--text-muted)">{{ $order->id }}</td>
-        <td>
-          <div style="font-weight:600;font-size:13px">{{ $order->customer_name }}</div>
-          <div style="font-size:12px;color:var(--text-muted)">{{ $order->customer_phone }}</div>
-        </td>
-        <td style="font-size:13px">{{ $order->car?->name ?? '—' }}</td>
-        <td>
-          @php
-            $statusMap = [
-              'chua_tu_van' => ['label' => 'Chưa tư vấn', 'color' => '#92400e', 'bg' => '#fef3c7'],
-              'da_tu_van'   => ['label' => 'Đã tư vấn',   'color' => '#1e40af', 'bg' => '#dbeafe'],
-              'da_chot_don' => ['label' => 'Đã chốt',     'color' => '#166534', 'bg' => '#dcfce7'],
-            ];
-            $s = $statusMap[$order->consultation_status] ?? ['label' => $order->consultation_status, 'color' => '#555', 'bg' => '#f3f4f6'];
-          @endphp
-          <span style="padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;color:{{ $s['color'] }};background:{{ $s['bg'] }}">
-            {{ $s['label'] }}
-          </span>
-          @if($order->sale_price)
-            <div style="font-size:11px;color:var(--text-3);margin-top:3px">
-              {{ number_format($order->sale_price, 0, ',', '.') }}đ
-              @if($order->commission_amount)
-                &nbsp;·&nbsp;🏆 {{ number_format($order->commission_amount, 0, ',', '.') }}đ
+
+  {{-- DESKTOP TABLE --}}
+  <div class="order-table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Khách hàng</th>
+          <th>Xe</th>
+          <th>Trạng thái</th>
+          <th>Ngày tạo</th>
+          <th style="text-align:right">Hành động</th>
+        </tr>
+      </thead>
+      <tbody>
+        @foreach($orders as $order)
+        @php
+          $statusMap = [
+            'chua_tu_van' => ['label' => 'Chưa tư vấn', 'color' => '#92400e', 'bg' => '#fef3c7'],
+            'da_tu_van'   => ['label' => 'Đã tư vấn',   'color' => '#1e40af', 'bg' => '#dbeafe'],
+            'da_chot_don' => ['label' => 'Đã chốt',     'color' => '#166534', 'bg' => '#dcfce7'],
+          ];
+          $s = $statusMap[$order->consultation_status] ?? ['label' => $order->consultation_status, 'color' => '#555', 'bg' => '#f3f4f6'];
+        @endphp
+        <tr>
+          <td style="color:var(--text-muted)">{{ $order->id }}</td>
+          <td>
+            <div style="font-weight:600;font-size:13px">{{ $order->customer_name }}</div>
+            <div style="font-size:12px;color:var(--text-muted)">{{ $order->customer_phone }}</div>
+          </td>
+          <td style="font-size:13px">{{ $order->car?->name ?? '—' }}</td>
+          <td>
+            <span style="padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;color:{{ $s['color'] }};background:{{ $s['bg'] }}">
+              {{ $s['label'] }}
+            </span>
+            @if($order->sale_price)
+              <div style="font-size:11px;color:var(--text-3);margin-top:3px">
+                {{ number_format($order->sale_price, 0, ',', '.') }}đ
+                @if($order->commission_amount)
+                  &nbsp;·&nbsp;🏆 {{ number_format($order->commission_amount, 0, ',', '.') }}đ
+                @endif
+              </div>
+            @endif
+          </td>
+          <td style="font-size:13px;color:var(--text-muted)">{{ $order->created_at->format('d/m/Y') }}</td>
+          <td style="text-align:right">
+            <div style="display:flex;gap:6px;justify-content:flex-end;align-items:center;flex-wrap:wrap">
+              @if($order->consultation_status === 'chua_tu_van')
+                <form id="consulted-form-dt-{{ $order->id }}" action="{{ route('admin.kpi.markConsulted', $order) }}" method="POST" style="display:none">@csrf</form>
+                <button type="button" class="btn btn-sm"
+                  style="background:#dbeafe;color:#1e40af;border-color:#bfdbfe;font-size:12px"
+                  onclick="openKpiConfirm('consulted-form-dt-{{ $order->id }}', 'Xác nhận tư vấn', 'Xác nhận đã tư vấn xong khách <strong>{{ addslashes($order->customer_name) }}</strong>?', 'info')">
+                  💬 Đã tư vấn
+                </button>
+                <form id="delete-form-dt-{{ $order->id }}" action="{{ route('admin.kpi.destroyOrder', [$user, $order]) }}" method="POST" style="display:none">@csrf @method('DELETE')</form>
+                <button type="button" class="btn btn-sm btn-danger" style="font-size:12px"
+                  onclick="openKpiConfirm('delete-form-dt-{{ $order->id }}', 'Xóa đơn hàng', 'Xóa đơn <strong>#{{ $order->id }}</strong> của <strong>{{ addslashes($order->customer_name) }}</strong>? Không thể hoàn tác!', 'danger')">
+                  Xóa
+                </button>
+              @elseif($order->consultation_status === 'da_tu_van')
+                <button type="button" class="btn btn-sm"
+                  style="background:#dcfce7;color:#166534;border-color:#bbf7d0;font-size:12px"
+                  onclick="openCloseModal({{ $order->id }}, '{{ addslashes($order->car?->name ?? '') }}', {{ $order->car->price_per_day ?? 0 }})">
+                  ✅ Chốt đơn
+                </button>
+              @else
+                <span style="font-size:12px;color:var(--text-muted)">Hoàn tất</span>
               @endif
             </div>
+          </td>
+        </tr>
+        @endforeach
+      </tbody>
+    </table>
+  </div>
+
+  {{-- MOBILE CARD LIST --}}
+  <div class="order-mobile-list">
+    @foreach($orders as $order)
+    @php
+      $statusMap = [
+        'chua_tu_van' => ['label' => 'Chưa tư vấn', 'color' => '#92400e', 'bg' => '#fef3c7'],
+        'da_tu_van'   => ['label' => 'Đã tư vấn',   'color' => '#1e40af', 'bg' => '#dbeafe'],
+        'da_chot_don' => ['label' => 'Đã chốt',     'color' => '#166534', 'bg' => '#dcfce7'],
+      ];
+      $s = $statusMap[$order->consultation_status] ?? ['label' => $order->consultation_status, 'color' => '#555', 'bg' => '#f3f4f6'];
+    @endphp
+    <div class="order-mobile-item">
+      {{-- Top: tên + badge --}}
+      <div class="order-mi-top">
+        <div>
+          <div class="order-mi-name">{{ $order->customer_name }}</div>
+          <div class="order-mi-phone">{{ $order->customer_phone }}</div>
+        </div>
+        <span style="padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;color:{{ $s['color'] }};background:{{ $s['bg'] }};flex-shrink:0">
+          {{ $s['label'] }}
+        </span>
+      </div>
+
+      {{-- Xe --}}
+      <div class="order-mi-car">🚗 {{ $order->car?->name ?? '—' }}</div>
+
+      {{-- Giá + hoa hồng + ngày --}}
+      <div class="order-mi-row">
+        @if($order->sale_price)
+          <span class="order-mi-price">{{ number_format($order->sale_price, 0, ',', '.') }}đ</span>
+          @if($order->commission_amount)
+            <span class="order-mi-comm">🏆 {{ number_format($order->commission_amount, 0, ',', '.') }}đ</span>
           @endif
-        </td>
-        <td style="font-size:13px;color:var(--text-muted)">{{ $order->created_at->format('d/m/Y') }}</td>
-        <td style="text-align:right">
-          <div style="display:flex;gap:6px;justify-content:flex-end;align-items:center;flex-wrap:wrap">
+        @endif
+        <span class="order-mi-date">{{ $order->created_at->format('d/m/Y') }}</span>
+      </div>
 
-            @if($order->consultation_status === 'chua_tu_van')
-              {{-- hidden form tư vấn --}}
-              <form id="consulted-form-{{ $order->id }}" action="{{ route('admin.kpi.markConsulted', $order) }}" method="POST" style="display:none">
-                @csrf
-              </form>
-              <button type="button"
-                class="btn btn-sm"
-                style="background:#dbeafe;color:#1e40af;border-color:#bfdbfe;font-size:12px"
-                onclick="openKpiConfirm('consulted-form-{{ $order->id }}', 'Xác nhận tư vấn', 'Xác nhận đã tư vấn xong khách <strong>{{ addslashes($order->customer_name) }}</strong>?', 'info')">
-                💬 Đã tư vấn
-              </button>
+      {{-- Actions --}}
+      <div class="order-mi-actions">
+        @if($order->consultation_status === 'chua_tu_van')
+          <form id="consulted-form-{{ $order->id }}" action="{{ route('admin.kpi.markConsulted', $order) }}" method="POST" style="display:none">@csrf</form>
+          <button type="button" class="btn btn-sm"
+            style="background:#dbeafe;color:#1e40af;border-color:#bfdbfe;font-size:12px"
+            onclick="openKpiConfirm('consulted-form-{{ $order->id }}', 'Xác nhận tư vấn', 'Xác nhận đã tư vấn xong khách <strong>{{ addslashes($order->customer_name) }}</strong>?', 'info')">
+            💬 Đã tư vấn
+          </button>
+          <form id="delete-form-{{ $order->id }}" action="{{ route('admin.kpi.destroyOrder', [$user, $order]) }}" method="POST" style="display:none">@csrf @method('DELETE')</form>
+          <button type="button" class="btn btn-sm btn-danger" style="font-size:12px"
+            onclick="openKpiConfirm('delete-form-{{ $order->id }}', 'Xóa đơn hàng', 'Xóa đơn <strong>#{{ $order->id }}</strong> của <strong>{{ addslashes($order->customer_name) }}</strong>? Không thể hoàn tác!', 'danger')">
+            Xóa
+          </button>
+        @elseif($order->consultation_status === 'da_tu_van')
+          <button type="button" class="btn btn-sm"
+            style="background:#dcfce7;color:#166534;border-color:#bbf7d0;font-size:12px"
+            onclick="openCloseModal({{ $order->id }}, '{{ addslashes($order->car?->name ?? '') }}', {{ $order->car->price_per_day ?? 0 }})">
+            ✅ Chốt đơn
+          </button>
+        @else
+          <span style="font-size:12px;color:var(--text-muted)">Hoàn tất</span>
+        @endif
+      </div>
+    </div>
+    @endforeach
+  </div>
 
-              {{-- hidden form xóa --}}
-              <form id="delete-form-{{ $order->id }}" action="{{ route('admin.kpi.destroyOrder', [$user, $order]) }}" method="POST" style="display:none">
-                @csrf @method('DELETE')
-              </form>
-              <button type="button"
-                class="btn btn-sm btn-danger"
-                style="font-size:12px"
-                onclick="openKpiConfirm('delete-form-{{ $order->id }}', 'Xóa đơn hàng', 'Xóa đơn <strong>#{{ $order->id }}</strong> của <strong>{{ addslashes($order->customer_name) }}</strong>? Không thể hoàn tác!', 'danger')">
-                Xóa
-              </button>
-
-            @elseif($order->consultation_status === 'da_tu_van')
-              <button type="button" class="btn btn-sm"
-                style="background:#dcfce7;color:#166534;border-color:#bbf7d0;font-size:12px"
-                onclick="openCloseModal({{ $order->id }}, '{{ addslashes($order->car?->name ?? '') }}', {{ $order->car->price_per_day ?? 0 }})">
-                ✅ Chốt đơn
-              </button>
-
-            @else
-              <span style="font-size:12px;color:var(--text-muted)">Hoàn tất</span>
-            @endif
-
-          </div>
-        </td>
-      </tr>
-      @endforeach
-    </tbody>
-  </table>
   <div style="padding:12px 18px">
     {{ $orders->links() }}
   </div>
@@ -254,8 +415,8 @@ new Chart(document.getElementById('kpiChart').getContext('2d'), {
 @endif
 
 {{-- ── Modal chốt đơn ── --}}
-<div id="close-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.45);backdrop-filter:blur(3px);align-items:center;justify-content:center">
-  <div style="background:#fff;border-radius:14px;padding:28px;width:400px;max-width:calc(100vw - 32px);box-shadow:0 20px 60px rgba(0,0,0,.18);animation:modalIn .18s ease">
+<div id="close-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.45);backdrop-filter:blur(3px);align-items:center;justify-content:center;padding:16px">
+  <div style="background:#fff;border-radius:14px;padding:24px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.18);animation:modalIn .18s ease">
     <div style="font-size:22px;margin-bottom:8px">✅</div>
     <div style="font-weight:700;font-size:16px;margin-bottom:4px">Chốt đơn hàng</div>
     <div id="modal-car-name" style="font-size:13px;color:var(--text-3);margin-bottom:18px"></div>
@@ -267,7 +428,7 @@ new Chart(document.getElementById('kpiChart').getContext('2d'), {
             Giá bán cuối (đ) <span style="color:var(--danger)">*</span>
           </label>
           <input type="number" name="sale_price" id="modal-sale-price" class="form-control"
-            placeholder="5500000000" required oninput="calcModalCommission()">
+            placeholder="5500000000" required oninput="calcModalCommission()" style="width:100%">
         </div>
         <div style="padding:10px 12px;background:#f9fafb;border-radius:8px;font-size:13px">
           Hoa hồng dự tính:
@@ -279,9 +440,9 @@ new Chart(document.getElementById('kpiChart').getContext('2d'), {
         </div>
         <div>
           <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:5px">Ghi chú</label>
-          <textarea name="manager_note" class="form-control" rows="2" placeholder="Ghi chú thêm..."></textarea>
+          <textarea name="manager_note" class="form-control" rows="2" placeholder="Ghi chú thêm..." style="width:100%"></textarea>
         </div>
-        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px">
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px;flex-wrap:wrap">
           <button type="button" onclick="closeCloseModal()" class="btn">Hủy</button>
           <button type="submit" class="btn btn-primary">✅ Xác nhận chốt đơn</button>
         </div>
@@ -290,9 +451,9 @@ new Chart(document.getElementById('kpiChart').getContext('2d'), {
   </div>
 </div>
 
-{{-- ── Modal xác nhận chung (thay confirm()) ── --}}
+{{-- ── Modal xác nhận chung ── --}}
 <div id="kpi-confirm-modal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.45);backdrop-filter:blur(3px);align-items:center;justify-content:center;padding:16px">
-  <div style="background:#fff;border-radius:16px;padding:28px 28px 22px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.18);animation:modalIn .18s ease">
+  <div style="background:#fff;border-radius:16px;padding:28px 24px 22px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.18);animation:modalIn .18s ease">
     <div id="kpi-confirm-icon" style="width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-size:22px"></div>
     <div id="kpi-confirm-title" style="font-size:16px;font-weight:700;color:#111827;margin-bottom:6px"></div>
     <div id="kpi-confirm-message" style="font-size:13.5px;color:#6b7280;line-height:1.5;margin-bottom:22px"></div>
@@ -337,7 +498,7 @@ function calcModalCommission() {
     price > 0 ? ' (' + rate + '%)' : '';
 }
 
-/* ── Confirm modal (thay confirm()) ── */
+/* ── Confirm modal ── */
 const THEMES = {
   info:    { bg:'#eff6ff', icon:'💬', btn:'#2563eb' },
   danger:  { bg:'#fef2f2', icon:'🗑️',  btn:'#dc2626' },

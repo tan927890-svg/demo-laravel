@@ -117,19 +117,27 @@
         <tbody>
           @foreach($payrolls as $payroll)
           @php
-            $validDays   = $payroll->valid_days   ?? 0;
-            $workingDays = $payroll->working_days ?? 30;
-            $isFullMonth = $validDays >= $workingDays;
+            $userName     = $payroll->user?->name     ?? '(Đã xóa)';
+            $userUsername = $payroll->user?->username  ?? '—';
+            $isDeleted    = is_null($payroll->user) || $payroll->user->trashed();
+            $validDays    = $payroll->valid_days   ?? 0;
+            $workingDays  = $payroll->working_days ?? 30;
+            $isFullMonth  = $validDays >= $workingDays;
           @endphp
           <tr>
             <td>
               <div style="display:flex;align-items:center;gap:10px">
-                <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#f97316);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0">
-                  {{ strtoupper(substr($payroll->user->name, 0, 2)) }}
+                <div style="width:34px;height:34px;border-radius:50%;background:{{ $isDeleted ? 'linear-gradient(135deg,#94a3b8,#64748b)' : 'linear-gradient(135deg,#f59e0b,#f97316)' }};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0">
+                  {{ strtoupper(substr($userName, 0, 2)) }}
                 </div>
                 <div>
-                  <div style="font-weight:700;font-size:14px">{{ $payroll->user->name }}</div>
-                  <div style="font-size:12px;color:var(--text-3)">{{ $payroll->user->username }}</div>
+                  <div style="display:flex;align-items:center;gap:6px;font-weight:700;font-size:14px">
+                    {{ $userName }}
+                    @if($isDeleted)
+                      <span style="font-size:10px;font-weight:600;padding:1px 6px;border-radius:99px;background:#fee2e2;color:#dc2626">Đã xóa</span>
+                    @endif
+                  </div>
+                  <div style="font-size:12px;color:var(--text-3)">{{ $userUsername }}</div>
                 </div>
               </div>
             </td>
@@ -177,7 +185,7 @@
                   <button type="button" style="border:none;background:none;padding:0;cursor:pointer"
                           data-form="form-reopen-{{ $payroll->id }}"
                           data-title="Mở lại bảng lương"
-                          data-body="Bảng lương của <strong>{{ e($payroll->user->name) }}</strong> sẽ được mở lại để tính lại."
+                          data-body="Bảng lương của <strong>{{ e($userName) }}</strong> sẽ được mở lại để tính lại."
                           data-ok="🔓 Mở lại"
                           data-type="warning"
                           onclick="triggerConfirm(this)">
@@ -194,7 +202,7 @@
                   <button type="button" style="border:none;background:none;padding:0;cursor:pointer"
                           data-form="form-approve-{{ $payroll->id }}"
                           data-title="Chốt bảng lương"
-                          data-body="Xác nhận chốt lương tháng {{ $payroll->month }}/{{ $payroll->year }} cho <strong>{{ e($payroll->user->name) }}</strong>?"
+                          data-body="Xác nhận chốt lương tháng {{ $payroll->month }}/{{ $payroll->year }} cho <strong>{{ e($userName) }}</strong>?"
                           data-ok="✅ Chốt lương"
                           data-type="primary"
                           onclick="triggerConfirm(this)">
@@ -224,7 +232,7 @@
                           onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='#fff'"
                           data-form="form-delete-{{ $payroll->id }}"
                           data-title="Xoá bảng lương"
-                          data-body="Xoá bảng lương tháng {{ $payroll->month }}/{{ $payroll->year }} của <strong>{{ e($payroll->user->name) }}</strong>? Hành động này không thể hoàn tác."
+                          data-body="Xoá bảng lương tháng {{ $payroll->month }}/{{ $payroll->year }} của <strong>{{ e($userName) }}</strong>? Hành động này không thể hoàn tác."
                           data-ok="🗑️ Xoá"
                           data-type="danger"
                           onclick="triggerConfirm(this)"

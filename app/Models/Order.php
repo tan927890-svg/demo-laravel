@@ -18,6 +18,8 @@ class Order extends Model
         'deposit_amount',
         'note',
         'status',
+        'start_date',
+        'end_date',
         'consultation_status',
         'consulted_at',
         'sale_price',
@@ -28,6 +30,8 @@ class Order extends Model
     ];
 
     protected $casts = [
+        'start_date'   => 'date',
+        'end_date'     => 'date',
         'consulted_at' => 'datetime',
         'closed_at'    => 'datetime',
     ];

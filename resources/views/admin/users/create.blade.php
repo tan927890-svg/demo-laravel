@@ -124,17 +124,16 @@
         <div class="field-group">
           <label class="field-label">Vai trò <span class="req">*</span></label>
           <select name="role" class="field-input" required>
-            <option value="staff"   @selected(old('role')==='staff')>Staff – Nhân viên tư vấn</option>
-            <option value="manager" @selected(old('role')==='manager')>Manager – Quản lý team</option>
+            <option value="staff" @selected(old('role')==='staff')>Staff – Nhân viên tư vấn</option>
             @if(auth()->user()->isAdmin())
-            <option value="admin"   @selected(old('role')==='admin')>Admin – Toàn quyền hệ thống</option>
+              <option value="manager" @selected(old('role')==='manager')>Manager – Quản lý team</option>
             @endif
+            {{-- Không cho phép tạo Admin mới dù bất kỳ ai --}}
           </select>
           @error('role')<div class="field-error">⚠ {{ $message }}</div>@enderror
           <div class="role-info">
             <strong>Staff</strong>: Tạo đơn, tư vấn khách, chấm công GPS<br>
-            <strong>Manager</strong>: Duyệt đơn, nhập giá &amp; hoa hồng, xem báo cáo team<br>
-            <strong>Admin</strong>: Toàn quyền hệ thống
+            <strong>Manager</strong>: Duyệt đơn, nhập giá &amp; hoa hồng, xem báo cáo team
           </div>
         </div>
 

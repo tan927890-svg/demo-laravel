@@ -374,5 +374,281 @@
       }
     ],
     "last_interaction": "2026-05-12T15:50:26.916421"
+  },
+  "Bx9TB6ESzyVGy2V4UwHSjjpEovSvnn8xoB5KHm7d": {
+    "messages": [
+      {
+        "role": "user",
+        "content": "Bảng giá"
+      },
+      {
+        "role": "assistant",
+        "content": "Dưới đây là bảng giá của các dòng xe tại AutoViet:\n- Mercedes-AMG GLE: 5 tỷ 500 triệu - 8 tỷ 900 triệu\n- Mercedes-Benz E-Class: 3 tỷ 250 triệu - 4 tỷ 550 triệu\n- Mercedes-Benz EQS: 7 tỷ 800 triệu - 14 tỷ 200 triệu\n- Mercedes-Benz G-Class: 11 tỷ 500 triệu - 19 tỷ 500 triệu\n- Mercedes-Benz GLE: 4 tỷ 750 triệu - 7 tỷ 800 triệu\n- Mercedes-Benz GLS: 6 tỷ 350 triệu - 12 tỷ 500 triệu\n- Mercedes-Benz S-Class: 8 tỷ 500 triệu - 18 tỷ\n- Mercedes-Benz SL-Class: 7 tỷ 200 triệu - 12 tỷ 800 triệu\n- Mercedes-Maybach GLS: 18 tỷ 900 triệu - 21 tỷ\n- Mercedes-Maybach S-Class: 22 tỷ 500 triệu - 45 tỷ\n- VinFast VF 3: 235 triệu - 265 triệu\n- VinFast VF 5: 458 triệu - 488 triệu\n- VinFast VF 6: 675 triệu - 720 triệu\n- VinFast VF 7: 850 triệu - 950 triệu\n- VinFast VF 8: 1 tỷ 90 triệu - 1 tỷ 190 triệu\n- VinFast VF 9: 1 tỷ 690 triệu - 1 tỷ 890 triệu"
+      },
+      {
+        "role": "user",
+        "content": "Bảng giá"
+      },
+      {
+        "role": "assistant",
+        "content": "Dưới đây là danh sách xe tại AutoViet:\n- Mercedes-AMG GLE: 5 tỷ 500 triệu - 8 tỷ 900 triệu\n- Mercedes-Benz E-Class: 3 tỷ 250 triệu - 4 tỷ 550 triệu\n- Mercedes-Benz EQS: 7 tỷ 800 triệu - 14 tỷ 200 triệu\n- Mercedes-Benz G-Class: 11 tỷ 500 triệu - 19 tỷ 500 triệu\n- Mercedes-Benz GLE: 4 tỷ 750 triệu - 7 tỷ 800 triệu\n- Mercedes-Benz GLS: 6 tỷ 350 triệu - 12 tỷ 500 triệu\n- Mercedes-Benz S-Class: 8 tỷ 500 triệu - 18 tỷ\n- Mercedes-Benz SL-Class: 7 tỷ 200 triệu - 12 tỷ 800 triệu\n- Mercedes-Maybach GLS: 18 tỷ 900 triệu - 21 tỷ\n- Mercedes-Maybach S-Class: 22 tỷ 500 triệu - 45 tỷ\n- VinFast VF 3: 235 triệu - 265 triệu\n- VinFast VF 5: 458 triệu - 488 triệu\n- VinFast VF 6: 675 triệu - 720 triệu\n- VinFast VF 7: 850 triệu - 950 triệu\n- VinFast VF 8: 1 tỷ 90 triệu - 1 tỷ 190 triệu\n- VinFast VF 9: 1 tỷ 690 triệu - 1 tỷ 890 triệu"
+      },
+      {
+        "role": "user",
+        "content": "so sánh vf5 với vf7"
+      },
+      {
+        "role": "assistant",
+        "content": "Dưới đây là so sánh giữa VinFast VF 5 và VinFast VF 7:\n- Giá: VF 5 (458 triệu - 488 triệu), VF 7 (850 triệu - 950 triệu)\n- Màu sắc: VF 5 (Vàng, Xám, Xanh), VF 7 (Đỏ, Trắng, Xám)\n- Thông số:\n  - VF 5: Công suất 100 kW, mô-men xoắn 242 Nm, tăng tốc 0-100 km/h trong 9 giây, tốc độ tối đa 140 km/h\n  - VF 7: Công suất 349 kW, mô-men xoắn 640 Nm, tăng tốc 0-100 km/h trong 5,9 giây, tốc độ tối đa 200 km/h\n- Tính năng:\n  - VF 5: Màn hình 10 inch, Apple CarPlay, Android Auto, ADAS cảnh báo lệch làn, giám sát điểm mù, đỗ xe tự động\n  - VF 7: Màn hình 12,9 inch, ghế da cao cấp, panoramic sunroof, sạc không dây 15W"
+      },
+      {
+        "role": "user",
+        "content": "xe gì đi cho đô thị"
+      },
+      {
+        "role": "assistant",
+        "content": "Dưới đây là một số lựa chọn xe phù hợp cho đô thị:\n- VinFast VF 3: Giá từ 235 triệu, động cơ điện, 4 chỗ ngồi\n- VinFast VF 5: Giá từ 458 triệu, động cơ điện, 5 chỗ ngồi\n- VinFast VF 6: Giá từ 675 triệu, động cơ điện, 5 chỗ ngồi\n\nNhững mẫu xe này đều có thiết kế nhỏ gọn, phù hợp cho việc di chuyển trong đô thị."
+      },
+      {
+        "role": "user",
+        "content": "mvc là gì"
+      },
+      {
+        "role": "assistant",
+        "content": "Mình chỉ có thể tư vấn về xe ô tô, bạn có câu hỏi nào về xe không?"
+      },
+      {
+        "role": "user",
+        "content": "Bảng giá"
+      },
+      {
+        "role": "assistant",
+        "content": "Dưới đây là bảng giá của các dòng xe tại AutoViet:\n- Mercedes-AMG GLE: 5 tỷ 500 triệu - 8 tỷ 900 triệu\n- Mercedes-Benz E-Class: 3 tỷ 250 triệu - 4 tỷ 550 triệu\n- Mercedes-Benz EQS: 7 tỷ 800 triệu - 14 tỷ 200 triệu\n- Mercedes-Benz G-Class: 11 tỷ 500 triệu - 19 tỷ 500 triệu\n- Mercedes-Benz GLE: 4 tỷ 750 triệu - 7 tỷ 800 triệu\n- Mercedes-Benz GLS: 6 tỷ 350 triệu - 12 tỷ 500 triệu\n- Mercedes-Benz S-Class: 8 tỷ 500 triệu - 18 tỷ\n- Mercedes-Benz SL-Class: 7 tỷ 200 triệu - 12 tỷ 800 triệu\n- Mercedes-Maybach GLS: 18 tỷ 900 triệu - 21 tỷ\n- Mercedes-Maybach S-Class: 22 tỷ 500 triệu - 45 tỷ\n- VinFast VF 3: 235 triệu - 265 triệu\n- VinFast VF 5: 458 triệu - 488 triệu\n- VinFast VF 6: 675 triệu - 720 triệu\n- VinFast VF 7: 850 triệu - 950 triệu\n- VinFast VF 8: 1 tỷ 90 triệu - 1 tỷ 190 triệu\n- VinFast VF 9: 1 tỷ 690 triệu - 1 tỷ 890 triệu"
+      },
+      {
+        "role": "user",
+        "content": "[Ảnh — không nhận ra xe]"
+      },
+      {
+        "role": "assistant",
+        "content": "Không nhận diện được xe. Vui lòng gửi ảnh rõ hơn hoặc cho biết tên xe."
+      },
+      {
+        "role": "user",
+        "content": "[Ảnh: VinFast VF 3]"
+      },
+      {
+        "role": "assistant",
+        "content": "Hiện tại showroom **AutoViet** không có **VinFast VF 3** trong kho.\n\nBạn có thể tham khảo các xe đang có:\n- Mercedes-AMG GLE — từ 5 tỷ 500 triệu\n- Mercedes-Benz E-Class — từ 3 tỷ 250 triệu\n- Mercedes-Benz EQS — từ 7 tỷ 800 triệu\n- Mercedes-Benz G-Class — từ 11 tỷ 500 triệu\n- Mercedes-Benz GLE — từ 4 tỷ 750 triệu\n- Mercedes-Benz GLS — từ 6 tỷ 350 triệu\n- Mercedes-Benz S-Class — từ 8 tỷ 500 triệu\n- Mercedes-Benz SL-Class — từ 7 tỷ 200 triệu\n- Mercedes-Maybach GLS — từ 18 tỷ 900 triệu\n- Mercedes-Maybach S-Class — từ 22 tỷ 500 triệu\n- VinFast VF 3 — từ 235 triệu\n- VinFast VF 5 — từ 458 triệu\n- VinFast VF 6 — từ 675 triệu\n- VinFast VF 7 — từ 850 triệu\n- VinFast VF 8 — từ 1 tỷ 90 triệu\n- VinFast VF 9 — từ 1 tỷ 690 triệu\n- VF 9 — từ Liên hệ"
+      }
+    ],
+    "last_interaction": "2026-05-16T15:47:54.340375"
+  },
+  "WbCG1jKtX5oYvXPCXULJ9gbaPL5R6Zrjx2yPxUaH": {
+    "messages": [
+      {
+        "role": "user",
+        "content": "[Ảnh: VinFast VF3]"
+      },
+      {
+        "role": "assistant",
+        "content": "Chúng tôi không có mẫu **VinFast VF3** trong kho.\n\nBạn có thể xem các xe đang có tại showroom:\n- Mercedes-AMG GLE — từ 5 tỷ 500 triệu\n- Mercedes-Benz E-Class — từ 3 tỷ 250 triệu\n- Mercedes-Benz EQS — từ 7 tỷ 800 triệu\n- Mercedes-Benz G-Class — từ 11 tỷ 500 triệu\n- Mercedes-Benz GLE — từ 4 tỷ 750 triệu\n- Mercedes-Benz GLS — từ 6 tỷ 350 triệu\n- Mercedes-Benz S-Class — từ 8 tỷ 500 triệu\n- Mercedes-Benz SL-Class — từ 7 tỷ 200 triệu\n- Mercedes-Maybach GLS — từ 18 tỷ 900 triệu\n- Mercedes-Maybach S-Class — từ 22 tỷ 500 triệu\n- VinFast VF 3 — từ 235 triệu\n- VinFast VF 5 — từ 458 triệu\n- VinFast VF 6 — từ 675 triệu\n- VinFast VF 7 — từ 850 triệu\n- VinFast VF 8 — từ 1 tỷ 90 triệu\n- VinFast VF 9 — từ 1 tỷ 690 triệu\n- test — từ Liên hệ"
+      },
+      {
+        "role": "user",
+        "content": "[Ảnh: VinFast VF3]"
+      },
+      {
+        "role": "assistant",
+        "content": "Chúng tôi không có mẫu **VinFast VF3** trong kho.\n\nBạn có thể xem các xe đang có tại showroom:\n- Mercedes-AMG GLE — từ 5 tỷ 500 triệu\n- Mercedes-Benz E-Class — từ 3 tỷ 250 triệu\n- Mercedes-Benz EQS — từ 7 tỷ 800 triệu\n- Mercedes-Benz G-Class — từ 11 tỷ 500 triệu\n- Mercedes-Benz GLE — từ 4 tỷ 750 triệu\n- Mercedes-Benz GLS — từ 6 tỷ 350 triệu\n- Mercedes-Benz S-Class — từ 8 tỷ 500 triệu\n- Mercedes-Benz SL-Class — từ 7 tỷ 200 triệu\n- Mercedes-Maybach GLS — từ 18 tỷ 900 triệu\n- Mercedes-Maybach S-Class — từ 22 tỷ 500 triệu\n- VinFast VF 3 — từ 235 triệu\n- VinFast VF 5 — từ 458 triệu\n- VinFast VF 6 — từ 675 triệu\n- VinFast VF 7 — từ 850 triệu\n- VinFast VF 8 — từ 1 tỷ 90 triệu\n- VinFast VF 9 — từ 1 tỷ 690 triệu\n- test — từ Liên hệ"
+      },
+      {
+        "role": "user",
+        "content": "[Ảnh: VinFast VF3]"
+      },
+      {
+        "role": "assistant",
+        "content": "Chúng tôi không có mẫu **VinFast VF3** trong kho.\n\nBạn có thể xem các xe đang có tại showroom:\n- Mercedes-AMG GLE — từ 5 tỷ 500 triệu\n- Mercedes-Benz E-Class — từ 3 tỷ 250 triệu\n- Mercedes-Benz EQS — từ 7 tỷ 800 triệu\n- Mercedes-Benz G-Class — từ 11 tỷ 500 triệu\n- Mercedes-Benz GLE — từ 4 tỷ 750 triệu\n- Mercedes-Benz GLS — từ 6 tỷ 350 triệu\n- Mercedes-Benz S-Class — từ 8 tỷ 500 triệu\n- Mercedes-Benz SL-Class — từ 7 tỷ 200 triệu\n- Mercedes-Maybach GLS — từ 18 tỷ 900 triệu\n- Mercedes-Maybach S-Class — từ 22 tỷ 500 triệu\n- VinFast VF 3 — từ 235 triệu\n- VinFast VF 5 — từ 458 triệu\n- VinFast VF 6 — từ 675 triệu\n- VinFast VF 7 — từ 850 triệu\n- VinFast VF 8 — từ 1 tỷ 90 triệu\n- VinFast VF 9 — từ 1 tỷ 690 triệu\n- test — từ Liên hệ"
+      },
+      {
+        "role": "user",
+        "content": "[Ảnh: VinFast VF3]"
+      },
+      {
+        "role": "assistant",
+        "content": "Nhận diện: **VinFast VF 3**\n\n**Phiên bản & Giá:**\n- VF 3 Standard: 235 triệu\n- VF 3 Plus: 265 triệu\n\n**Màu có sẵn:** Vàng Chanh, Xanh Dương, Hồng Pastel\n\nĐặt lịch lái thử: /services/dat-lich"
+      },
+      {
+        "role": "user",
+        "content": "[Ảnh: VinFast VF 7]"
+      },
+      {
+        "role": "assistant",
+        "content": "Nhận diện: **VinFast VF 7**\n\n**Phiên bản & Giá:**\n- VF 7 Base: 850 triệu\n- VF 7 Plus: 950 triệu\n\n**Màu có sẵn:** Đỏ, Trắng, Xám\n\nĐặt lịch lái thử: /services/dat-lich"
+      },
+      {
+        "role": "user",
+        "content": "mvc là gì"
+      },
+      {
+        "role": "assistant",
+        "content": "Mình chỉ có thể tư vấn về xe ô tô, bạn có câu hỏi nào về xe không?"
+      },
+      {
+        "role": "user",
+        "content": "so sánh vf5 và bmw"
+      },
+      {
+        "role": "assistant",
+        "content": "Xe **VinFast VF 5** có giá từ 458 triệu - 488 triệu, còn **BMW** không có trong danh sách xe của chúng tôi. Bạn có muốn so sánh **VinFast VF 5** với các mẫu xe khác không?"
+      },
+      {
+        "role": "user",
+        "content": "Xem tất cả xe"
+      },
+      {
+        "role": "assistant",
+        "content": "Danh sách xe tại AutoViet:\n- Mercedes-AMG GLE — từ 5 tỷ 500 triệu\n- Mercedes-Benz E-Class — từ 3 tỷ 250 triệu\n- Mercedes-Benz EQS — từ 7 tỷ 800 triệu\n- Mercedes-Benz G-Class — từ 11 tỷ 500 triệu\n- Mercedes-Benz GLE — từ 4 tỷ 750 triệu\n- Mercedes-Benz GLS — từ 6 tỷ 350 triệu\n- Mercedes-Benz S-Class — từ 8 tỷ 500 triệu\n- Mercedes-Benz SL-Class — từ 7 tỷ 200 triệu\n- Mercedes-Maybach GLS — từ 18 tỷ 900 triệu\n- Mercedes-Maybach S-Class — từ 22 tỷ 500 triệu\n- VinFast VF 3 — từ 235 triệu\n- VinFast VF 5 — từ 458 triệu\n- VinFast VF 6 — từ 675 triệu\n- VinFast VF 7 — từ 850 triệu\n- VinFast VF 8 — từ 1 tỷ 90 triệu\n- VinFast VF 9 — từ 1 tỷ 690 triệu\n- test — từ Liên hệ\n\nĐể so sánh **VinFast VF 5** và **BMW**, bạn cần chọn mẫu **BMW** cụ thể vì không có thông tin về **BMW** trong danh sách."
+      },
+      {
+        "role": "user",
+        "content": "so sánh bmw với vf5"
+      },
+      {
+        "role": "assistant",
+        "content": "Xe **BMW** không có trong danh sách của chúng tôi. Bạn có thể so sánh **VinFast VF 5** với các mẫu xe khác không?"
+      },
+      {
+        "role": "user",
+        "content": "Xem tất cả xe"
+      },
+      {
+        "role": "assistant",
+        "content": "Danh sách xe tại AutoViet:\n- Mercedes-AMG GLE — từ 5 tỷ 500 triệu\n- Mercedes-Benz E-Class — từ 3 tỷ 250 triệu\n- Mercedes-Benz EQS — từ 7 tỷ 800 triệu\n- Mercedes-Benz G-Class — từ 11 tỷ 500 triệu\n- Mercedes-Benz GLE — từ 4 tỷ 750 triệu\n- Mercedes-Benz GLS — từ 6 tỷ 350 triệu\n- Mercedes-Benz S-Class — từ 8 tỷ 500 triệu\n- Mercedes-Benz SL-Class — từ 7 tỷ 200 triệu\n- Mercedes-Maybach GLS — từ 18 tỷ 900 triệu\n- Mercedes-Maybach S-Class — từ 22 tỷ 500 triệu\n- VinFast VF 3 — từ 235 triệu\n- VinFast VF 5 — từ 458 triệu\n- VinFast VF 6 — từ 675 triệu\n- VinFast VF 7 — từ 850 triệu\n- VinFast VF 8 — từ 1 tỷ 90 triệu\n- VinFast VF 9 — từ 1 tỷ 690 triệu\n- test — từ Liên hệ\n\nĐể so sánh **VinFast VF 5** và **BMW**, bạn cần chọn mẫu **BMW** cụ thể vì không có thông tin về **BMW** trong danh sách."
+      },
+      {
+        "role": "user",
+        "content": "Xem tất cả xe"
+      },
+      {
+        "role": "assistant",
+        "content": "Danh sách xe tại AutoViet:\n- Mercedes-AMG GLE\n- Mercedes-Benz E-Class\n- Mercedes-Benz EQS\n- Mercedes-Benz G-Class\n- Mercedes-Benz GLE\n- Mercedes-Benz GLS\n- Mercedes-Benz S-Class\n- Mercedes-Benz SL-Class\n- Mercedes-Maybach GLS\n- Mercedes-Maybach S-Class\n- VinFast VF 3\n- VinFast VF 5\n- VinFast VF 6\n- VinFast VF 7\n- VinFast VF 8\n- VinFast VF 9\n- test\n\nĐể so sánh **VinFast VF 5** và **BMW**, bạn cần chọn mẫu **BMW** cụ thể vì không có thông tin về **BMW** trong danh sách."
+      },
+      {
+        "role": "user",
+        "content": "Xem tất cả xe"
+      },
+      {
+        "role": "assistant",
+        "content": "Danh sách xe tại Auto X:\n- Mercedes-AMG GLE — từ 5 tỷ 500 triệu\n- Mercedes-Benz E-Class — từ 3 tỷ 250 triệu\n- Mercedes-Benz EQS — từ 7 tỷ 800 triệu\n- Mercedes-Benz G-Class — từ 11 tỷ 500 triệu\n- Mercedes-Benz GLE — từ 4 tỷ 750 triệu\n- Mercedes-Benz GLS — từ 6 tỷ 350 triệu\n- Mercedes-Benz S-Class — từ 8 tỷ 500 triệu\n- Mercedes-Benz SL-Class — từ 7 tỷ 200 triệu\n- Mercedes-Maybach GLS — từ 18 tỷ 900 triệu\n- Mercedes-Maybach S-Class — từ 22 tỷ 500 triệu\n- VinFast VF 3 — từ 235 triệu\n- VinFast VF 5 — từ 458 triệu\n- VinFast VF 6 — từ 675 triệu\n- VinFast VF 7 — từ 850 triệu\n- VinFast VF 8 — từ 1 tỷ 90 triệu\n- VinFast VF 9 — từ 1 tỷ 690 triệu\n- test — từ Liên hệ"
+      },
+      {
+        "role": "user",
+        "content": "Xe điện"
+      },
+      {
+        "role": "assistant",
+        "content": "Danh sách xe điện tại Auto X:\n- Mercedes-Benz EQS — từ 7 tỷ 800 triệu\n- VinFast VF 3 — từ 235 triệu\n- VinFast VF 5 — từ 458 triệu\n- VinFast VF 6 — từ 675 triệu\n- VinFast VF 7 — từ 850 triệu\n- VinFast VF 8 — từ 1 tỷ 90 triệu\n- VinFast VF 9 — từ 1 tỷ 690 triệu\n- test — từ Liên hệ"
+      },
+      {
+        "role": "user",
+        "content": "SUV 7 chỗ"
+      },
+      {
+        "role": "assistant",
+        "content": "Danh sách SUV 7 chỗ tại Auto X:\n- Mercedes-Benz GLS — từ 6 tỷ 350 triệu\n- VinFast VF 8 — từ 1 tỷ 90 triệu\n- VinFast VF 9 — từ 1 tỷ 690 triệu"
+      },
+      {
+        "role": "user",
+        "content": "Xem tất cả xe"
+      },
+      {
+        "role": "assistant",
+        "content": "Danh sách xe tại Auto X:\n- Mercedes-AMG GLE — từ 5 tỷ 500 triệu\n- Mercedes-Benz E-Class — từ 3 tỷ 250 triệu\n- Mercedes-Benz EQS — từ 7 tỷ 800 triệu\n- Mercedes-Benz G-Class — từ 11 tỷ 500 triệu\n- Mercedes-Benz GLE — từ 4 tỷ 750 triệu\n- Mercedes-Benz GLS — từ 6 tỷ 350 triệu\n- Mercedes-Benz S-Class — từ 8 tỷ 500 triệu\n- Mercedes-Benz SL-Class — từ 7 tỷ 200 triệu\n- Mercedes-Maybach GLS — từ 18 tỷ 900 triệu\n- Mercedes-Maybach S-Class — từ 22 tỷ 500 triệu\n- VinFast VF 3 — từ 235 triệu\n- VinFast VF 5 — từ 458 triệu\n- VinFast VF 6 — từ 675 triệu\n- VinFast VF 7 — từ 850 triệu\n- VinFast VF 8 — từ 1 tỷ 90 triệu\n- VinFast VF 9 — từ 1 tỷ 690 triệu\n- test — từ Liên hệ"
+      }
+    ],
+    "last_interaction": "2026-05-23T12:07:00.035548"
+  },
+  "web_g3wixukmkd_1779522038576": {
+    "messages": [
+      {
+        "role": "user",
+        "content": "Xe điện"
+      },
+      {
+        "role": "assistant",
+        "content": "Mình chỉ có thể tư vấn về xe ô tô, bạn có câu hỏi nào về xe không?"
+      },
+      {
+        "role": "user",
+        "content": "Bảng giá"
+      },
+      {
+        "role": "assistant",
+        "content": "Dưới đây là bảng giá các xe ô tô hiện có tại Auto X:\n- Mercedes-AMG GLE: 5 tỷ 500 triệu - 8 tỷ 900 triệu\n- Mercedes-Benz E-Class: 3 tỷ 250 triệu - 4 tỷ 550 triệu\n- Mercedes-Benz EQS: 7 tỷ 800 triệu - 14 tỷ 200 triệu\n- Mercedes-Benz G-Class: 11 tỷ 500 triệu - 19 tỷ 500 triệu\n- Mercedes-Benz GLE: 4 tỷ 750 triệu - 7 tỷ 800 triệu\n- Mercedes-Benz GLS: 6 tỷ 350 triệu - 12 tỷ 500 triệu\n- Mercedes-Benz S-Class: 8 tỷ 500 triệu - 18 tỷ\n- Mercedes-Benz SL-Class: 7 tỷ 200 triệu - 12 tỷ 800 triệu\n- Mercedes-Maybach GLS: 18 tỷ 900 triệu - 21 tỷ\n- Mercedes-Maybach S-Class: 22 tỷ 500 triệu - 45 tỷ\n- VinFast VF 3: 235 triệu - 265 triệu\n- VinFast VF 5: 458 triệu - 488 triệu\n- VinFast VF 6: 675 triệu - 720 triệu\n- VinFast VF 7: 850 triệu - 950 triệu\n- VinFast VF 8: 1 tỷ 90 triệu - 1 tỷ 190 triệu\n- VinFast VF 9: 1 tỷ 690 triệu - 1 tỷ 890 triệu\n\nĐể biết thêm thông tin chi tiết về từng mẫu xe, bạn có thể liên hệ với tôi hoặc truy cập trang web của Auto X."
+      },
+      {
+        "role": "user",
+        "content": "SUV 7 chỗ"
+      },
+      {
+        "role": "assistant",
+        "content": "Dưới đây là danh sách SUV 7 chỗ tại Auto X:\n- Mercedes-Benz GLS: 6 tỷ 350 triệu - 12 tỷ 500 triệu\n- VinFast VF 8: 1 tỷ 90 triệu - 1 tỷ 190 triệu\n- VinFast VF 9: 1 tỷ 690 triệu - 1 tỷ 890 triệu\n\nĐể biết thêm thông tin chi tiết về từng mẫu xe, bạn có thể liên hệ với tôi hoặc truy cập trang web của Auto X."
+      },
+      {
+        "role": "user",
+        "content": "Xe điện"
+      },
+      {
+        "role": "assistant",
+        "content": "Dưới đây là danh sách xe điện tại Auto X:\n- Mercedes-Benz EQS: 7 tỷ 800 triệu - 14 tỷ 200 triệu\n- VinFast VF 3: 235 triệu - 265 triệu\n- VinFast VF 5: 458 triệu - 488 triệu\n- VinFast VF 6: 675 triệu - 720 triệu\n- VinFast VF 7: 850 triệu - 950 triệu\n- VinFast VF 8: 1 tỷ 90 triệu - 1 tỷ 190 triệu\n- VinFast VF 9: 1 tỷ 690 triệu - 1 tỷ 890 triệu\n\nĐể biết thêm thông tin chi tiết về từng mẫu xe, bạn có thể liên hệ với tôi hoặc truy cập trang web của Auto X."
+      },
+      {
+        "role": "user",
+        "content": "Bảng giá"
+      },
+      {
+        "role": "assistant",
+        "content": "Dưới đây là bảng giá các xe ô tô hiện có tại Auto X:\n- Mercedes-AMG GLE: 5 tỷ 500 triệu - 8 tỷ 900 triệu\n- Mercedes-Benz E-Class: 3 tỷ 250 triệu - 4 tỷ 550 triệu\n- Mercedes-Benz EQS: 7 tỷ 800 triệu - 14 tỷ 200 triệu\n- Mercedes-Benz G-Class: 11 tỷ 500 triệu - 19 tỷ 500 triệu\n- Mercedes-Benz GLE: 4 tỷ 750 triệu - 7 tỷ 800 triệu\n- Mercedes-Benz GLS: 6 tỷ 350 triệu - 12 tỷ 500 triệu\n- Mercedes-Benz S-Class: 8 tỷ 500 triệu - 18 tỷ\n- Mercedes-Benz SL-Class: 7 tỷ 200 triệu - 12 tỷ 800 triệu\n- Mercedes-Maybach GLS: 18 tỷ 900 triệu - 21 tỷ\n- Mercedes-Maybach S-Class: 22 tỷ 500 triệu - 45 tỷ\n- VinFast VF 3: 235 triệu - 265 triệu\n- VinFast VF 5: 458 triệu - 488 triệu\n- VinFast VF 6: 675 triệu - 720 triệu\n- VinFast VF 7: 850 triệu - 950 triệu\n- VinFast VF 8: 1 tỷ 90 triệu - 1 tỷ 190 triệu\n- VinFast VF 9: 1 tỷ 690 triệu - 1 tỷ 890 triệu\n\nĐể biết thêm thông tin chi tiết về từng mẫu xe, bạn có thể liên hệ với tôi hoặc truy cập trang web của Auto X."
+      }
+    ],
+    "last_interaction": "2026-05-23T15:49:29.196665"
+  },
+  "xjYsQjYIGzKYwH2VNA0jQATicSuHLtBbDO7UQNWQ": {
+    "messages": [
+      {
+        "role": "user",
+        "content": "[Ảnh: VinFast VF 7]"
+      },
+      {
+        "role": "assistant",
+        "content": "Nhận diện: **VinFast VF 7**\n\n**Phiên bản & Giá:**\n- VF 7 Base: 850 triệu\n- VF 7 Plus: 950 triệu\n\n**Màu có sẵn:** Đỏ, Trắng, Xám\n\nĐặt lịch lái thử: /services/dat-lich"
+      },
+      {
+        "role": "user",
+        "content": "[Ảnh: BMW BMW 5 Series]"
+      },
+      {
+        "role": "assistant",
+        "content": "Showroom không có mẫu BMW BMW 5 Series trong kho.\n\nCác xe đang có tại showroom:\n- Mercedes-AMG GLE — từ 5 tỷ 500 triệu\n- Mercedes-Benz E-Class — từ 3 tỷ 250 triệu\n- Mercedes-Benz EQS — từ 7 tỷ 800 triệu\n- Mercedes-Benz G-Class — từ 11 tỷ 500 triệu\n- Mercedes-Benz GLE — từ 4 tỷ 750 triệu\n- Mercedes-Benz GLS — từ 6 tỷ 350 triệu\n- Mercedes-Benz S-Class — từ 8 tỷ 500 triệu\n- Mercedes-Benz SL-Class — từ 7 tỷ 200 triệu\n- Mercedes-Maybach GLS — từ 18 tỷ 900 triệu\n- Mercedes-Maybach S-Class — từ 22 tỷ 500 triệu\n- VinFast VF 3 — từ 235 triệu\n- VinFast VF 5 — từ 458 triệu\n- VinFast VF 6 — từ 675 triệu\n- VinFast VF 7 — từ 850 triệu\n- VinFast VF 8 — từ 1 tỷ 90 triệu\n- VinFast VF 9 — từ 1 tỷ 690 triệu\n- test — từ Liên hệ"
+      },
+      {
+        "role": "user",
+        "content": "[Ảnh: VinFast VF6]"
+      },
+      {
+        "role": "assistant",
+        "content": "Nhận diện: **VinFast VF 6**\n\n**Phiên bản & Giá:**\n- VF 6 Base: 675 triệu\n- VF 6 Plus: 720 triệu\n\n**Màu có sẵn:** Xanh, Trắng, Xám\n\nĐặt lịch lái thử: /services/dat-lich"
+      },
+      {
+        "role": "user",
+        "content": "[Ảnh: BMW BMW 5 Series]"
+      },
+      {
+        "role": "assistant",
+        "content": "Showroom không có mẫu BMW BMW 5 Series trong kho.\n\nCác xe đang có tại showroom:\n- Mercedes-AMG GLE — từ 5 tỷ 500 triệu\n- Mercedes-Benz E-Class — từ 3 tỷ 250 triệu\n- Mercedes-Benz EQS — từ 7 tỷ 800 triệu\n- Mercedes-Benz G-Class — từ 11 tỷ 500 triệu\n- Mercedes-Benz GLE — từ 4 tỷ 750 triệu\n- Mercedes-Benz GLS — từ 6 tỷ 350 triệu\n- Mercedes-Benz S-Class — từ 8 tỷ 500 triệu\n- Mercedes-Benz SL-Class — từ 7 tỷ 200 triệu\n- Mercedes-Maybach GLS — từ 18 tỷ 900 triệu\n- Mercedes-Maybach S-Class — từ 22 tỷ 500 triệu\n- VinFast VF 3 — từ 235 triệu\n- VinFast VF 5 — từ 458 triệu\n- VinFast VF 6 — từ 675 triệu\n- VinFast VF 7 — từ 850 triệu\n- VinFast VF 8 — từ 1 tỷ 90 triệu\n- VinFast VF 9 — từ 1 tỷ 690 triệu\n- test — từ Liên hệ"
+      }
+    ],
+    "last_interaction": "2026-05-23T15:50:59.676961"
   }
 }
